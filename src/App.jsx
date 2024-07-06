@@ -2,11 +2,12 @@ import { useContext, useEffect } from "react";
 import "./App.scss";
 import { ThemeContext } from "./context/ThemeContext";
 import { DARK_THEME, LIGHT_THEME } from "./constants/themeConstants";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import MoonIcon from "./assets/icons/moon.svg";
 import SunIcon from "./assets/icons/sun.svg";
 import BaseLayout from "./layout/BaseLayout";
 import { Dashboard, PageNotFound } from "./screens";
+import Carousel from "./screens/Carousel/Carousel";
 
 function App() {
   // const { theme, toggleTheme } = useContext(ThemeContext);
@@ -23,15 +24,14 @@ function App() {
   return (
     <>
 
-      <Router>
-        <Routes>
-          <Route element={<BaseLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="*" element={<PageNotFound />} />
-          </Route>
-        </Routes>
+      <Routes>
+        <Route element={<BaseLayout />}>
+          <Route path="/carousel" element={<Carousel />} />
+          <Route path="*" element={<PageNotFound />} />
+        </Route>
+      </Routes>
 
-        {/* <button
+      {/* <button
           type="button"
           className="theme-toggle-btn"
           onClick={toggleTheme}
@@ -41,7 +41,7 @@ function App() {
             src={theme === LIGHT_THEME ? SunIcon : MoonIcon}
           />
         </button> */}
-      </Router>
+
     </>
   );
 }

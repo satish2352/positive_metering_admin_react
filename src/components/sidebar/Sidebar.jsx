@@ -3,6 +3,7 @@ import { ThemeContext } from "../../context/ThemeContext";
 import { LIGHT_THEME } from "../../constants/themeConstants";
 import logo from "../../assets/images/logo.png"
 import { Sidebar as MenuBar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
+import { Link } from "react-router-dom";
 import {
   MdOutlineAttachMoney,
   MdOutlineBarChart,
@@ -20,18 +21,18 @@ import {
   MdViewCarousel,
   MdIntegrationInstructions,
 } from "react-icons/md";
-import { Link } from "react-router-dom";
 import "./Sidebar.scss";
 import { SidebarContext } from "../../context/SidebarContext";
 import { TitleContext } from "../../context/TitleContext";
 let SidebarMenu = [
   {
     menu: "Home",
+    url: "/dashboard",
     mainIcon: <MdHome size={24} />,
     subMenu: [
       {
         subMenus: "Carousel",
-        url: "/dashboard",
+        url: "/carousel",
         icon: <MdViewCarousel style={{ color: 'red' }} size={24} />
       },
       {
@@ -43,11 +44,13 @@ let SidebarMenu = [
   },
   {
     menu: "About",
+    url: "/about",
     mainIcon: <MdIntegrationInstructions size={24} />,
     subMenu: []
   },
   {
     menu: "Logout",
+    url: "/",
     mainIcon: <MdLogout size={24} />,
     subMenu: []
   },
@@ -86,8 +89,8 @@ const Sidebar = () => {
       >
         <div className="sidebar-top">
           <div className="sidebar-brand">
-            <img className="w-12" src={logo} alt="" />
-            <span className="sidebar-brand-text text-red-600">Positive Metering Pvt Ltd</span>
+            <img className="w-25 " src={logo} alt="" />
+            <span className="sidebar-brand-text text-danger">Positive Metering Pvt Ltd</span>
           </div>
           <button className="sidebar-close-btn" onClick={closeSidebar}>
             <MdOutlineClose size={24} />
@@ -104,11 +107,11 @@ const Sidebar = () => {
                         {
                           (item.subMenu).length > 0 ?
                             <>
-                              <SubMenu className="menu-link-text" icon={item.mainIcon} label={item.menu}>
+                              <SubMenu className="menu-link-text bg-white" icon={item.mainIcon} label={item.menu}>
                                 {
                                   item.subMenu.map((items, id) => {
                                     return (
-                                      <MenuItem onClick={() => setTitle(items.subMenus)} icon={items.icon} className="menu-link-text">{items.subMenus}</MenuItem>
+                                      <MenuItem onClick={() => setTitle(items.subMenus)} icon={items.icon} className="menu-link-text bg-white"><Link to={items.url} className="text-decoration-none text-black">{items.subMenus}</Link></MenuItem>
 
                                     )
                                   })
@@ -116,7 +119,7 @@ const Sidebar = () => {
                               </SubMenu>
                             </>
                             :
-                            <MenuItem icon={item.mainIcon} className="menu-link-text">{item.menu}</MenuItem>
+                            <MenuItem icon={item.mainIcon} className="menu-link-text bg-white"><Link to={item.url} className="text-decoration-none text-black">{item.menu}</Link></MenuItem>
                         }
 
                       </>
