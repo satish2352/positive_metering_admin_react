@@ -1,8 +1,7 @@
 import { useContext, useEffect, useRef } from "react";
 import { ThemeContext } from "../../context/ThemeContext";
 import { LIGHT_THEME } from "../../constants/themeConstants";
-import LogoBlue from "../../assets/images/logo_blue.svg";
-import LogoWhite from "../../assets/images/logo_white.svg";
+import logo from "../../assets/images/logo.png"
 import { Sidebar as MenuBar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import {
   MdOutlineAttachMoney,
@@ -15,23 +14,41 @@ import {
   MdOutlinePeople,
   MdOutlineSettings,
   MdOutlineShoppingBag,
+  MdHome,
+  MdSlideshow,
+  MdLogout,
+  MdViewCarousel,
+  MdIntegrationInstructions,
 } from "react-icons/md";
 import { Link } from "react-router-dom";
 import "./Sidebar.scss";
 import { SidebarContext } from "../../context/SidebarContext";
+import { TitleContext } from "../../context/TitleContext";
 let SidebarMenu = [
   {
     menu: "Home",
+    mainIcon: <MdHome size={24} />,
     subMenu: [
       {
-        subMenus: "Home1",
+        subMenus: "Carousel",
         url: "/dashboard",
-        // icon:<xyz/>
-      }
+        icon: <MdViewCarousel style={{ color: 'red' }} size={24} />
+      },
+      {
+        subMenus: "Infrastructure",
+        url: "/infrastructure",
+        icon: <MdViewCarousel style={{ color: 'red' }} size={24} />
+      },
     ]
   },
   {
     menu: "About",
+    mainIcon: <MdIntegrationInstructions size={24} />,
+    subMenu: []
+  },
+  {
+    menu: "Logout",
+    mainIcon: <MdLogout size={24} />,
     subMenu: []
   },
 ]
@@ -39,6 +56,7 @@ const Sidebar = () => {
   const { theme } = useContext(ThemeContext);
   const { isSidebarOpen, closeSidebar } = useContext(SidebarContext);
   const navbarRef = useRef(null);
+  const { setTitle } = useContext(TitleContext)
 
   // closing the navbar when clicked outside the sidebar area
   const handleClickOutside = (event) => {
@@ -68,8 +86,8 @@ const Sidebar = () => {
       >
         <div className="sidebar-top">
           <div className="sidebar-brand">
-            <img src={theme === LIGHT_THEME ? LogoBlue : LogoWhite} alt="" />
-            <span className="sidebar-brand-text">tabernam.</span>
+            <img className="w-12" src={logo} alt="" />
+            <span className="sidebar-brand-text text-red-600">Positive Metering Pvt Ltd</span>
           </div>
           <button className="sidebar-close-btn" onClick={closeSidebar}>
             <MdOutlineClose size={24} />
@@ -86,19 +104,19 @@ const Sidebar = () => {
                         {
                           (item.subMenu).length > 0 ?
                             <>
-                              {
-                                item.subMenu.map((items, id) => {
-                                  return (
-                                    <SubMenu label={item.menu}>
-                                      <MenuItem>{items.subMenus}</MenuItem>
-                                    </SubMenu>
+                              <SubMenu className="menu-link-text" icon={item.mainIcon} label={item.menu}>
+                                {
+                                  item.subMenu.map((items, id) => {
+                                    return (
+                                      <MenuItem onClick={() => setTitle(items.subMenus)} icon={items.icon} className="menu-link-text">{items.subMenus}</MenuItem>
 
-                                  )
-                                })
-                              }
+                                    )
+                                  })
+                                }
+                              </SubMenu>
                             </>
                             :
-                            <MenuItem>{item.menu}</MenuItem>
+                            <MenuItem icon={item.mainIcon} className="menu-link-text">{item.menu}</MenuItem>
                         }
 
                       </>
@@ -107,7 +125,7 @@ const Sidebar = () => {
                 }
               </Menu>
             </MenuBar>
-            <ul className="menu-list">
+            {/* <ul className="menu-list">
 
               <li className="menu-item">
                 <Link to="/" className="menu-link active">
@@ -165,10 +183,10 @@ const Sidebar = () => {
                   <span className="menu-link-text">Messages</span>
                 </Link>
               </li>
-            </ul>
+            </ul> */}
           </div>
 
-          <div className="sidebar-menu sidebar-menu2">
+          {/* <div className="sidebar-menu sidebar-menu2">
             <ul className="menu-list">
               <li className="menu-item">
                 <Link to="/" className="menu-link">
@@ -187,7 +205,7 @@ const Sidebar = () => {
                 </Link>
               </li>
             </ul>
-          </div>
+          </div> */}
         </div>
       </nav>
     </>

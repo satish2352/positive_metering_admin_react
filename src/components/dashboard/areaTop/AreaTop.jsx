@@ -6,10 +6,12 @@ import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
 import { addDays } from "date-fns";
 import { DateRange } from "react-date-range";
+import { Button } from "@material-tailwind/react";
+import { TitleContext } from "../../../context/TitleContext";
 
 const AreaTop = () => {
   const { openSidebar } = useContext(SidebarContext);
-
+  const { title } = useContext(TitleContext)
   const [state, setState] = useState([
     {
       startDate: new Date(),
@@ -39,7 +41,7 @@ const AreaTop = () => {
   }, []);
 
   return (
-    <section className="content-area-top">
+    <section className="content-area-top bg-white p-5">
       <div className="area-top-l">
         <button
           className="sidebar-open-btn"
@@ -48,24 +50,11 @@ const AreaTop = () => {
         >
           <MdOutlineMenu size={24} />
         </button>
-        <h2 className="area-top-title">Dashboard</h2>
+        <h2 className="area-top-title text-2xl">{title || "Carousel"}</h2>
       </div>
       <div className="area-top-r">
-        <div
-          ref={dateRangeRef}
-          className={`date-range-wrapper ${
-            !showDatePicker ? "hide-date-range" : ""
-          }`}
-          onClick={handleInputClick}
-        >
-          <DateRange
-            editableDateInputs={true}
-            onChange={(item) => setState([item.selection])}
-            moveRangeOnFirstSelection={false}
-            ranges={state}
-            showMonthAndYearPickers={false}
-          />
-        </div>
+      <Button>Button</Button> 
+        
       </div>
     </section>
   );
