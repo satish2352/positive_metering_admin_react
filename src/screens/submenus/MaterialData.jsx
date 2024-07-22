@@ -1,6 +1,5 @@
 
-
-// ////new works 
+// ////made post and put independent properly
 // import React, { useState, useEffect, useContext } from "react";
 // import { Container, Row, Col, Card, Button, Form, Table } from "react-bootstrap";
 // import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -14,7 +13,7 @@
 // import ReusableDropdown from "../../components/dropdown/ReusableDropdown";
 // import instance from "../../api/AxiosInstance";
 
-// const TechnicalData = () => {
+// const MaterialData = () => {
 //   const { searchQuery, handleSearch, handleExport, setData, filteredData } = useSearchExport();
 //   const { shows, toggleForm, toggleShow } = useContext(ShowContext);
 //   const [team, setTeam] = useState([]);
@@ -24,11 +23,10 @@
 //   const [formData, setFormData] = useState({});
 //   const [eyeVisibilityById, setEyeVisibilityById] = useState({});
 
-//   const tableColumns = [
-//     { key: "productName", label: "Product Name" },
-//     { key: "technicalDescription", label: "Technical Description" },
-//   ];
-
+  // const tableColumns = [
+  //   { key: "productName", label: "Product Name" },
+  //   { key: "materialDescription", label: "Technical Description" },
+  // ];
 
 //   useEffect(() => {
 //     fetchTeam();
@@ -37,7 +35,7 @@
 //   const fetchTeam = async () => {
 //     const accessToken = localStorage.getItem("accessToken");
 //     try {
-//       const response = await instance.get("technicalData/get-technicaldata", {
+//       const response = await instance.get("materialData/get-materialData", {
 //         headers: {
 //           Authorization: `Bearer ${accessToken}`,
 //           "Content-Type": "application/json",
@@ -54,37 +52,18 @@
 //     let errors = {};
 //     let isValid = true;
 
-//     if (!formData.cv) {
-//       errors.cv = "Cv is required";
+//     if (!formData.img) {
+//       errors.img = "Image is required";
 //       isValid = false;
 //     }
 
-//     if (!formData.name?.trim()) {
-//       errors.name = "Name is required";
+//     if (!formData.productName?.trim()) {
+//       errors.productName = "Product Name is required";
 //       isValid = false;
 //     }
 
-//     if (!formData.email?.trim()) {
-//       errors.email = "Email is required";
-//       isValid = false;
-//     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-//       errors.email = "Invalid email address";
-//       isValid = false;
-//     }
-
-//     if (!formData.phone?.trim()) {
-//       errors.phone = "Phone number is required";
-//       isValid = false;
-//     } else if (!/^\d{10}$/.test(formData.phone)) {
-//       errors.phone = "Phone number must be exactly 10 digits";
-//       isValid = false;
-//     }
-//     if (!formData.subject?.trim()) {
-//       errors.subject = "Subject is required";
-//       isValid = false;
-//     }
-//     if (!formData.message?.trim()) {
-//       errors.message = "Message is required";
+//     if (!formData.materialDescription?.trim()) {
+//       errors.materialDescription = "Technical Description is required";
 //       isValid = false;
 //     }
 
@@ -101,7 +80,7 @@
 //       }
 
 //       try {
-//         await instance.post("technicalData/create-technicaldata", data, {
+//         await instance.post("materialData/create-materialData", data, {
 //           headers: {
 //             Authorization: `Bearer ${accessToken}`,
 //             "Content-Type": "multipart/form-data",
@@ -128,7 +107,7 @@
 
 //       try {
 //         await instance.put(
-//           `technicalData/update-technicaldata/${editingId}`,
+//           `materialData/update-materialData/${editingId}`,
 //           data,
 //           {
 //             headers: {
@@ -153,7 +132,7 @@
 //     const accessToken = localStorage.getItem("accessToken");
 //     try {
 //       await instance.patch(
-//         `technicalData/delete-technical/${id}`,
+//         `materialData/delete-material/${id}`,
 //         {},
 //         {
 //           headers: {
@@ -173,7 +152,7 @@
 //     const accessToken = localStorage.getItem("accessToken");
 //     try {
 //       await instance.patch(
-//         `technicalData/isactive-technicalData/${id}`,
+//         `productdetails/isactive-productdetails/${id}`,
 //         { isVisible },
 //         {
 //           headers: {
@@ -279,34 +258,32 @@
 //             <Card className="p-4">
 //               <Form>
 //                 <Row>
-//                 <Col md={6}>
-//                     <ReusableDropdown
-//                       label="Product Name"
-//                       name="productName"
-//                       onChange={handleChange}
-//                       initialData={formData}
-//                     />
-//                     {errors.productName && (
-//                       <p className="text-danger">{errors.productName}</p>
-//                     )}
-//                   </Col>
-//                   <Col md={6}>
-//                     <NewResuableForm
-//                       label="technicalDescription"
-//                       placeholder="Enter Technical Description"
-//                       name="technicalDescription"
-//                       type="text"
-//                       onChange={handleChange}
-//                       initialData={formData}
-//                       textarea
-//                       useJodit={true}
-//                     />
-//                     {errors.technicalDescription && (
-//                       <p className="text-danger">
-//                         {errors.technicalDescription}
-//                       </p>
-//                     )}
-//                   </Col>
+                  // <Col md={6}>
+                  //   <ReusableDropdown
+                  //     label="Product Name"
+                  //     name="productName"
+                  //     onChange={handleChange}
+                  //     initialData={formData}
+                  //   />
+                  //   {errors.productName && (
+                  //     <p className="text-danger">{errors.productName}</p>
+                  //   )}
+                  // </Col>
+                  // <Col md={6}>
+                  //   <NewResuableForm
+                  //     label="materialDescription"
+                  //     placeholder="Enter materialDescription"
+                  //     name="materialDescription"
+                  //     type="text"
+                  //     onChange={handleChange}
+                  //     initialData={formData}
+                  //     textarea
+                  //     useJodit={true}
+                  //   />
+                  //   {errors.materialDescription && (
+                  //     <p className="text-danger">{errors.materialDescription}</p>
+                  //   )}
+                  // </Col>
 //                 </Row>
 //                 <Row>
 //                   <Col className="d-flex justify-content-end">
@@ -346,21 +323,13 @@
 //   );
 // };
 
-// export default TechnicalData;
+// export default MaterialData;
 
 
 
 
 
-
-
-
-
-
-
-
-
-////works delete only
+////
 import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Card, Button, Form, Table } from "react-bootstrap";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -374,7 +343,7 @@ import TablePagination from "../../components/pagination/TablePagination";
 import ReusableDropdown from "../../components/dropdown/ReusableDropdown";
 import instance from "../../api/AxiosInstance";
 
-const TechnicalData = () => {
+const MaterialData = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } = useSearchExport();
   const { shows, toggleForm, toggleShow } = useContext(ShowContext);
   const [team, setTeam] = useState([]);
@@ -386,7 +355,7 @@ const TechnicalData = () => {
 
   const tableColumns = [
     { key: "productName", label: "Product Name" },
-    { key: "technicalDescription", label: "Technical Description" },
+    { key: "materialDescription", label: "Technical Description" },
   ];
 
   useEffect(() => {
@@ -396,7 +365,7 @@ const TechnicalData = () => {
   const fetchTeam = async () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      const response = await instance.get("technicalData/get-technicaldata", {
+      const response = await instance.get("materialData/get-materialdata", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
@@ -418,46 +387,41 @@ const TechnicalData = () => {
       isValid = false;
     }
 
-    if (!formData.technicalDescription?.trim()) {
-      errors.technicalDescription = "Technical Description is required";
+    if (!formData.materialDescription?.trim()) {
+      errors.materialDescription = "Technical Description is required";
       isValid = false;
     }
 
     setErrors(errors);
     return isValid;
   };
+
   const handlePost = async () => {
-    try {
-      if (validateForm(formData)) {
-        const accessToken = localStorage.getItem("accessToken");
-        const data = new FormData();
-        for (const key in formData) {
-          data.append(key, formData[key]);
-        }
-  
-        const response = await instance.post("technicalData/create-technicaldata", data, {
+    if (validateForm(formData)) {
+      const accessToken = localStorage.getItem("accessToken");
+      const data = new FormData();
+      for (const key in formData) {
+        data.append(key, formData[key]);
+      }
+
+      try {
+        await instance.post("materialData/create-materialdata", data, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/form-data",
           },
         });
-  
-        if (response.status === 200) {
-          toast.success("Data Submitted Successfully");
-          fetchTeam();
-          toggleForm();
-          toggleShow();
-          setFormData({});
-        } else {
-          toast.error("Failed to submit data");
-        }
+        toast.success("Data Submitted Successfully");
+        fetchTeam();
+        toggleForm();
+        toggleShow();
+        setFormData({});
+      } catch (error) {
+        console.error("Error handling form submission:", error);
+        toast.error("Error handling form submission");
       }
-    } catch (error) {
-      console.error("Error handling form submission:", error);
-      toast.error("Error handling form submission");
     }
   };
-  
 
   const handlePut = async () => {
     if (validateForm(formData)) {
@@ -469,7 +433,7 @@ const TechnicalData = () => {
 
       try {
         await instance.put(
-          `technicalData/update-technicaldata/${editingId}`,
+          `materialData/update-materialdata/${editingId}`,
           data,
           {
             headers: {
@@ -495,7 +459,7 @@ const TechnicalData = () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
       await instance.patch(
-        `technicalData/delete-technical/${id}`,
+        `materialData/delete-material/${id}`,
         {},
         {
           headers: {
@@ -516,7 +480,7 @@ const TechnicalData = () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
       await instance.patch(
-        `technicalData/isactive-technicalData/${id}`,
+        `materialData/isactive-materialData/${id}`,
         { isVisible },
         {
           headers: {
@@ -563,7 +527,6 @@ const TechnicalData = () => {
   const handleChange = (name, value) => {
     setFormData({ ...formData, [name]: value });
   };
-  
 
   return (
     <Container>
@@ -624,7 +587,7 @@ const TechnicalData = () => {
             <Card className="p-4">
               <Form>
                 <Row>
-                  <Col md={6}>
+                <Col md={6}>
                     <ReusableDropdown
                       label="Product Name"
                       name="productName"
@@ -637,17 +600,17 @@ const TechnicalData = () => {
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
-                      label="Technical Description"
-                      placeholder="Enter Technical Description"
-                      name="technicalDescription"
+                      label="materialDescription"
+                      placeholder="Enter materialDescription"
+                      name="materialDescription"
                       type="text"
                       onChange={handleChange}
                       initialData={formData}
                       textarea
                       useJodit={true}
                     />
-                    {errors.technicalDescription && (
-                      <p className="text-danger">{errors.technicalDescription}</p>
+                    {errors.materialDescription && (
+                      <p className="text-danger">{errors.materialDescription}</p>
                     )}
                   </Col>
                 </Row>
@@ -689,17 +652,4 @@ const TechnicalData = () => {
   );
 };
 
-export default TechnicalData;
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default MaterialData;

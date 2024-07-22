@@ -1,10 +1,9 @@
-
-//////sos
-import React, { useState, useEffect } from "react";
+////sos success
+import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
-import NewReusableForm from "../../components/form/NewResuableForm";
+import NewResuableForm from "../../components/form/NewResuableForm";
 import ReusableTable from "../../components/table/ReusableTable";
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
@@ -12,10 +11,10 @@ import "react-toastify/dist/ReactToastify.css";
 import TablePagination from "../../components/pagination/TablePagination";
 import instance from "../../api/AxiosInstance";
 
-const Carousal = () => {
+const Subscribe = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-  const { shows, toggleForm, toggleShow } = React.useContext(ShowContext);
+  const { shows, toggleForm, toggleShow } = useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -23,21 +22,7 @@ const Carousal = () => {
   const [formData, setFormData] = useState({});
 
   const tableColumns = [
-    {
-      key: "img",
-      label: "Image",
-      render: (value) => (
-        <img
-          src={value}
-          alt="Carousel"
-          style={{ width: "100px", height: "auto" }}
-        />
-
-      ),
-
-
-   
-    },
+    { key: "email", label: "Email" },
   ];
 
   useEffect(() => {
@@ -47,16 +32,16 @@ const Carousal = () => {
   const fetchTeam = async () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      const response = await instance.get("carrousal/find-carrousal", {
+      const response = await instance.get("subscribe/find-subscribedemail", {
         headers: {
-          Authorization: "Bearer " + accessToken,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
       });
       setTeam(response.data.responseData);
       setData(response.data.responseData);
     } catch (error) {
-      console.error("Error fetching team:", error);
+      console.error("Error fetching subscribe data:", error);
     }
   };
 
@@ -64,8 +49,11 @@ const Carousal = () => {
     let errors = {};
     let isValid = true;
 
-    if (!formData.img) {
-      errors.img = "Image is required";
+    if (!formData.email?.trim()) {
+      errors.email = "Email is required";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Invalid email format";
       isValid = false;
     }
 
@@ -73,90 +61,40 @@ const Carousal = () => {
     return isValid;
   };
 
-  const handleSubmit = async (e) => {
+  const handlePostSubmit = async (data) => {
+    try {
+      await instance.post("subscribe/add-subscribeemail", data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      toast.success("Data Submitted Successfully");
+      fetchTeam();
+      toggleForm();
+      toggleShow();
+      setEditMode(false);
+      setFormData({ email: "" });
+    } catch (error) {
+      console.error("Error handling form submission:", error);
+    }
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm(formData)) {
-      const accessToken = localStorage.getItem("accessToken");
-      const data = new FormData();
-      for (const key in formData) {
-        data.append(key, formData[key]);
-      }
-
-      try {
-        if (editMode) {
-          await instance.put(`carrousal/update-carrousal/${editingId}`, data, {
-            headers: {
-              Authorization: "Bearer " + accessToken,
-              "Content-Type": "multipart/form-data",
-            },
-          });
-          toast.success("Data Updated Successfully");
-        } else {
-          await instance.post("carrousal/create-carrousal", data, {
-            headers: {
-              Authorization: "Bearer " + accessToken,
-              "Content-Type": "multipart/form-data",
-            },
-          });
-          toast.success("Data Submitted Successfully");
-        }
-        fetchTeam();
-        toggleForm();
-        toggleShow();
-        setEditMode(false);
-        setFormData({});
-      } catch (error) {
-        console.error("Error handling form submission:", error);
+      const data = { ...formData };
+      if (editMode) {
+        handlePutSubmit(data);
+      } else {
+        handlePostSubmit(data);
       }
     }
   };
 
-  const handleDelete = async (id) => {
-    const accessToken = localStorage.getItem("accessToken");
-    try {
-      await instance.patch(
-        `carrousal/isdelete-carrousal/${id}`,
-        {},
-        {
-          headers: {
-            Authorization: "Bearer " + accessToken,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      toast.success("Data Deleted Successfully");
-      fetchTeam();
-    } catch (error) {
-      console.error("Error deleting team member:", error);
-      toast.error("Error deleting data");
-    }
-  };
-
-  const handleIsActive = async (id, isVisible) => {
-    const accessToken = localStorage.getItem("accessToken");
-    try {
-      await instance.patch(
-        `carrousal/isactive-carrousal/${id}`,
-        { isVisible },
-        {
-          headers: {
-            Authorization: "Bearer " + accessToken,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      toast.success("Visibility Updated Successfully");
-      fetchTeam();
-    } catch (error) {
-      console.error("Error updating visibility:", error);
-      toast.error("Error updating data");
-    }
-  };
-
-  const toggleEdit = (leaderId) => {
-    const memberToEdit = team.find((item) => item.id === leaderId);
+  const toggleEdit = (id) => {
+    const memberToEdit = team.find((item) => item.id === id);
     if (memberToEdit) {
-      setEditingId(leaderId);
+      setEditingId(id);
       setEditMode(true);
       toggleForm();
       toggleShow();
@@ -168,7 +106,7 @@ const Carousal = () => {
     if (shows) {
       setEditMode(false);
       setEditingId(null);
-      setFormData({});
+      setFormData({ email: "" });
     }
   }, [shows]);
 
@@ -195,23 +133,23 @@ const Carousal = () => {
               columns={tableColumns}
               data={searchQuery.trim() ? filteredData : team}
               onEdit={toggleEdit}
-              onDelete={handleDelete}
-              onShow={handleIsActive}
             />
           ) : (
             <Card className="p-4">
               <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col md={6}>
-                    <NewReusableForm
-                      label={"Image Upload"}
-                      placeholder={"Upload Image"}
-                      name={"img"}
-                      type={"file"}
+                    <NewResuableForm
+                      label="Email"
+                      placeholder="Enter Email"
+                      type="text"
+                      name="email"
                       onChange={handleChange}
                       initialData={formData}
                     />
-                    {errors.img && <p className="text-danger">{errors.img}</p>}
+                    {errors.email && (
+                      <span className="error text-danger">{errors.email}</span>
+                    )}
                   </Col>
                 </Row>
                 <Row>
@@ -221,7 +159,7 @@ const Carousal = () => {
                       variant="secondary"
                       className="me-2"
                       onClick={() => {
-                        setFormData({});
+                        setFormData({ email: "" });
                         toggleForm();
                         toggleShow();
                         setEditMode(false);
@@ -251,4 +189,4 @@ const Carousal = () => {
   );
 };
 
-export default Carousal;
+export default Subscribe;

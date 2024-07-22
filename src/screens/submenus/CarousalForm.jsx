@@ -1,34 +1,37 @@
 
 
-// ////new works 
-// import React, { useState, useEffect, useContext } from "react";
-// import { Container, Row, Col, Card, Button, Form, Table } from "react-bootstrap";
-// import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
+
+
+
+
+// //////
+// import React, { useState, useEffect } from "react";
+// import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
 // import { useSearchExport } from "../../context/SearchExportContext";
 // import { ShowContext } from "../../context/ShowContext";
 // import NewResuableForm from "../../components/form/NewResuableForm";
+// import ReusableTable from "../../components/table/ReusableTable";
 // import SearchInput from "../../components/search/SearchInput";
 // import { toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 // import TablePagination from "../../components/pagination/TablePagination";
-// import ReusableDropdown from "../../components/dropdown/ReusableDropdown";
 // import instance from "../../api/AxiosInstance";
 
-// const TechnicalData = () => {
+// const CarousalForm = () => {
 //   const { searchQuery, handleSearch, handleExport, setData, filteredData } = useSearchExport();
-//   const { shows, toggleForm, toggleShow } = useContext(ShowContext);
+//   const { shows, toggleForm, toggleShow } = React.useContext(ShowContext);
 //   const [team, setTeam] = useState([]);
 //   const [errors, setErrors] = useState({});
 //   const [editMode, setEditMode] = useState(false);
 //   const [editingId, setEditingId] = useState(null);
 //   const [formData, setFormData] = useState({});
-//   const [eyeVisibilityById, setEyeVisibilityById] = useState({});
 
-//   const tableColumns = [
-//     { key: "productName", label: "Product Name" },
-//     { key: "technicalDescription", label: "Technical Description" },
-//   ];
-
+  // const tableColumns = [
+  //   { key: "name", label: "Name" },
+  //   { key: "email", label: "Email" },
+  //   { key: "mobile", label: "Mobile" },
+  //   { key: "message", label: "Message" },
+  // ];
 
 //   useEffect(() => {
 //     fetchTeam();
@@ -37,7 +40,7 @@
 //   const fetchTeam = async () => {
 //     const accessToken = localStorage.getItem("accessToken");
 //     try {
-//       const response = await instance.get("technicalData/get-technicaldata", {
+//       const response = await instance.get("carousal-form/find-carousalform", {
 //         headers: {
 //           Authorization: `Bearer ${accessToken}`,
 //           "Content-Type": "application/json",
@@ -46,53 +49,47 @@
 //       setTeam(response.data.responseData);
 //       setData(response.data.responseData);
 //     } catch (error) {
-//       console.error("Error fetching product data:", error);
+//       console.error("Error fetching team:", error);
+//       toast.error("Error fetching team data.");
 //     }
 //   };
 
-//   const validateForm = (formData) => {
-//     let errors = {};
-//     let isValid = true;
+  // const validateForm = (data) => {
+  //   let errors = {};
+  //   let isValid = true;
 
-//     if (!formData.cv) {
-//       errors.cv = "Cv is required";
-//       isValid = false;
-//     }
+  //   if (!data.name?.trim()) {
+  //     errors.name = "Name is required";
+  //     isValid = false;
+  //   }
 
-//     if (!formData.name?.trim()) {
-//       errors.name = "Name is required";
-//       isValid = false;
-//     }
+  //   if (!data.email?.trim()) {
+  //     errors.email = "Email is required";
+  //     isValid = false;
+  //   } else if (!/\S+@\S+\.\S+/.test(data.email)) {
+  //     errors.email = "Invalid email address";
+  //     isValid = false;
+  //   }
 
-//     if (!formData.email?.trim()) {
-//       errors.email = "Email is required";
-//       isValid = false;
-//     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-//       errors.email = "Invalid email address";
-//       isValid = false;
-//     }
+  //   if (!data.mobile?.trim()) {
+  //     errors.mobile = "Mobile number is required";
+  //     isValid = false;
+  //   } else if (!/^\d{10}$/.test(data.mobile)) {
+  //     errors.mobile = "Mobile number must be exactly 10 digits";
+  //     isValid = false;
+  //   }
 
-//     if (!formData.phone?.trim()) {
-//       errors.phone = "Phone number is required";
-//       isValid = false;
-//     } else if (!/^\d{10}$/.test(formData.phone)) {
-//       errors.phone = "Phone number must be exactly 10 digits";
-//       isValid = false;
-//     }
-//     if (!formData.subject?.trim()) {
-//       errors.subject = "Subject is required";
-//       isValid = false;
-//     }
-//     if (!formData.message?.trim()) {
-//       errors.message = "Message is required";
-//       isValid = false;
-//     }
+  //   if (!data.message?.trim()) {
+  //     errors.message = "Message is required";
+  //     isValid = false;
+  //   }
 
-//     setErrors(errors);
-//     return isValid;
-//   };
+  //   setErrors(errors);
+  //   return isValid;
+  // };
 
-//   const handlePost = async () => {
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
 //     if (validateForm(formData)) {
 //       const accessToken = localStorage.getItem("accessToken");
 //       const data = new FormData();
@@ -101,50 +98,35 @@
 //       }
 
 //       try {
-//         await instance.post("technicalData/create-technicaldata", data, {
-//           headers: {
-//             Authorization: `Bearer ${accessToken}`,
-//             "Content-Type": "multipart/form-data",
-//           },
-//         });
-//         toast.success("Data Submitted Successfully");
-//         fetchTeam();
-//         toggleForm();
-//         toggleShow();
-//         setFormData({});
-//       } catch (error) {
-//         console.error("Error handling form submission:", error);
-//       }
-//     }
-//   };
-
-//   const handlePut = async () => {
-//     if (validateForm(formData)) {
-//       const accessToken = localStorage.getItem("accessToken");
-//       const data = new FormData();
-//       for (const key in formData) {
-//         data.append(key, formData[key]);
-//       }
-
-//       try {
-//         await instance.put(
-//           `technicalData/update-technicaldata/${editingId}`,
-//           data,
-//           {
+//         if (editMode) {
+//           await instance.put(
+//             `carousal-form/update/${editingId}`,
+//             data,
+//             {
+//               headers: {
+//                 Authorization: `Bearer ${accessToken}`,
+//                 "Content-Type": "multipart/form-data",
+//               },
+//             }
+//           );
+//           toast.success("Data Updated Successfully");
+//         } else {
+//           await instance.post("carousal-form/addcarousalform", data, {
 //             headers: {
 //               Authorization: `Bearer ${accessToken}`,
 //               "Content-Type": "multipart/form-data",
 //             },
-//           }
-//         );
-//         toast.success("Data Updated Successfully");
+//           });
+//           toast.success("Data Submitted Successfully");
+//         }
 //         fetchTeam();
 //         toggleForm();
 //         toggleShow();
 //         setEditMode(false);
 //         setFormData({});
 //       } catch (error) {
-//         console.error("Error handling form update:", error);
+//         console.error("Error handling form submission:", error);
+//         toast.error("Error submitting data.");
 //       }
 //     }
 //   };
@@ -153,7 +135,7 @@
 //     const accessToken = localStorage.getItem("accessToken");
 //     try {
 //       await instance.patch(
-//         `technicalData/delete-technical/${id}`,
+//         `carousal-form/delete/${id}`,
 //         {},
 //         {
 //           headers: {
@@ -165,7 +147,8 @@
 //       toast.success("Data Deleted Successfully");
 //       fetchTeam();
 //     } catch (error) {
-//       console.error("Error deleting product:", error);
+//       console.error("Error deleting team member:", error);
+//       toast.error("Error deleting data.");
 //     }
 //   };
 
@@ -173,7 +156,7 @@
 //     const accessToken = localStorage.getItem("accessToken");
 //     try {
 //       await instance.patch(
-//         `technicalData/isactive-technicalData/${id}`,
+//         `testimonials/isactive-testimonial/${id}`,
 //         { isVisible },
 //         {
 //           headers: {
@@ -182,10 +165,11 @@
 //           },
 //         }
 //       );
-//       toast.success("Visibility Changed Successfully");
+//       toast.success("Data visibility updated successfully");
 //       fetchTeam();
 //     } catch (error) {
-//       console.error("Error changing visibility:", error);
+//       console.error("Error updating visibility:", error);
+//       toast.error("Error updating visibility.");
 //     }
 //   };
 
@@ -200,14 +184,6 @@
 //     }
 //   };
 
-//   const toggleVisibility = (id) => {
-//     const updatedEyeVisibilityById = {
-//       ...eyeVisibilityById,
-//       [id]: !eyeVisibilityById[id],
-//     };
-//     setEyeVisibilityById(updatedEyeVisibilityById);
-//   };
-
 //   useEffect(() => {
 //     if (shows) {
 //       setEditMode(false);
@@ -217,7 +193,7 @@
 //   }, [shows]);
 
 //   const handleChange = (name, value) => {
-//     setFormData({ ...formData, [name]: value });
+//     setFormData((prevData) => ({ ...prevData, [name]: value }));
 //   };
 
 //   return (
@@ -235,78 +211,61 @@
 //       <Row>
 //         <Col>
 //           {!shows && !editMode ? (
-//             <Table striped bordered hover responsive>
-//               <thead>
-//                 <tr>
-//                   {tableColumns.map((col) => (
-//                     <th key={col.key}>{col.label}</th>
-//                   ))}
-//                   <th>Actions</th>
-//                 </tr>
-//               </thead>
-//               <tbody>
-//                 {(searchQuery.trim() ? filteredData : team).map((item) => (
-//                   <tr key={item.id}>
-//                     {tableColumns.map((col) => (
-//                       <td key={col.key}>
-//                         {col.render ? col.render(item[col.key]) : item[col.key]}
-//                       </td>
-//                     ))}
-//                     <td>
-//                       <div className="d-flex">
-//                         <Button className="ms-1" onClick={() => toggleEdit(item.id)}>
-//                           <FaEdit />
-//                         </Button>
-//                         <Button className="ms-1" onClick={() => handleDelete(item.id)}>
-//                           <FaTrash />
-//                         </Button>
-//                         <Button
-//                           className="ms-1"
-//                           onClick={() => {
-//                             toggleVisibility(item.id);
-//                             handleIsActive(item.id, !eyeVisibilityById[item.id]);
-//                           }}
-//                         >
-//                           {eyeVisibilityById[item.id] ? <FaEyeSlash /> : <FaEye />}
-//                         </Button>
-//                       </div>
-//                     </td>
-//                   </tr>
-//                 ))}
-//               </tbody>
-//             </Table>
+//             <ReusableTable
+//               columns={tableColumns}
+//               data={searchQuery.trim() ? filteredData : team}
+//               onEdit={toggleEdit}
+//               onDelete={handleDelete}
+//               onShow={handleIsActive}
+//             />
 //           ) : (
 //             <Card className="p-4">
-//               <Form>
+//               <Form onSubmit={handleSubmit}>
 //                 <Row>
-//                 <Col md={6}>
-//                     <ReusableDropdown
-//                       label="Product Name"
-//                       name="productName"
-//                       onChange={handleChange}
-//                       initialData={formData}
-//                     />
-//                     {errors.productName && (
-//                       <p className="text-danger">{errors.productName}</p>
-//                     )}
-//                   </Col>
-//                   <Col md={6}>
-//                     <NewResuableForm
-//                       label="technicalDescription"
-//                       placeholder="Enter Technical Description"
-//                       name="technicalDescription"
-//                       type="text"
-//                       onChange={handleChange}
-//                       initialData={formData}
-//                       textarea
-//                       useJodit={true}
-//                     />
-//                     {errors.technicalDescription && (
-//                       <p className="text-danger">
-//                         {errors.technicalDescription}
-//                       </p>
-//                     )}
-//                   </Col>
+                  // <Col md={6}>
+                  //   <NewResuableForm
+                  //     label={"Name"}
+                  //     placeholder={"Enter Name"}
+                  //     type={"text"}
+                  //     name={"name"}
+                  //     onChange={handleChange}
+                  //     initialData={formData}
+                  //   />
+                  //   {errors.name && <span className="error text-danger">{errors.name}</span>}
+                  // </Col>
+                  // <Col md={6}>
+                  //   <NewResuableForm
+                  //     label={"Email"}
+                  //     placeholder={"Enter Email"}
+                  //     type={"text"}
+                  //     name={"email"}
+                  //     onChange={handleChange}
+                  //     initialData={formData}
+                  //   />
+                  //   {errors.email && <span className="error text-danger">{errors.email}</span>}
+                  // </Col>
+                  // <Col md={6}>
+                  //   <NewResuableForm
+                  //     label={"Mobile"}
+                  //     placeholder={"Enter Mobile"}
+                  //     type={"number"}
+                  //     name={"mobile"}
+                  //     onChange={handleChange}
+                  //     initialData={formData}
+                  //   />
+                  //   {errors.mobile && <span className="error text-danger">{errors.mobile}</span>}
+                  // </Col>
+                  // <Col md={6}>
+                  //   <NewResuableForm
+                  //     label={"Message"}
+                  //     placeholder={"Enter Message"}
+                  //     type={"text"}
+                  //     name={"message"}
+                  //     onChange={handleChange}
+                  //     initialData={formData}
+                  //   />
+                  //   {errors.message && <span className="error text-danger">{errors.message}</span>}
+                  // </Col>
 //                 </Row>
 //                 <Row>
 //                   <Col className="d-flex justify-content-end">
@@ -323,16 +282,9 @@
 //                     >
 //                       Cancel
 //                     </Button>
-//                     {!editMode && (
-//                       <Button type="button" variant="primary" onClick={handlePost}>
-//                         Submit
-//                       </Button>
-//                     )}
-//                     {editMode && (
-//                       <Button type="button" variant="primary" onClick={handlePut}>
-//                         Update
-//                       </Button>
-//                     )}
+//                     <Button type="submit" variant="primary">
+//                       {editMode ? "Update" : "Submit"}
+//                     </Button>
 //                   </Col>
 //                 </Row>
 //               </Form>
@@ -341,12 +293,18 @@
 //         </Col>
 //       </Row>
 
-//       {!shows && !editMode && <TablePagination />}
+//       {!shows && !editMode && (
+//         <Row>
+//           <Col>
+//             <TablePagination data={searchQuery.trim() ? filteredData : team} />
+//           </Col>
+//         </Row>
+//       )}
 //     </Container>
 //   );
 // };
 
-// export default TechnicalData;
+// export default CarousalForm;
 
 
 
@@ -356,11 +314,7 @@
 
 
 
-
-
-
-
-////works delete only
+////eor
 import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Card, Button, Form, Table } from "react-bootstrap";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -374,7 +328,7 @@ import TablePagination from "../../components/pagination/TablePagination";
 import ReusableDropdown from "../../components/dropdown/ReusableDropdown";
 import instance from "../../api/AxiosInstance";
 
-const TechnicalData = () => {
+const CarousalForm = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } = useSearchExport();
   const { shows, toggleForm, toggleShow } = useContext(ShowContext);
   const [team, setTeam] = useState([]);
@@ -385,8 +339,10 @@ const TechnicalData = () => {
   const [eyeVisibilityById, setEyeVisibilityById] = useState({});
 
   const tableColumns = [
-    { key: "productName", label: "Product Name" },
-    { key: "technicalDescription", label: "Technical Description" },
+    { key: "name", label: "Name" },
+    { key: "email", label: "Email" },
+    { key: "mobile", label: "Mobile" },
+    { key: "message", label: "Message" },
   ];
 
   useEffect(() => {
@@ -396,7 +352,7 @@ const TechnicalData = () => {
   const fetchTeam = async () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      const response = await instance.get("technicalData/get-technicaldata", {
+      const response = await instance.get("carousal-form/find-carousalform", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
@@ -409,55 +365,65 @@ const TechnicalData = () => {
     }
   };
 
-  const validateForm = (formData) => {
+  const validateForm = (data) => {
     let errors = {};
     let isValid = true;
 
-    if (!formData.productName?.trim()) {
-      errors.productName = "Product Name is required";
+    if (!data.name?.trim()) {
+      errors.name = "Name is required";
       isValid = false;
     }
 
-    if (!formData.technicalDescription?.trim()) {
-      errors.technicalDescription = "Technical Description is required";
+    if (!data.email?.trim()) {
+      errors.email = "Email is required";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(data.email)) {
+      errors.email = "Invalid email address";
+      isValid = false;
+    }
+
+    if (!data.mobile?.trim()) {
+      errors.mobile = "Mobile number is required";
+      isValid = false;
+    } else if (!/^\d{10}$/.test(data.mobile)) {
+      errors.mobile = "Mobile number must be exactly 10 digits";
+      isValid = false;
+    }
+
+    if (!data.message?.trim()) {
+      errors.message = "Message is required";
       isValid = false;
     }
 
     setErrors(errors);
     return isValid;
   };
+
   const handlePost = async () => {
-    try {
-      if (validateForm(formData)) {
-        const accessToken = localStorage.getItem("accessToken");
-        const data = new FormData();
-        for (const key in formData) {
-          data.append(key, formData[key]);
-        }
+    if (validateForm(formData)) {
   
-        const response = await instance.post("technicalData/create-technicaldata", data, {
+      const data = new FormData();
+      for (const key in formData) {
+        data.append(key, formData[key]);
+      }
+
+      try {
+        await instance.post("carousal-form/addcarousalform", data, {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+      
             "Content-Type": "multipart/form-data",
           },
         });
-  
-        if (response.status === 200) {
-          toast.success("Data Submitted Successfully");
-          fetchTeam();
-          toggleForm();
-          toggleShow();
-          setFormData({});
-        } else {
-          toast.error("Failed to submit data");
-        }
+        toast.success("Data Submitted Successfully");
+        fetchTeam();
+        toggleForm(); 
+        toggleShow();
+        setFormData({});
+      } catch (error) {
+        console.error("Error handling form submission:", error);
       }
-    } catch (error) {
-      console.error("Error handling form submission:", error);
-      toast.error("Error handling form submission");
     }
   };
-  
 
   const handlePut = async () => {
     if (validateForm(formData)) {
@@ -469,12 +435,12 @@ const TechnicalData = () => {
 
       try {
         await instance.put(
-          `technicalData/update-technicaldata/${editingId}`,
+          `carousal-form/update/${editingId}`,
           data,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "application/form-data",
+              "Content-Type": "multipart/form-data",
             },
           }
         );
@@ -486,7 +452,6 @@ const TechnicalData = () => {
         setFormData({});
       } catch (error) {
         console.error("Error handling form update:", error);
-        toast.error("Error handling form update");
       }
     }
   };
@@ -494,9 +459,8 @@ const TechnicalData = () => {
   const handleDelete = async (id) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
-        `technicalData/delete-technical/${id}`,
-        {},
+      await instance.delete(
+        `carousal-form/delete/${id}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -507,16 +471,17 @@ const TechnicalData = () => {
       toast.success("Data Deleted Successfully");
       fetchTeam();
     } catch (error) {
-      console.error("Error deleting product:", error);
-      toast.error("Error deleting product");
+      console.error("Error deleting data:", error);
+      toast.error("Error deleting data");
     }
   };
+
 
   const handleIsActive = async (id, isVisible) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
       await instance.patch(
-        `technicalData/isactive-technicalData/${id}`,
+        `uploadcv/isactive-uploadcv/${id}`,
         { isVisible },
         {
           headers: {
@@ -529,7 +494,6 @@ const TechnicalData = () => {
       fetchTeam();
     } catch (error) {
       console.error("Error changing visibility:", error);
-      toast.error("Error changing visibility");
     }
   };
 
@@ -563,7 +527,6 @@ const TechnicalData = () => {
   const handleChange = (name, value) => {
     setFormData({ ...formData, [name]: value });
   };
-  
 
   return (
     <Container>
@@ -624,31 +587,49 @@ const TechnicalData = () => {
             <Card className="p-4">
               <Form>
                 <Row>
-                  <Col md={6}>
-                    <ReusableDropdown
-                      label="Product Name"
-                      name="productName"
+                <Col md={6}>
+                    <NewResuableForm
+                      label={"Name"}
+                      placeholder={"Enter Name"}
+                      type={"text"}
+                      name={"name"}
                       onChange={handleChange}
                       initialData={formData}
                     />
-                    {errors.productName && (
-                      <p className="text-danger">{errors.productName}</p>
-                    )}
+                    {errors.name && <span className="error text-danger">{errors.name}</span>}
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
-                      label="Technical Description"
-                      placeholder="Enter Technical Description"
-                      name="technicalDescription"
-                      type="text"
+                      label={"Email"}
+                      placeholder={"Enter Email"}
+                      type={"text"}
+                      name={"email"}
                       onChange={handleChange}
                       initialData={formData}
-                      textarea
-                      useJodit={true}
                     />
-                    {errors.technicalDescription && (
-                      <p className="text-danger">{errors.technicalDescription}</p>
-                    )}
+                    {errors.email && <span className="error text-danger">{errors.email}</span>}
+                  </Col>
+                  <Col md={6}>
+                    <NewResuableForm
+                      label={"Mobile"}
+                      placeholder={"Enter Mobile"}
+                      type={"number"}
+                      name={"mobile"}
+                      onChange={handleChange}
+                      initialData={formData}
+                    />
+                    {errors.mobile && <span className="error text-danger">{errors.mobile}</span>}
+                  </Col>
+                  <Col md={6}>
+                    <NewResuableForm
+                      label={"Message"}
+                      placeholder={"Enter Message"}
+                      type={"text"}
+                      name={"message"}
+                      onChange={handleChange}
+                      initialData={formData}
+                    />
+                    {errors.message && <span className="error text-danger">{errors.message}</span>}
                   </Col>
                 </Row>
                 <Row>
@@ -689,17 +670,4 @@ const TechnicalData = () => {
   );
 };
 
-export default TechnicalData;
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default CarousalForm;

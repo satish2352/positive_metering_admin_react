@@ -1,17 +1,4 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-/////SearchExportContext.js
+////works only for title field
 
 import React, { createContext, useContext, useState } from "react";
 import { utils, writeFile } from "xlsx";

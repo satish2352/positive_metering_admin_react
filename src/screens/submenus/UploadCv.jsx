@@ -1,4 +1,5 @@
-////image is just not visible
+
+////working successfully
 import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Card, Button, Form, Table } from "react-bootstrap";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -12,7 +13,7 @@ import TablePagination from "../../components/pagination/TablePagination";
 import ReusableDropdown from "../../components/dropdown/ReusableDropdown";
 import instance from "../../api/AxiosInstance";
 
-const BlogDetails = () => {
+const UploadCv = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } = useSearchExport();
   const { shows, toggleForm, toggleShow } = useContext(ShowContext);
   const [team, setTeam] = useState([]);
@@ -24,21 +25,20 @@ const BlogDetails = () => {
 
   const tableColumns = [
     {
-      key: "img",
-      label: "Image",
+      key: "cv",
+      label: "Docs",
       render: (value) => (
-        <img
-          src={value}
-          alt="Blog Details"
-          style={{ width: "100px", height: "auto" }}
-        />
+        <a href={value} alt="Upload CV" target="_blank">
+          cv
+        </a>
       ),
     },
-    { key: "title", label: "Title" },
-    { key: "shortDesc", label: "Short Description" },
-    { key: "longDesc", label: "LOng Description" },
-
+    { key: "email", label: "Email" },
+    { key: "phone", label: "Phone" },
+    { key: "subject", label: "Subject" },
+    { key: "message", label: "Message" },
   ];
+
   useEffect(() => {
     fetchTeam();
   }, []);
@@ -46,7 +46,7 @@ const BlogDetails = () => {
   const fetchTeam = async () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      const response = await instance.get("blogdetails/find-blogdetails", {
+      const response = await instance.get("uploadcv/find-uploadcv", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
@@ -101,54 +101,68 @@ const BlogDetails = () => {
     return isValid;
   };
 
-
   const handlePost = async () => {
-    const accessToken = localStorage.getItem("accessToken");
-  
-    try {
-      await instance.post("blogdetails/create-blogdetail", formData, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-      toast.success("Data Submitted Successfully");
-      fetchTeam();
-      toggleForm();
-      toggleShow();
-      setFormData({});
-    } catch (error) {
-      console.error("Error handling form submission:", error);
-    }
-  };
-  
-  const handlePut = async () => {
-    const accessToken = localStorage.getItem("accessToken");
-  
-    try {
-      await instance.put(`blogdetails/update-blogdetail/${editingId}`, formData, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-      toast.success("Data Updated Successfully");
-      fetchTeam();
-      toggleForm();
-      toggleShow();
-      setEditMode(false);
-      setFormData({});
-    } catch (error) {
-      console.error("Error handling form update:", error);
+    if (validateForm(formData)) {
+      const accessToken = localStorage.getItem("accessToken");
+      const data = new FormData();
+      for (const key in formData) {
+        data.append(key, formData[key]);
+      }
+
+      try {
+        await instance.post("uploadcv/create-uploadcv", data, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        toast.success("Data Submitted Successfully");
+        fetchTeam();
+        toggleForm();
+        toggleShow();
+        setFormData({});
+      } catch (error) {
+        console.error("Error handling form submission:", error);
+      }
     }
   };
 
+  const handlePut = async () => {
+    if (validateForm(formData)) {
+      const accessToken = localStorage.getItem("accessToken");
+      const data = new FormData();
+      for (const key in formData) {
+        data.append(key, formData[key]);
+      }
+
+      try {
+        await instance.put(
+          `uploadcv/update-uploadcv/${editingId}`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        toast.success("Data Updated Successfully");
+        fetchTeam();
+        toggleForm();
+        toggleShow();
+        setEditMode(false);
+        setFormData({});
+      } catch (error) {
+        console.error("Error handling form update:", error);
+      }
+    }
+  };
 
   const handleDelete = async (id) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
       await instance.patch(
-        `blogdetails/isdelete-blogdetail/${id}`,
+        `uploadcv/isdelete-uploadcv/${id}`,
         {},
         {
           headers: {
@@ -168,7 +182,7 @@ const BlogDetails = () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
       await instance.patch(
-        `blogdetails/isactive-blogdetail/${id}`,
+        `uploadcv/isactive-uploadcv/${id}`,
         { isVisible },
         {
           headers: {
@@ -276,54 +290,82 @@ const BlogDetails = () => {
                 <Row>
                 <Col md={6}>
                     <NewResuableForm
-                      label="Image Upload"
-                      placeholder="Upload Image"
-                      name="img"
-                      type="file"
+                      label={" Upload CV"}
+                      placeholder={"Upload CV"}
+                      name={"cv"}
+                      type={"file"}
                       onChange={handleChange}
                       initialData={formData}
                     />
-                    {errors.img && <p className="text-danger">{errors.img}</p>}
+                    {errors.cv && <p className="text-danger">{errors.cv}</p>}
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
-                      label="Title"
-                      placeholder="Enter Title"
-                      name="title"
-                      type="text"
+                      label={"Name"}
+                      placeholder={"Enter Name"}
+                      type={"text"}
+                      name={"name"}
                       onChange={handleChange}
                       initialData={formData}
                     />
-                    {errors.title && (
-                      <p className="text-danger">{errors.title}</p>
+                    {errors.name && (
+                      <span className="error text-danger">{errors.name}</span>
                     )}
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
-                      label="Short Description"
-                      placeholder="Enter Short Description"
-                      name="shortDesc"
-                      type="text"
+                      label={"Email"}
+                      placeholder={"Enter Email"}
+                      type={"text"}
+                      name={"email"}
                       onChange={handleChange}
                       initialData={formData}
-                
                     />
-                    {errors.shortDesc && (
-                      <p className="text-danger">{errors.shortDesc}</p>
+                    {errors.email && (
+                      <span className="error text-danger">{errors.email}</span>
                     )}
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
-                      label="Long Description"
-                      placeholder="Enter Short Description"
-                      name="longDesc"
-                      type="text"
+                      label={"Phone"}
+                      placeholder={"Enter Phone no"}
+                      type={"number"}
+                      name={"phone"}
                       onChange={handleChange}
                       initialData={formData}
-                
                     />
-                    {errors.longDesc && (
-                      <p className="text-danger">{errors.longDesc}</p>
+                    {errors.phone && (
+                      <span className="error text-danger">{errors.phone}</span>
+                    )}
+                  </Col>
+                  <Col md={6}>
+                    <NewResuableForm
+                      label={"Subject"}
+                      placeholder={"Enter Subject"}
+                      type={"text"}
+                      name={"subject"}
+                      onChange={handleChange}
+                      initialData={formData}
+                    />
+                    {errors.subject && (
+                      <span className="error text-danger">
+                        {errors.subject}
+                      </span>
+                    )}
+                  </Col>
+                  <Col md={6}>
+                    <NewResuableForm
+                      label={"Message"}
+                      placeholder={"Enter Message"}
+                      type={"text"}
+                      name={"message"}
+                      onChange={handleChange}
+                      initialData={formData}
+                    />
+                    {errors.message && (
+                      <span className="error text-danger">
+                        {errors.message}
+                      </span>
                     )}
                   </Col>
                 </Row>
@@ -365,4 +407,4 @@ const BlogDetails = () => {
   );
 };
 
-export default BlogDetails;
+export default UploadCv;

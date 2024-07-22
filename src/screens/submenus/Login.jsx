@@ -1,20 +1,14 @@
+
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Card } from "react-bootstrap";
-import axios from "axios";
+import instance from "../../api/AxiosInstance";
 import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-
-  const loginData = [
-    {
-      email: "abc@test.com",
-      password: "12345678",
-      key: "true"
-    }
-  ];
 
   const validateForm = () => {
     let errors = {};
@@ -41,28 +35,28 @@ const Login = () => {
     e.preventDefault();
 
     if (validateForm()) {
-      const user = loginData.find((user) => user.email === email && user.password === password);
-
-      if (user) {
-        try {
-    
-          const response = await axios.post("http://localhost:5000/login", {
-            email: email,
-            password: password,
-          });
-
-          if (response.status === 200) {
-            toast.success("Login successful");
-         
-          } else {
-            toast.error("Login failed");
+      try {
+        const response = await instance.post(`/auth/login`, {
+          email,
+          password,
+        }, {
+          headers: {
+            "Content-Type": "application/json"
           }
-        } catch (error) {
-          console.error("Error handling form submission:", error);
-          toast.error("Error in Submit", error);
+        });
+
+        console.log(response);
+        if (response.data.result) {
+          const { token, user } = response.data.responseData;
+          localStorage.setItem('accessToken', token); 
+          localStorage.setItem('user', JSON.stringify(user)); 
+          toast.success("Login successful");
+        } else {
+          toast.error("Login failed");
         }
-      } else {
-        toast.error("Invalid email or password");
+      } catch (error) {
+        console.error("Error handling form submission:", error);
+        toast.error("Error in Submit");
       }
     }
   };
@@ -90,7 +84,7 @@ const Login = () => {
                   )}
                 </Form.Group>
 
-                <Form.Group controlId="formBasicPassword">
+                <Form.Group controlId="formBasicPassword" className="mt-3">
                   <Form.Label>Password</Form.Label>
                   <Form.Control
                     type="password"
