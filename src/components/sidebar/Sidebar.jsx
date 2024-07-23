@@ -213,11 +213,7 @@ const SidebarMenu = [
         url: "/login",
         icon: <BsChatRightQuoteFill style={{ color: "red" }} size={24} />,
       },
-      {
-        subMenus: "Register",
-        url: "/register",
-        icon: <BsChatRightQuoteFill style={{ color: "red" }} size={24} />,
-      },
+ 
     ],
   },
   {

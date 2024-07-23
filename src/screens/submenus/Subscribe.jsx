@@ -1,10 +1,9 @@
-////sos success
+/////sos working success
 import React, { useState, useEffect, useContext } from "react";
-import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Table, Button } from "react-bootstrap";
+import { FaTrash } from "react-icons/fa";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
-import NewResuableForm from "../../components/form/NewResuableForm";
-import ReusableTable from "../../components/table/ReusableTable";
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,14 +11,9 @@ import TablePagination from "../../components/pagination/TablePagination";
 import instance from "../../api/AxiosInstance";
 
 const Subscribe = () => {
-  const { searchQuery, handleSearch, handleExport, setData, filteredData } =
-    useSearchExport();
-  const { shows, toggleForm, toggleShow } = useContext(ShowContext);
+  const { searchQuery, handleSearch, handleExport, setData, filteredData, data } = useSearchExport();
+  const { shows } = useContext(ShowContext);
   const [team, setTeam] = useState([]);
-  const [errors, setErrors] = useState({});
-  const [editMode, setEditMode] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({});
 
   const tableColumns = [
     { key: "email", label: "Email" },
@@ -39,79 +33,38 @@ const Subscribe = () => {
         },
       });
       setTeam(response.data.responseData);
-      setData(response.data.responseData);
+      setData(response.data.responseData); // Update data in context
     } catch (error) {
-      console.error("Error fetching subscribe data:", error);
+      console.error("Error fetching team data:", error);
     }
   };
 
-  const validateForm = (formData) => {
-    let errors = {};
-    let isValid = true;
-
-    if (!formData.email?.trim()) {
-      errors.email = "Email is required";
-      isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = "Invalid email format";
-      isValid = false;
-    }
-
-    setErrors(errors);
-    return isValid;
-  };
-
-  const handlePostSubmit = async (data) => {
+  const handleDelete = async (id) => {
+    const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.post("subscribe/add-subscribeemail", data, {
+      await instance.delete(`subscribe/delete/${id}`, {
         headers: {
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
       });
-      toast.success("Data Submitted Successfully");
+      toast.success("Data Deleted Successfully");
       fetchTeam();
-      toggleForm();
-      toggleShow();
-      setEditMode(false);
-      setFormData({ email: "" });
     } catch (error) {
-      console.error("Error handling form submission:", error);
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm(formData)) {
-      const data = { ...formData };
-      if (editMode) {
-        handlePutSubmit(data);
-      } else {
-        handlePostSubmit(data);
-      }
-    }
-  };
-
-  const toggleEdit = (id) => {
-    const memberToEdit = team.find((item) => item.id === id);
-    if (memberToEdit) {
-      setEditingId(id);
-      setEditMode(true);
-      toggleForm();
-      toggleShow();
-      setFormData(memberToEdit);
+      console.error("Error deleting data:", error);
+      toast.error("Error deleting data");
     }
   };
 
   useEffect(() => {
     if (shows) {
-      setEditMode(false);
-      setEditingId(null);
-      setFormData({ email: "" });
+
     }
   }, [shows]);
 
-  const handleChange = (name, value) => {
-    setFormData({ ...formData, [name]: value });
+  const exportData = () => {
+    const dataToExport = searchQuery.trim() ? filteredData : team;
+    handleExport(dataToExport);
   };
 
   return (
@@ -121,70 +74,43 @@ const Subscribe = () => {
           <SearchInput
             searchQuery={searchQuery}
             onSearch={handleSearch}
-            onExport={handleExport}
+            onExport={exportData}
           />
         </Col>
       </Row>
 
       <Row>
         <Col>
-          {!shows && !editMode ? (
-            <ReusableTable
-              columns={tableColumns}
-              data={searchQuery.trim() ? filteredData : team}
-              onEdit={toggleEdit}
-            />
-          ) : (
-            <Card className="p-4">
-              <Form onSubmit={handleSubmit}>
-                <Row>
-                  <Col md={6}>
-                    <NewResuableForm
-                      label="Email"
-                      placeholder="Enter Email"
-                      type="text"
-                      name="email"
-                      onChange={handleChange}
-                      initialData={formData}
-                    />
-                    {errors.email && (
-                      <span className="error text-danger">{errors.email}</span>
-                    )}
-                  </Col>
-                </Row>
-                <Row>
-                  <Col className="d-flex justify-content-end">
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      className="me-2"
-                      onClick={() => {
-                        setFormData({ email: "" });
-                        toggleForm();
-                        toggleShow();
-                        setEditMode(false);
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit" variant="primary">
-                      {editMode ? "Update" : "Submit"}
-                    </Button>
-                  </Col>
-                </Row>
-              </Form>
-            </Card>
-          )}
+          <Table striped bordered hover responsive>
+            <thead>
+              <tr>
+                {tableColumns.map((col) => (
+                  <th key={col.key}>{col.label}</th>
+                ))}
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(searchQuery.trim() ? filteredData : team).map((item) => (
+                <tr key={item.id}>
+                  {tableColumns.map((col) => (
+                    <td key={col.key}>{item[col.key]}</td>
+                  ))}
+                  <td>
+                    <div className="d-flex">
+                      <Button className="ms-1" onClick={() => handleDelete(item.id)}>
+                        <FaTrash />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
         </Col>
       </Row>
 
-      {!shows && !editMode && (
-        <Row>
-          <Col>
-            <TablePagination data={searchQuery.trim() ? filteredData : team} />
-          </Col>
-        </Row>
-      )}
+      <TablePagination />
     </Container>
   );
 };

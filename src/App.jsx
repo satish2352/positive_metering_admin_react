@@ -41,6 +41,7 @@ import TechnicalData from "./screens/submenus/TechnicalData";
 import OptionsData from "./screens/submenus/OptionsData";
 import ProjectTitleName from "./screens/submenus/ProjectTitleName";
 import MaterialData from "./screens/submenus/MaterialData";
+import Logout from "./screens/submenus/Logout";
 
 
 function App() {
@@ -82,6 +83,7 @@ function App() {
           <Route path="/optionsdata" element={<OptionsData />} />
           <Route path="/materialdata" element={<MaterialData />} />
           <Route path="/projecttitilename" element={<ProjectTitleName />} />
+          <Route path="/logout" element={<Logout />} />
 
           <Route path="*" element={<PageNotFound />} />
         </Route>
