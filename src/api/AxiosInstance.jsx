@@ -104,6 +104,7 @@ instance.interceptors.response.use(
         localStorage.removeItem(key);
       }
       toast.error("Unauthorized access - please log in.");
+      window.location.href = "/login"; // Redirect to login page
     } else if (error?.response?.status === 404) {
       toast.error("Resource not found.");
     } else if (error?.response?.status === 500) {

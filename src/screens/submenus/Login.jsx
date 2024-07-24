@@ -4,8 +4,13 @@ import { Form, Button, Container, Row, Col, Card } from "react-bootstrap";
 import instance from "../../api/AxiosInstance";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { Navigate, useNavigate } from "react-router-dom";
+import { Sidebar } from "../../components";
 
 const Login = () => {
+
+ const navi = useNavigate()
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
@@ -51,6 +56,9 @@ const Login = () => {
           localStorage.setItem('accessToken', token); 
           localStorage.setItem('user', JSON.stringify(user)); 
           toast.success("Login successful");
+          navi("/");
+          
+
         } else {
           toast.error("Login failed");
         }

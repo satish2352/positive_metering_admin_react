@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TablePagination from "../../components/pagination/TablePagination";
 import instance from "../../api/AxiosInstance";
-
+import NewResuableForm from "../../components/form/NewResuableForm";
 const TechnicalData = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } = useSearchExport();
   const { shows, toggleForm, toggleShow } = useContext(ShowContext);
@@ -296,23 +296,23 @@ const TechnicalData = () => {
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
+     
+
                 <Col md={6}>
-                  <Form.Group controlId="technicalDescription">
-                    <Form.Label>Technical Description</Form.Label>
-                    <Form.Control
-                      as="textarea"
-                      rows={3}
-                      value={formData.technicalDescription || ""}
-                      onChange={(e) =>
-                        handleChange("technicalDescription", e.target.value)
-                      }
-                      isInvalid={!!errors.technicalDescription}
+                    <NewResuableForm
+                      label="Technical Description"
+                      placeholder="Enter Technical Description"
+                      name="technicalDescription"
+                      type="text"
+                      onChange={handleChange}
+                      initialData={formData}
+                      textarea
+                      useJodit={true}
                     />
-                    <Form.Control.Feedback type="invalid">
-                      {errors.technicalDescription}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                </Col>
+                    {errors.technicalDescription && (
+                      <p className="text-danger">{errors.technicalDescription}</p>
+                    )}
+                  </Col>
               </Row>
               <Button className="mt-3" onClick={editMode ? handlePut : handlePost}>
                 {editMode ? "Update" : "Submit"}

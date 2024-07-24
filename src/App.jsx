@@ -1,8 +1,8 @@
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import "./App.scss";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import BaseLayout from "./layout/BaseLayout";
 import { Dashboard, PageNotFound } from "./screens";
@@ -11,8 +11,6 @@ import Leadership from "./screens/submenus/Leadership";
 import Infrastructure from "./screens/submenus/Infrastructure";
 import OurStory from "./screens/submenus/OurStory";
 import OurTeam from "./screens/submenus/OurTeam";
-
-
 
 import NewsAndEventCards from "./screens/submenus/NewAndEventCards";
 
@@ -42,22 +40,22 @@ import OptionsData from "./screens/submenus/OptionsData";
 import ProjectTitleName from "./screens/submenus/ProjectTitleName";
 import MaterialData from "./screens/submenus/MaterialData";
 import Logout from "./screens/submenus/Logout";
-
+import { Sidebar } from "./components";
 
 function App() {
-
-
   return (
     <>
-     <ToastContainer />
+      <ToastContainer />
       <Routes>
+        <Route path="/login" element={<Login />} />
         <Route element={<BaseLayout />}>
           {/* submenus */}
+
+          <Route path="/" element={<Dashboard />} />
           <Route path="/carousal" element={<Carausal />} />
           <Route path="/infrastructure" element={<Infrastructure />} />
           <Route path="/ourstory" element={<OurStory />} />
           <Route path="/ourteam" element={<OurTeam />} />
-       
           <Route path="/testimonial" element={<Testimonial />} />
           <Route path="/leadership" element={<Leadership />} />
           <Route path="/newsandeventcards" element={<NewsAndEventCards />} />
@@ -68,14 +66,14 @@ function App() {
           <Route path="/bloglist" element={<BlogList />} />
           <Route path="/productlist" element={<ProductList />} />
           <Route path="/blogdetails" element={<BlogDetails />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/uploadcv" element={<UploadCv />} />
           <Route path="/carousalform" element={<CarousalForm />} />
           <Route path="/office" element={<Office />} />
           <Route path="/contactsalesperson" element={<ContactSalesPerson />} />
           <Route path="/getintouch" element={<GetInTouch />} />
-          <Route path="/requestcallbackform" element={<RequestCallbackForm />} />
+          <Route
+            path="/requestcallbackform" element={<RequestCallbackForm />} />
           <Route path="/subscribe" element={<Subscribe />} />
           <Route path="/productname" element={<ProductName />} />
           <Route path="/productdetails" element={<ProductDetails />} />
@@ -88,8 +86,6 @@ function App() {
           <Route path="*" element={<PageNotFound />} />
         </Route>
       </Routes>
-
- 
     </>
   );
 }
