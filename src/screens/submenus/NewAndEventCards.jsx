@@ -1,39 +1,41 @@
-
-
-// ////
+////sos
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
-import axios from "../../api/AxiosInstance";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
-import NewReusableForm from "../../components/form/NewResuableForm";
+import NewResuableForm from "../../components/form/NewResuableForm";
 import ReusableTable from "../../components/table/ReusableTable";
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TablePagination from "../../components/pagination/TablePagination";
+import instance from "../../api/AxiosInstance";
 
 const NewsAndEventCards = () => {
-  const {
-    searchQuery,
-    handleSearch,
-    handleExport,
-    setData,
-    filteredData,
-  } = useSearchExport();
-
+  const { searchQuery, handleSearch, handleExport, setData, filteredData } =
+    useSearchExport();
   const { shows, toggleForm, toggleShow } = React.useContext(ShowContext);
-
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({ name: "", email: "", mobile: "", message: "" });
+  const [formData, setFormData] = useState({});
 
   const tableColumns = [
-    { key: "shortdescription", label: "Short Description" },
-    { key: "longdescription", label: "Long Description" },
-    { key: "image", label: "Image" },
+    {
+      key: "img",
+      label: "Image",
+      render: (value) => (
+        <img
+          src={value}
+          alt="Testimonial"
+          style={{ width: "100px", height: "auto" }}
+        />
+      ),
+    },
+    { key: "title", label: "Title" },
+    { key: "shortDesc", label: "Short Description" },
+    { key: "longDesc", label: "Long Description" },
 
   ];
 
@@ -42,10 +44,16 @@ const NewsAndEventCards = () => {
   }, []);
 
   const fetchTeam = async () => {
+    const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
     try {
-      const response = await axios.get("http://localhost:5000/newsevents");
-      setTeam(response.data);
-      setData(response.data); // Update the context data
+      const response = await instance.get("newsandevent/get-newevents", {
+        headers: {
+          Authorization: "Bearer " + accessToken,
+          "Content-Type": "application/json",
+        },
+      });
+      setTeam(response.data.responseData);
+      setData(response.data.responseData);
     } catch (error) {
       console.error(
         "Error fetching team:",
@@ -58,23 +66,24 @@ const NewsAndEventCards = () => {
     let errors = {};
     let isValid = true;
 
-    // Validate Name
-    if (!formData.shortdescription?.trim()) {
-      errors.shortdescription = "Short Description is required";
+    if (!formData.img) {
+      errors.img = "Image is required";
       isValid = false;
     }
 
-    if (!formData.longdescription?.trim()) {
-      errors.longdescription = "Long Description is required";
+    if (!formData.title?.trim()) {
+      errors.title = "Title is required";
       isValid = false;
     }
 
-    // Validate Message
-    if (!formData.image?.trim()) {
-      errors.image = "Image is required";
+    if (!formData.shortDesc?.trim()) {
+      errors.shortDesc = "Short Description is required";
       isValid = false;
     }
-
+    if (!formData.longDesc?.trim()) {
+      errors.longDesc = "Long Description is required";
+      isValid = false;
+    }
     setErrors(errors);
     return isValid;
   };
@@ -82,37 +91,84 @@ const NewsAndEventCards = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm(formData)) {
+      const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
+      const data = new FormData();
+      for (const key in formData) {
+        data.append(key, formData[key]);
+      }
+
       try {
         if (editMode) {
-          await axios.put(
-            `http://localhost:5000/newsevents/${editingId}`,
-            formData
+          await instance.put(
+            `newsandevent/update-newevent/${editingId}`,
+            data,
+            {
+              headers: {
+                Authorization: "Bearer " + accessToken,
+                "Content-Type": "multipart/form-data",
+              },
+            }
           );
           toast.success("Data Updated Successfully");
         } else {
-          await axios.post("http://localhost:5000/newsevents", formData);
+          await instance.post("newsandevent/create-newevent", data, {
+            headers: {
+              Authorization: "Bearer " + accessToken,
+              "Content-Type": "multipart/form-data",
+            },
+          });
           toast.success("Data Submitted Successfully");
         }
         fetchTeam();
         toggleForm();
         toggleShow();
         setEditMode(false);
-        setFormData({ shortdescription: "", longdescription: "", image: "", }); // Reset form data after submission
+        setFormData({});
       } catch (error) {
         console.error("Error handling form submission:", error);
-       
       }
     }
   };
 
   const handleDelete = async (id) => {
+    const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
     try {
-      await axios.delete(`http://localhost:5000/newsevents/${id}`);
+      await instance.patch(
+        `newsandevent/isdelete-newevent/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: "Bearer " + accessToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       toast.success("Data Deleted Successfully");
       fetchTeam();
     } catch (error) {
       console.error("Error deleting team member:", error);
-      toast.error("Error deleting data");
+      toast.error("Error submitting data");
+    }
+  };
+
+  const handleIsActive = async (id, isVisible) => {
+    const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
+    try {
+      await instance.patch(
+        `newsandevent/isactive-newevent/${id}`,
+        { isVisible },
+        {
+          headers: {
+            Authorization: "Bearer " + accessToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      toast.success("Data Hide/Show Successfully");
+      fetchTeam();
+    } catch (error) {
+      console.error("Error Hide/Show team member:", error);
+      toast.error("Error submitting data");
     }
   };
 
@@ -123,7 +179,7 @@ const NewsAndEventCards = () => {
       setEditMode(true);
       toggleForm();
       toggleShow();
-      setFormData(memberToEdit); // Set initial form data for editing
+      setFormData(memberToEdit);
     }
   };
 
@@ -131,7 +187,7 @@ const NewsAndEventCards = () => {
     if (shows) {
       setEditMode(false);
       setEditingId(null);
-      setFormData({  shortdescription: "", longdescription: "", image: "",});
+      setFormData({});
     }
   }, [shows]);
 
@@ -159,81 +215,115 @@ const NewsAndEventCards = () => {
               data={searchQuery.trim() ? filteredData : team}
               onEdit={toggleEdit}
               onDelete={handleDelete}
+              onShow={handleIsActive}
             />
           ) : (
             <Card className="p-4">
               <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col md={6}>
-                    <NewReusableForm
-                      label={"Short Description"}
-                      placeholder={"Enter Short Description"}
-                      type={"text"}
-                      name={"shortdescription"}
-                      textarea={true}
-                      onChange={handleChange}
-                      initialData={formData}
-                    />
-                    {errors.shortdescription && (
-                      <span className="error text-danger">{errors.shortdescription}</span>
-                    )}
-                  </Col>
-
-                  <Col md={6}>
-                    <NewReusableForm
-                      label={"Long Description"}
-                      placeholder={"Enter Long Description"}
-                      type={"text"}
-                      name={"longdescription"}
-                      textarea={true}
-                      onChange={handleChange}
-                      initialData={formData}
-                    />
-                    {errors.longdescription && (
-                      <span className="error text-danger">{errors.longdescription}</span>
-                    )}
-                  </Col>
-
-         
-
-                  <Col md={6}>
-                    <NewReusableForm
-                      label={"Image"}
-                      placeholder={"Add Image"}
+                    <NewResuableForm
+                      label={"Image Upload"}
+                      placeholder={"Upload Image"}
+                      name={"img"}
                       type={"file"}
-                      name={"image"}
                       onChange={handleChange}
                       initialData={formData}
                     />
-                    {errors.image && (
-                      <span className="error text-danger">{errors.image}</span>
+                    {errors.img && (
+                      <p className="text-danger">{errors.img}</p>
                     )}
                   </Col>
-                  <div className="mt-3">
-                    <Button type="submit" variant="primary">
-                      {editMode ? "Update" : "Submit"}
-                    </Button>
+                  <Col md={6}>
+                    <NewResuableForm
+                      label={"Title"}
+                      placeholder={"Enter Title"}
+                      name={"title"}
+                      type={"text"}
+                      onChange={handleChange}
+                      initialData={formData}
+                    />
+                    {errors.title && (
+                      <p className="text-danger">{errors.title}</p>
+                    )}
+                  </Col>
+                  <Col md={6}>
+                    <NewResuableForm
+                      label={"Short Description "}
+                      placeholder={"Short Description "}
+                      name={"shortDesc"}
+                      type={"text"}
+                      onChange={handleChange}
+                      initialData={formData}
+                      textarea
+                   
+                    />
+                    {errors.shortDesc && (
+                      <p className="text-danger">{errors.shortDesc}</p>
+                    )}
+                  </Col>
+                  <Col md={6}>
+                    <NewResuableForm
+                      label={"Long Description "}
+                      placeholder={"Long Description "}
+                      name={"longDesc"}
+                      type={"text"}
+                      onChange={handleChange}
+                      initialData={formData}
+                      textarea
+                   
+                    />
+                    {errors.longDesc && (
+                      <p className="text-danger">{errors.longDesc}</p>
+                    )}
+                  </Col>
+                </Row>
+                <Row>
+                  <Col className="d-flex justify-content-end">
                     <Button
-                      onClick={() => setEditMode(false)}
+                      type="button"
                       variant="secondary"
-                      className="ms-2"
+                      className="me-2"
+                      onClick={() => {
+                        setFormData({});
+                        toggleForm();
+                        toggleShow();
+                        setEditMode(false);
+                      }}
                     >
                       Cancel
                     </Button>
-                  </div>
+                    <Button type="submit" variant="primary">
+                      {editMode ? "Update" : "Submit"}
+                    </Button>
+                  </Col>
                 </Row>
               </Form>
             </Card>
           )}
         </Col>
       </Row>
-      <Row>
-     <Col>
-     <TablePagination />
-     </Col>
-      </Row>
+
+      {!shows && !editMode && (
+        <Row>
+          <Col>
+            <TablePagination data={searchQuery.trim() ? filteredData : team} />
+          </Col>
+        </Row>
+      )}
     </Container>
   );
 };
 
 export default NewsAndEventCards;
+
+
+
+
+
+
+
+
+
+
+

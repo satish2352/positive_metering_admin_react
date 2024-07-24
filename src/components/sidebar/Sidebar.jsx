@@ -1,6 +1,6 @@
 
-////added style to menus and submenus
-
+// ////added style to menus and submenus
+//// new icon
 import { useContext, useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import logo from "../../assets/images/logo.png";
@@ -10,16 +10,17 @@ import {
   MdOutlineClose,
   MdHome,
   MdLogout,
-  MdViewCarousel,
-  MdIntegrationInstructions,
-  MdLeaderboard,
-  MdCategory,
+  MdOutlineContactMail,
+  MdAccountBox,
 } from "react-icons/md";
 import { SiStorybook } from "react-icons/si";
-import { GrLineChart, GrServices } from "react-icons/gr";
-import { RiTeamFill } from "react-icons/ri";
-import { LuNewspaper } from "react-icons/lu";
-import { BsChatRightQuoteFill, BsBuildings } from "react-icons/bs";
+import { GrServices } from "react-icons/gr";
+import { RiTeamFill, RiFileListLine, RiContactsBookLine } from "react-icons/ri";
+import { FiUsers, FiList, FiFileText, FiUploadCloud } from "react-icons/fi";
+import { AiOutlineAppstoreAdd, AiOutlineProject } from "react-icons/ai";
+import { BsNewspaper, BsChatSquareQuote, BsBuilding, BsCameraVideo } from "react-icons/bs";
+import { IoIosOptions, IoIosPeople } from "react-icons/io";
+import { FaRegNewspaper } from "react-icons/fa";
 import "./Sidebar.scss";
 import { SidebarContext } from "../../context/SidebarContext";
 import { TitleContext } from "../../context/TitleContext";
@@ -33,139 +34,125 @@ const SidebarMenu = [
       {
         subMenus: "Header Contact",
         url: "/headercontact",
-        icon: <MdViewCarousel style={{ color: "red" }} size={24} />,
+        icon: <RiContactsBookLine style={{ color: "red" }} size={24} />,
       },
       {
         subMenus: "Hero Form",
         url: "/heroform",
-        icon: <MdViewCarousel style={{ color: "red" }} size={24} />,
+        icon: <AiOutlineAppstoreAdd style={{ color: "red" }} size={24} />,
       },
       {
         subMenus: "Upload CV",
         url: "/uploadcv",
-        icon: <MdViewCarousel style={{ color: "red" }} size={24} />,
+        icon: <FiUploadCloud style={{ color: "red" }} size={24} />,
       },
       {
         subMenus: "Home Slider",
         url: "/homeslider",
-        icon: <MdViewCarousel style={{ color: "red" }} size={24} />,
+        icon: <AiOutlineProject style={{ color: "red" }} size={24} />,
       },
       {
         subMenus: "Carousal",
         url: "/carousal",
-        icon: <MdViewCarousel style={{ color: "red" }} size={24} />,
+        icon: <RiFileListLine style={{ color: "red" }} size={24} />,
       },
       {
         subMenus: "Carousal Form",
         url: "/carousalform",
-        icon: <MdViewCarousel style={{ color: "red" }} size={24} />,
+        icon: <RiFileListLine style={{ color: "red" }} size={24} />,
       },
       {
-        subMenus: "Contact sales Person",
+        subMenus: "Contact Sales Person",
         url: "/contactsalesperson",
-        icon: <MdViewCarousel style={{ color: "red" }} size={24} />,
+        icon: <AiOutlineAppstoreAdd style={{ color: "red" }} size={24} />,
       },
-      {
-        subMenus: "Get In Touch",
-         url: "/getintouch",
-        icon: <MdViewCarousel style={{ color: "red" }} size={24} />,
-      },
+  
       {
         subMenus: "Request Callback Form",
-         url: "/requestcallbackform",
-        icon: <MdViewCarousel style={{ color: "red" }} size={24} />,
+        url: "/requestcallbackform",
+        icon: <MdOutlineContactMail style={{ color: "red" }} size={24} />,
       },
-      {
-        subMenus: "Subscribe",
-         url: "/subscribe",
-        icon: <MdViewCarousel style={{ color: "red" }} size={24} />,
-      },
-      {
-        subMenus: "Office",
-        url: "/office",
-        icon: <MdViewCarousel style={{ color: "red" }} size={24} />,
-      },
+  
+ 
       {
         subMenus: "Testimonial",
         url: "/testimonial",
-        icon: <BsChatRightQuoteFill style={{ color: "red" }} size={24} />,
+        icon: <BsChatSquareQuote style={{ color: "red" }} size={24} />,
       },
       {
         subMenus: "Infrastructure",
         url: "/infrastructure",
-        icon: <BsBuildings style={{ color: "red" }} size={24} />,
+        icon: <BsBuilding style={{ color: "red" }} size={24} />,
       },
       {
         subMenus: "Bg Video Form",
         url: "/bgvideoform",
-        icon: <BsBuildings style={{ color: "red" }} size={24} />,
+        icon: <BsCameraVideo style={{ color: "red" }} size={24} />,
       },
     ],
   },
   {
     menu: "About",
     url: "/about",
-    mainIcon: <MdIntegrationInstructions size={24} />,
+    mainIcon: <RiTeamFill size={24} />,
     subMenu: [
       {
         subMenus: "Leadership",
         url: "/leadership",
-        icon: <MdLeaderboard style={{ color: "red" }} size={24} />,
+        icon: <IoIosPeople style={{ color: "red" }} size={24} />,
       },
       {
-        subMenus: "Our story",
+        subMenus: "Our Story",
         url: "/ourstory",
         icon: <SiStorybook style={{ color: "red" }} size={24} />,
       },
       {
         subMenus: "Our Team",
         url: "/ourteam",
-        icon: <RiTeamFill style={{ color: "red" }} size={24} />,
+        icon: <FiUsers style={{ color: "red" }} size={24} />,
       },
       {
         subMenus: "Project Title Name",
-        url: "/projecttitilename",
-        icon: <RiTeamFill style={{ color: "red" }} size={24} />,
+        url: "/projecttitlename",
+        icon: <AiOutlineProject style={{ color: "red" }} size={24} />,
       },
     ],
   },
   {
     menu: "Product",
     url: "/product",
-    mainIcon: <MdCategory size={24} />,
+    mainIcon: <FiList size={24} />,
     subMenu: [
- 
       {
         subMenus: "Product List",
         url: "/productlist",
-        icon: <GrLineChart style={{ color: "red" }} size={24} />,
+        icon: <RiFileListLine style={{ color: "red" }} size={24} />,
       },
       {
         subMenus: "Product Name",
         url: "/productname",
-        icon: <GrLineChart style={{ color: "red" }} size={24} />,
+        icon: <FiFileText style={{ color: "red" }} size={24} />,
       },
       {
         subMenus: "Product Details",
         url: "/productdetails",
-        icon: <GrLineChart style={{ color: "red" }} size={24} />,
+        icon: <IoIosOptions style={{ color: "red" }} size={24} />,
       },
       {
         subMenus: "Technical Data",
         url: "/technicaldata",
-        icon: <GrLineChart style={{ color: "red" }} size={24} />,
+        icon: <FiFileText style={{ color: "red" }} size={24} />,
       },
       {
         subMenus: "Options Data",
         url: "/optionsdata",
-        icon: <GrLineChart style={{ color: "red" }} size={24} />,
+        icon: <IoIosOptions style={{ color: "red" }} size={24} />,
       },
       {
-        subMenus: "Material Data ",
+        subMenus: "Material Data",
         url: "/materialdata",
-        icon: <GrLineChart style={{ color: "red" }} size={24} />,
+        icon: <RiFileListLine style={{ color: "red" }} size={24} />,
       },
-
     ],
   },
   {
@@ -177,29 +164,51 @@ const SidebarMenu = [
   {
     menu: "Blog",
     url: "/blog",
-    mainIcon: <GrServices size={24} />,
+    mainIcon: <FaRegNewspaper size={24} />,
     subMenu: [
       {
         subMenus: "Blog List",
         url: "/bloglist",
-        icon: <GrLineChart style={{ color: "red" }} size={24} />,
+        icon: <BsNewspaper style={{ color: "red" }} size={24} />,
       },
       {
         subMenus: "Blog Details",
         url: "/blogdetails",
-        icon: <GrLineChart style={{ color: "red" }} size={24} />,
+        icon: <FaRegNewspaper style={{ color: "red" }} size={24} />,
       },
     ],
   },
   {
     menu: "News and Event",
     url: "/newsandevent",
-    mainIcon: <LuNewspaper size={24} />,
+    mainIcon: <BsNewspaper size={24} />,
     subMenu: [
       {
         subMenus: "News Event Cards",
         url: "/newsandeventcards",
-        icon: <BsChatRightQuoteFill style={{ color: "red" }} size={24} />,
+        icon: <BsNewspaper style={{ color: "red" }} size={24} />,
+      },
+    ],
+  },
+  {
+    menu: "Contact Us",
+    url: "/contactus",
+    mainIcon: <GrServices size={24} />,
+    subMenu: [
+      {
+        subMenus: "Get In Touch",
+        url: "/getintouch",
+        icon: <RiContactsBookLine style={{ color: "red" }} size={24} />,
+      },
+      {
+        subMenus: "Subscribe",
+        url: "/subscribe",
+        icon: <MdAccountBox style={{ color: "red" }} size={24} />,
+      },
+      {
+        subMenus: "Our Offices",
+        url: "/office",
+        icon: <BsBuilding style={{ color: "red" }} size={24} />,
       },
     ],
   },
@@ -211,9 +220,8 @@ const SidebarMenu = [
       {
         subMenus: "Login",
         url: "/login",
-        icon: <BsChatRightQuoteFill style={{ color: "red" }} size={24} />,
+        icon: <MdLogout style={{ color: "red" }} size={24} />,
       },
- 
     ],
   },
   {
