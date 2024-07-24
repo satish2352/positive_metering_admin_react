@@ -57,6 +57,7 @@ const Carousal = () => {
       setData(response.data.responseData);
     } catch (error) {
       console.error("Error fetching team:", error);
+      toast.error("Error fetching data");
     }
   };
 

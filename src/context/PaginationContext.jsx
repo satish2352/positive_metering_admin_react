@@ -1,33 +1,4 @@
-// // PaginationContext.jsx
-// import React, { createContext, useContext, useState } from 'react';
-
-// const PaginationContext = createContext();
-// const PaginationUpdateContext = createContext();
-
-// export const usePagination = () => useContext(PaginationContext);
-// export const usePaginationUpdate = () => useContext(PaginationUpdateContext);
-
-// export const PaginationProvider = ({ children }) => {
-//   const [currentPage, setCurrentPage] = useState(1);
-
-//   const goToPage = (page) => {
-//     setCurrentPage(page);
-//   };
-
-//   return (
-//     <PaginationContext.Provider value={currentPage}>
-//       <PaginationUpdateContext.Provider value={goToPage}>
-//         {children}
-//       </PaginationUpdateContext.Provider>
-//     </PaginationContext.Provider>
-//   );
-// };
-
-
-
-
-
-// PaginationContext.js
+////some issue not working sos
 import React, { createContext, useContext, useState } from 'react';
 
 const PaginationContext = createContext();

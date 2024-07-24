@@ -1,6 +1,5 @@
 
-
-// context created for passing title
+////sos
 
 import { createContext, useState } from "react"
 

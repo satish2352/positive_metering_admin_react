@@ -1,3 +1,4 @@
+////sos
 import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
 import { useSearchExport } from "../../context/SearchExportContext";
@@ -18,7 +19,13 @@ const ContactSalesPerson = () => {
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    img: null,
+    title: '',
+    person_name: '',
+    phone: '',
+    email: ''
+  });
 
   const tableColumns = [
     {
@@ -55,6 +62,7 @@ const ContactSalesPerson = () => {
       setData(response.data.responseData);
     } catch (error) {
       console.error("Error fetching office data:", error);
+      toast.error("Error fetching data");
     }
   };
 
@@ -81,7 +89,7 @@ const ContactSalesPerson = () => {
       errors.email = "Email is required";
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = "Invalid email person_name";
+      errors.email = "Invalid email address";
       isValid = false;
     }
 
@@ -151,7 +159,7 @@ const ContactSalesPerson = () => {
       toast.success("Data Deleted Successfully");
       fetchTeam();
     } catch (error) {
-      console.error("Error deleting office:", error);
+      console.error("Error deleting data:", error);
       toast.error("Deletion failed. Please try again.");
     }
   };
@@ -189,7 +197,7 @@ const ContactSalesPerson = () => {
   };
 
   useEffect(() => {
-    if (shows) {
+    if (!shows) {
       setEditMode(false);
       setEditingId(null);
       setFormData({});
@@ -227,6 +235,13 @@ const ContactSalesPerson = () => {
               <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col md={6}>
+                    {formData.img && (
+                      <img
+                        src={formData.img}
+                        alt="Current"
+                        style={{ width: "100px", height: "auto", marginBottom: '10px' }}
+                      />
+                    )}
                     <NewResuableForm
                       label="Image Upload"
                       placeholder="Upload Image"
@@ -258,7 +273,6 @@ const ContactSalesPerson = () => {
                       type="text"
                       onChange={handleChange}
                       initialData={formData}
-                
                     />
                     {errors.person_name && (
                       <p className="text-danger">{errors.person_name}</p>

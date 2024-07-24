@@ -1,8 +1,4 @@
-
-
-
-
-//t1
+////sos
 import { createContext, useState } from "react"
 
 const ShowContext = createContext()

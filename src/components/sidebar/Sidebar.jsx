@@ -1,6 +1,5 @@
 
-// ////added style to menus and submenus
-//// new icon
+////sos
 import { useContext, useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import logo from "../../assets/images/logo.png";
@@ -212,18 +211,18 @@ const SidebarMenu = [
       },
     ],
   },
-  {
-    menu: "Login/Register",
-    url: "/loginregister",
-    mainIcon: <MdLogout size={24} />,
-    subMenu: [
-      {
-        subMenus: "Login",
-        url: "/login",
-        icon: <MdLogout style={{ color: "red" }} size={24} />,
-      },
-    ],
-  },
+  // {
+  //   menu: "Login/Register",
+  //   url: "/loginregister",
+  //   mainIcon: <MdLogout size={24} />,
+  //   subMenu: [
+  //     {
+  //       subMenus: "Login",
+  //       url: "/login",
+  //       icon: <MdLogout style={{ color: "red" }} size={24} />,
+  //     },
+  //   ],
+  // },
   {
     menu: "Logout",
     url: "/logout",

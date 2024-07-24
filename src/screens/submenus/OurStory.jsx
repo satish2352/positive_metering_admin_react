@@ -95,7 +95,7 @@ const OurStory = () => {
         setFormData({ image: "", name: "", description: "" }); // Reset form data after submission
       } catch (error) {
         console.error("Error handling form submission:", error);
-        toast.error("Error Handling Submit")
+  
       }
     }
   };

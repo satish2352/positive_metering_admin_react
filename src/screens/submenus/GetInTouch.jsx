@@ -40,6 +40,7 @@ const GetInTouch = () => {
       setData(response.data.responseData); // Update data in context
     } catch (error) {
       console.error("Error fetching team data:", error);
+      toast.error("Error fetching data");
     }
   };
 

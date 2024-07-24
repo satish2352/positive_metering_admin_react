@@ -104,7 +104,7 @@ const OptionsData = () => {
       }
     } catch (error) {
       console.error("Error handling form submission:", error);
-      toast.error("Error handling form submission");
+   
     }
   };
 
@@ -139,7 +139,7 @@ const OptionsData = () => {
         }
       } catch (error) {
         console.error("Error handling form update:", error);
-        toast.error("Error handling form update");
+      
       }
     }
   };

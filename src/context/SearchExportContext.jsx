@@ -48,7 +48,7 @@
 
 
 
-////dymanic search 
+////sos search everthing in table
 import React, { createContext, useContext, useState } from "react";
 import { utils, writeFile } from "xlsx";
 

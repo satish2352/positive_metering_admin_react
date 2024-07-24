@@ -1,3 +1,4 @@
+////not in use
 import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col, Card } from 'react-bootstrap';
 
@@ -8,9 +9,9 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle registration logic here
+   
     console.log('Name:', name, 'Email:', email, 'Password:', password);
-    // Example: Send registration data to server
+    
   };
 
   return (

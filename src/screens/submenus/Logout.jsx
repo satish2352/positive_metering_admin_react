@@ -1,6 +1,6 @@
 
 
-
+////sos
 ////logout without logout api . remove token
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -10,14 +10,12 @@ const Logout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Remove tokens and user information from local storage
+
     localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
 
-    // Notify user of successful logout
     toast.success("Logged out successfully.");
 
-    // Redirect to login page
     navigate("/login");
   }, [navigate]);
 

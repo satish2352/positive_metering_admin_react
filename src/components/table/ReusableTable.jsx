@@ -1,18 +1,48 @@
 ////sos
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Table } from "react-bootstrap";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 
 const ReusableTable = ({ columns, data, onEdit, onDelete, onShow }) => {
   const [eyeVisibilityById, setEyeVisibilityById] = useState({});
 
+  useEffect(() => {
+    // Initialize eyeVisibilityById with the current visibility state of each item
+    const initialVisibility = data.reduce((acc, item) => {
+      acc[item.id] = item.isVisible; // Assuming each item has an `isVisible` field
+      return acc;
+    }, {});
+    setEyeVisibilityById(initialVisibility);
+  }, [data]);
+
+  // const toggleVisibility = (id) => {
+  //   const currentVisibility = eyeVisibilityById[id];
+  //   const updatedVisibility = !currentVisibility;
+  //   setEyeVisibilityById((prev) => ({
+  //     ...prev,
+  //     [id]: updatedVisibility,
+  //   }));
+  //   onShow(id, updatedVisibility);
+  // };
+
+
+
   const toggleVisibility = (id) => {
+  
+    console.log(`Current visibility for ID ${id}: ${eyeVisibilityById[id]}`);
+  
+    const updatedVisibility = !eyeVisibilityById[id];
+    console.log(`New visibility for ID ${id}: ${updatedVisibility}`);
+  
     const updatedEyeVisibilityById = {
       ...eyeVisibilityById,
-      [id]: !eyeVisibilityById[id],
+      [id]: updatedVisibility,
     };
     setEyeVisibilityById(updatedEyeVisibilityById);
+  
+    console.log('Updated eyeVisibilityById:', updatedEyeVisibilityById);
   };
+  
 
   return (
     <Table striped bordered hover responsive>
@@ -42,10 +72,7 @@ const ReusableTable = ({ columns, data, onEdit, onDelete, onShow }) => {
                 </Button>
                 <Button
                   className="ms-1"
-                  onClick={() => {
-                    toggleVisibility(item.id);
-                    onShow(item.id, !eyeVisibilityById[item.id]);
-                  }}
+                  onClick={() => toggleVisibility(item.id)}
                 >
                   {eyeVisibilityById[item.id] ? <FaEyeSlash /> : <FaEye />}
                 </Button>
@@ -59,13 +86,6 @@ const ReusableTable = ({ columns, data, onEdit, onDelete, onShow }) => {
 };
 
 export default ReusableTable;
-
-
-
-
-
-
-
 
 
 

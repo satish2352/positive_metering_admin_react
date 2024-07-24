@@ -1,4 +1,4 @@
-////works sos
+//// sos
 import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Card, Button, Form, Table } from "react-bootstrap";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -103,7 +103,7 @@ const MaterialData = () => {
       }
     } catch (error) {
       console.error("Error handling form submission:", error);
-      toast.error("Error handling form submission");
+    
     }
   };
 
@@ -138,7 +138,7 @@ const MaterialData = () => {
         }
       } catch (error) {
         console.error("Error handling form update:", error);
-        toast.error("Error handling form update");
+
       }
     }
   };

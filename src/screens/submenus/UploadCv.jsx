@@ -1,4 +1,4 @@
-// ////working success
+// ////error in download file . cors origin error backend error .
 import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Table, Button } from "react-bootstrap";
 import { FaTrash, FaDownload } from "react-icons/fa";
