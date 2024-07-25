@@ -1,18 +1,18 @@
 
 ///jodit work susscess
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Form ,Table} from "react-bootstrap";
 import axios from "axios";
 
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
 import NewResuableForm from "../../components/form/NewResuableForm";
-import ReusableTable from "../../components/table/ReusableTable";
+
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify"; 
 import "react-toastify/dist/ReactToastify.css";
 import TablePagination from "../../components/pagination/TablePagination";
-
+import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 const BlogList = () => {
   const {
     searchQuery,
@@ -30,6 +30,7 @@ const BlogList = () => {
   const [editMode, setEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({});
+  const [eyeVisibilityById, setEyeVisibilityById] = useState({});
   const formFields = [
     {
       name: "imageupload1",
@@ -147,7 +148,13 @@ const BlogList = () => {
       setFormData(memberToEdit); // Set initial form data for editing
     }
   };
-
+  const toggleVisibility = (id) => {
+    const updatedEyeVisibilityById = {
+      ...eyeVisibilityById,
+      [id]: !eyeVisibilityById[id],
+    };
+    setEyeVisibilityById(updatedEyeVisibilityById);
+  };
   useEffect(() => {
     if (shows) {
       setEditMode(false);
@@ -176,12 +183,46 @@ const BlogList = () => {
       <Row>
         <Col>
           {!shows && !editMode ? (
-            <ReusableTable
-              columns={tableColumns}
-              data={searchQuery.trim() ? filteredData : team}
-              onEdit={toggleEdit}
-              onDelete={handleDelete}
-            />
+            <Table striped bordered hover responsive>
+              <thead>
+                <tr>
+                  {tableColumns.map((col) => (
+                    <th key={col.key}>{col.label}</th>
+                  ))}
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(searchQuery.trim() ? filteredData : team).map((item) => (
+                  <tr key={item.id}>
+                    {tableColumns.map((col) => (
+                      <td key={col.key}>
+                        {col.render ? col.render(item[col.key]) : item[col.key]}
+                      </td>
+                    ))}
+                    <td>
+                      <div className="d-flex">
+                        <Button className="ms-1" onClick={() => toggleEdit(item.id)}>
+                          <FaEdit />
+                        </Button>
+                        <Button className="ms-1" onClick={() => handleDelete(item.id)}>
+                          <FaTrash />
+                        </Button>
+                        <Button
+                          className="ms-1"
+                          onClick={() => {
+                            toggleVisibility(item.id);
+                            handleIsActive(item.id, !eyeVisibilityById[item.id]);
+                          }}
+                        >
+                          {eyeVisibilityById[item.id] ? <FaEyeSlash /> : <FaEye />}
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
           ) : (
             <Card className="p-4">
               <Form onSubmit={handleSubmit}>

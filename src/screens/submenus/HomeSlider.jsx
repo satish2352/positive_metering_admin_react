@@ -1,6 +1,14 @@
 ////sos
 import React, { useState, useEffect, useContext } from "react";
-import { Container, Row, Col, Card, Button, Form, Table } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Table,
+} from "react-bootstrap";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
@@ -13,8 +21,9 @@ import ReusableDropdown from "../../components/dropdown/ReusableDropdown";
 import instance from "../../api/AxiosInstance";
 
 const HomeSlider = () => {
-  const { searchQuery, handleSearch, handleExport, setData, filteredData } = useSearchExport();
-  const { shows, toggleForm, toggleShow } = useContext(ShowContext);
+  const { searchQuery, handleSearch, handleExport, setData, filteredData } =
+    useSearchExport();
+  const { shows,  } = useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -32,11 +41,7 @@ const HomeSlider = () => {
           alt="Carousel"
           style={{ width: "100px", height: "auto" }}
         />
-
       ),
-
-
-   
     },
   ];
 
@@ -54,7 +59,6 @@ const HomeSlider = () => {
         },
       });
       setTeam(response.data.responseData);
-      setData(response.data.responseData);
     } catch (error) {
       console.error("Error fetching product data:", error);
     }
@@ -90,8 +94,7 @@ const HomeSlider = () => {
         });
         toast.success("Data Submitted Successfully");
         fetchTeam();
-        toggleForm();
-        toggleShow();
+
         setFormData({});
       } catch (error) {
         console.error("Error handling form submission:", error);
@@ -108,20 +111,15 @@ const HomeSlider = () => {
       }
 
       try {
-        await instance.put(
-          `homeslider/update-homeslider/${editingId}`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        await instance.put(`homeslider/update-homeslider/${editingId}`, data, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
         toast.success("Data Updated Successfully");
         fetchTeam();
-        toggleForm();
-        toggleShow();
+
         setEditMode(false);
         setFormData({});
       } catch (error) {
@@ -175,8 +173,7 @@ const HomeSlider = () => {
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-      toggleForm();
-      toggleShow();
+
       setFormData(memberToEdit);
     }
   };
@@ -205,11 +202,13 @@ const HomeSlider = () => {
     <Container>
       <Row>
         <Col>
-          <SearchInput
-            searchQuery={searchQuery}
-            onSearch={handleSearch}
-            onExport={handleExport}
-          />
+          {!shows && !editMode && (
+            <SearchInput
+              searchQuery={searchQuery}
+              onSearch={handleSearch}
+              onExport={handleExport}
+            />
+          )}
         </Col>
       </Row>
 
@@ -235,20 +234,33 @@ const HomeSlider = () => {
                     ))}
                     <td>
                       <div className="d-flex">
-                        <Button className="ms-1" onClick={() => toggleEdit(item.id)}>
+                        <Button
+                          className="ms-1"
+                          onClick={() => toggleEdit(item.id)}
+                        >
                           <FaEdit />
                         </Button>
-                        <Button className="ms-1" onClick={() => handleDelete(item.id)}>
+                        <Button
+                          className="ms-1"
+                          onClick={() => handleDelete(item.id)}
+                        >
                           <FaTrash />
                         </Button>
                         <Button
                           className="ms-1"
                           onClick={() => {
                             toggleVisibility(item.id);
-                            handleIsActive(item.id, !eyeVisibilityById[item.id]);
+                            handleIsActive(
+                              item.id,
+                              !eyeVisibilityById[item.id]
+                            );
                           }}
                         >
-                          {eyeVisibilityById[item.id] ? <FaEyeSlash /> : <FaEye />}
+                          {eyeVisibilityById[item.id] ? (
+                            <FaEyeSlash />
+                          ) : (
+                            <FaEye />
+                          )}
                         </Button>
                       </div>
                     </td>
@@ -260,7 +272,14 @@ const HomeSlider = () => {
             <Card className="p-4">
               <Form>
                 <Row>
-                <Col md={6}>
+                  <Col md={6}>
+                  {formData.img && (
+                      <img
+                        src={formData.img}
+                        alt="current image for post"
+                        style={{ width: "100px", height: "auto", marginBottom: '10px' }}
+                      />
+                    )}
                     <NewResuableForm
                       label={"Image Upload"}
                       placeholder={"Upload Image"}
@@ -274,26 +293,21 @@ const HomeSlider = () => {
                 </Row>
                 <Row>
                   <Col className="d-flex justify-content-end">
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      className="me-2"
-                      onClick={() => {
-                        setFormData({});
-                        toggleForm();
-                        toggleShow();
-                        setEditMode(false);
-                      }}
-                    >
-                      Cancel
-                    </Button>
                     {!editMode && (
-                      <Button type="button" variant="primary" onClick={handlePost}>
+                      <Button
+                        type="button"
+                        variant="primary"
+                        onClick={handlePost}
+                      >
                         Submit
                       </Button>
                     )}
                     {editMode && (
-                      <Button type="button" variant="primary" onClick={handlePut}>
+                      <Button
+                        type="button"
+                        variant="success"
+                        onClick={handlePut}
+                      >
                         Update
                       </Button>
                     )}
@@ -305,7 +319,11 @@ const HomeSlider = () => {
         </Col>
       </Row>
 
-      {!shows && !editMode && <TablePagination />}
+      <Row>
+        <Col className="mt-3">
+          <TablePagination />
+        </Col>
+      </Row>
     </Container>
   );
 };

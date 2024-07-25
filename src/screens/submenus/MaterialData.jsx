@@ -12,7 +12,7 @@ import instance from "../../api/AxiosInstance";
 import NewResuableForm from "../../components/form/NewResuableForm";
 const MaterialData = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } = useSearchExport();
-  const { shows, toggleForm, toggleShow } = useContext(ShowContext);
+  const { shows, } = useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [products, setProducts] = useState([]); // New state for product names
   const [errors, setErrors] = useState({});
@@ -94,8 +94,7 @@ const MaterialData = () => {
         if (response.status === 200) {
           toast.success("Data Submitted Successfully");
           fetchTeam();
-          toggleForm();
-          toggleShow();
+       
           setFormData({});
         } else {
           toast.error("Failed to submit data");
@@ -129,8 +128,7 @@ const MaterialData = () => {
         if (response.status === 200) {
           toast.success("Data Updated Successfully");
           fetchTeam();
-          toggleForm();
-          toggleShow();
+      
           setEditMode(false);
           setFormData({});
         } else {
@@ -190,8 +188,7 @@ const MaterialData = () => {
     if (itemToEdit) {
       setEditingId(id);
       setEditMode(true);
-      toggleForm();
-      toggleShow();
+
       setFormData(itemToEdit); // Ensure this correctly sets `OptionDescription`
     }
   };
@@ -219,12 +216,14 @@ const MaterialData = () => {
   return (
     <Container>
       <Row>
-        <Col>
-          <SearchInput
-            searchQuery={searchQuery}
-            onSearch={handleSearch}
-            onExport={handleExport}
-          />
+      <Col>
+          {!shows && !editMode && (
+            <SearchInput
+              searchQuery={searchQuery}
+              onSearch={handleSearch}
+              onExport={handleExport}
+            />
+          )}
         </Col>
       </Row>
 
@@ -312,17 +311,32 @@ const MaterialData = () => {
                     )}
                   </Col>
               </Row>
-              <Button className="mt-3" onClick={editMode ? handlePut : handlePost}>
-                {editMode ? "Update" : "Submit"}
-              </Button>
+              
+              <Col className="d-flex justify-content-end">
+              
+              {!editMode && (
+                <Button type="button" variant="primary" onClick={handlePost}>
+                  Submit
+                </Button>
+              )}
+              {editMode && (
+                <Button type="button" variant="success" onClick={handlePut}>
+                  Update
+                </Button>
+              )}
+            </Col>
             </Form>
           )}
         </Col>
       </Row>
       <Row>
-        <Col>
-          <TablePagination />
-        </Col>
+     
+      <Row>
+  <Col className="mt-3">
+  <TablePagination />
+
+  </Col>
+</Row>
       </Row>
     </Container>
   );

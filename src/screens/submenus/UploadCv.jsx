@@ -139,12 +139,7 @@ const UploadCv = () => {
                   ))}
                   <td>
                     <div className="d-flex">
-                      <Button
-                        className="ms-1 me-1"
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        <FaTrash />
-                      </Button>
+                    
                       <Button
                         size="sm"
                         onClick={() => downloadCV(item.cv)}
@@ -160,7 +155,13 @@ const UploadCv = () => {
         </Col>
       </Row>
 
-      <TablePagination />
+  
+      <Row>
+  <Col className="mt-3">
+  <TablePagination />
+
+  </Col>
+</Row>
     </Container>
   );
 };

@@ -99,12 +99,12 @@ instance.interceptors.response.use(
   async (response) => response,
   async (error) => {
     if (error?.response?.status === 401) {
-      let keysToRemove = ["user", "accessToken"];
+      let keysToRemove = [ "accessToken"];
       for (let key of keysToRemove) {
         localStorage.removeItem(key);
       }
       toast.error("Unauthorized access - please log in.");
-      window.location.href = "/login"; // Redirect to login page
+      window.location.href = "/"; // Redirect to login page
     } else if (error?.response?.status === 404) {
       toast.error("Resource not found.");
     } else if (error?.response?.status === 500) {

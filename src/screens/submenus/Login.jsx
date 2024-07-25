@@ -52,11 +52,12 @@ const Login = () => {
 
         console.log(response);
         if (response.data.result) {
-          const { token, user } = response.data.responseData;
+          const { token,} = response.data.responseData;
           localStorage.setItem('accessToken', token); 
-          localStorage.setItem('user', JSON.stringify(user)); 
+      
+     
           toast.success("Login successful");
-          navi("/");
+          navi("/headercontact");
           
 
         } else {

@@ -89,7 +89,7 @@ const RequestCallbackForm = () => {
                 {tableColumns.map((col) => (
                   <th key={col.key}>{col.label}</th>
                 ))}
-                <th>Actions</th>
+  
               </tr>
             </thead>
             <tbody>
@@ -98,21 +98,19 @@ const RequestCallbackForm = () => {
                   {tableColumns.map((col) => (
                     <td key={col.key}>{item[col.key]}</td>
                   ))}
-                  <td>
-                    <div className="d-flex">
-                      <Button className="ms-1" onClick={() => handleDelete(item.id)}>
-                        <FaTrash />
-                      </Button>
-                    </div>
-                  </td>
+               
                 </tr>
               ))}
             </tbody>
           </Table>
         </Col>
       </Row>
+      <Row>
+  <Col className="mt-3">
+  <TablePagination />
 
-      <TablePagination />
+  </Col>
+</Row>
     </Container>
   );
 };

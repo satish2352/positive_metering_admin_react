@@ -1,26 +1,26 @@
 //// sos
 import React, { useState, useEffect, useContext } from "react";
-import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Form,Table } from "react-bootstrap";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
 import NewResuableForm from "../../components/form/NewResuableForm";
-import ReusableTable from "../../components/table/ReusableTable";
+
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TablePagination from "../../components/pagination/TablePagination";
 import instance from "../../api/AxiosInstance";
-
+import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 const ProductName = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-  const { shows, toggleForm, toggleShow } = useContext(ShowContext);
+  const { shows, } = useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({});
-
+  const [eyeVisibilityById, setEyeVisibilityById] = useState({});
   const tableColumns = [{ key: "productName", label: "Product Name" }];
 
   useEffect(() => {
@@ -40,7 +40,7 @@ const ProductName = () => {
         }
       );
       setTeam(response.data.responseData);
-      setData(response.data.responseData);
+     
     } catch (error) {
       console.error("Error fetching product data:", error);
     }
@@ -87,8 +87,7 @@ const ProductName = () => {
           toast.success("Data Submitted Successfully");
         }
         fetchTeam();
-        toggleForm();
-        toggleShow();
+     
         setEditMode(false);
         setFormData({});
       } catch (error) {
@@ -142,10 +141,17 @@ const ProductName = () => {
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-      toggleForm();
-      toggleShow();
+  
       setFormData(memberToEdit);
     }
+  };
+
+  const toggleVisibility = (id) => {
+    const updatedEyeVisibilityById = {
+      ...eyeVisibilityById,
+      [id]: !eyeVisibilityById[id],
+    };
+    setEyeVisibilityById(updatedEyeVisibilityById);
   };
 
   useEffect(() => {
@@ -163,25 +169,60 @@ const ProductName = () => {
   return (
     <Container>
       <Row>
-        <Col>
-          <SearchInput
-            searchQuery={searchQuery}
-            onSearch={handleSearch}
-            onExport={handleExport}
-          />
+      <Col>
+          {!shows && !editMode && (
+            <SearchInput
+              searchQuery={searchQuery}
+              onSearch={handleSearch}
+              onExport={handleExport}
+            />
+          )}
         </Col>
       </Row>
 
       <Row>
         <Col>
           {!shows && !editMode ? (
-            <ReusableTable
-              columns={tableColumns}
-              data={searchQuery.trim() ? filteredData : team}
-              onEdit={toggleEdit}
-              onDelete={handleDelete}
-              onShow={handleIsActive}
-            />
+            <Table striped bordered hover responsive>
+              <thead>
+                <tr>
+                  {tableColumns.map((col) => (
+                    <th key={col.key}>{col.label}</th>
+                  ))}
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(searchQuery.trim() ? filteredData : team).map((item) => (
+                  <tr key={item.id}>
+                    {tableColumns.map((col) => (
+                      <td key={col.key}>
+                        {col.render ? col.render(item[col.key]) : item[col.key]}
+                      </td>
+                    ))}
+                    <td>
+                      <div className="d-flex">
+                        <Button className="ms-1" onClick={() => toggleEdit(item.id)}>
+                          <FaEdit />
+                        </Button>
+                        <Button className="ms-1" onClick={() => handleDelete(item.id)}>
+                          <FaTrash />
+                        </Button>
+                        <Button
+                          className="ms-1"
+                          onClick={() => {
+                            toggleVisibility(item.id);
+                            handleIsActive(item.id, !eyeVisibilityById[item.id]);
+                          }}
+                        >
+                          {eyeVisibilityById[item.id] ? <FaEyeSlash /> : <FaEye />}
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
           ) : (
             <Card className="p-4">
               <Form onSubmit={handleSubmit}>
@@ -202,22 +243,16 @@ const ProductName = () => {
                 </Row>
                 <Row>
                   <Col className="d-flex justify-content-end">
+                   
+             
+                  <div className="mt-3 d-flex justify-content-end">
                     <Button
-                      type="button"
-                      variant="secondary"
-                      className="me-2"
-                      onClick={() => {
-                        setFormData({});
-                        toggleForm();
-                        toggleShow();
-                        setEditMode(false);
-                      }}
+                      type="submit"
+                      variant={editMode ? "success" : "primary"}
                     >
-                      Cancel
-                    </Button>
-                    <Button type="submit" variant="primary">
                       {editMode ? "Update" : "Submit"}
                     </Button>
+                  </div>
                   </Col>
                 </Row>
               </Form>
@@ -226,13 +261,12 @@ const ProductName = () => {
         </Col>
       </Row>
 
-      {!shows && !editMode && (
-        <Row>
-          <Col>
-            <TablePagination data={searchQuery.trim() ? filteredData : team} />
-          </Col>
-        </Row>
-      )}
+      <Row>
+  <Col className="mt-3">
+  <TablePagination />
+
+  </Col>
+</Row>
     </Container>
   );
 };

@@ -42,49 +42,139 @@ import ProjectTitleName from "./screens/submenus/ProjectTitleName";
 import MaterialData from "./screens/submenus/MaterialData";
 import Logout from "./screens/submenus/Logout";
 import { Sidebar } from "./components";
+import ProtectedRoutes from "./api/ProtectedRoutes";
 
 function App() {
   return (
     <>
       <ToastContainer />
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
+        <Route path="*" element={<PageNotFound />} />
         <Route element={<BaseLayout />}>
           {/* submenus */}
 
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/carousal" element={<Carausal />} />
-          <Route path="/infrastructure" element={<Infrastructure />} />
-          <Route path="/ourstory" element={<OurStory />} />
-          <Route path="/ourteam" element={<OurTeam />} />
-          <Route path="/testimonial" element={<Testimonial />} />
-          <Route path="/leadership" element={<Leadership />} />
-          <Route path="/newsandeventcards" element={<NewsAndEventCards />} />
-          <Route path="/headercontact" element={<HeaderContact />} />
-          <Route path="/heroform" element={<HeroForm />} />
-          <Route path="/homeslider" element={<HomeSlider />} />
-          <Route path="/bgvideoform" element={<BgVideoForm />} />
-          <Route path="/bloglist" element={<BlogList />} />
-          <Route path="/productlist" element={<ProductList />} />
-          <Route path="/blogdetails" element={<BlogDetails />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/uploadcv" element={<UploadCv />} />
-          <Route path="/carousalform" element={<CarousalForm />} />
-          <Route path="/office" element={<Office />} />
-          <Route path="/contactsalesperson" element={<ContactSalesPerson />} />
-          <Route path="/getintouch" element={<GetInTouch />} />
+         
           <Route
-            path="/requestcallbackform" element={<RequestCallbackForm />} />
-          <Route path="/subscribe" element={<Subscribe />} />
-          <Route path="/productname" element={<ProductName />} />
-          <Route path="/productdetails" element={<ProductDetails />} />
-          <Route path="/technicaldata" element={<TechnicalData />} />
-          <Route path="/optionsdata" element={<OptionsData />} />
-          <Route path="/materialdata" element={<MaterialData />} />
-          <Route path="/projecttitilename" element={<ProjectTitleName />} />
-          <Route path="/logout" element={<Logout />} />
-
-          <Route path="*" element={<PageNotFound />} />
+            path="/dashboard"
+            element={<ProtectedRoutes Component={Dashboard} />}
+          />
+          <Route
+            path="/carousal"
+            element={<ProtectedRoutes Component={Carausal} />}
+          />
+          <Route
+            path="/infrastructure"
+            element={<ProtectedRoutes Component={Infrastructure} />}
+          />
+          <Route
+            path="/ourstory"
+            element={<ProtectedRoutes Component={OurStory} />}
+          />
+          <Route
+            path="/ourteam"
+            element={<ProtectedRoutes Component={OurTeam} />}
+          />
+          <Route
+            path="/testimonial"
+            element={<ProtectedRoutes Component={Testimonial} />}
+          />
+          <Route
+            path="/leadership"
+            element={<ProtectedRoutes Component={Leadership} />}
+          />
+          <Route
+            path="/newsandeventcards"
+            element={<ProtectedRoutes Component={NewsAndEventCards} />}
+          />
+          <Route
+            path="/headercontact"
+            element={<ProtectedRoutes Component={HeaderContact} />}
+          />
+          <Route
+            path="/heroform"
+            element={<ProtectedRoutes Component={HeroForm} />}
+          />
+          <Route
+            path="/homeslider"
+            element={<ProtectedRoutes Component={HomeSlider} />}
+          />
+          <Route
+            path="/bgvideoform"
+            element={<ProtectedRoutes Component={BgVideoForm} />}
+          />
+          <Route
+            path="/bloglist"
+            element={<ProtectedRoutes Component={BlogList} />}
+          />
+          <Route
+            path="/productlist"
+            element={<ProtectedRoutes Component={ProductList} />}
+          />
+          <Route
+            path="/blogdetails"
+            element={<ProtectedRoutes Component={BlogDetails} />}
+          />
+          <Route
+            path="/register"
+            element={<ProtectedRoutes Component={Register} />}
+          />
+          <Route
+            path="/uploadcv"
+            element={<ProtectedRoutes Component={UploadCv} />}
+          />
+          <Route
+            path="/carousalform"
+            element={<ProtectedRoutes Component={CarousalForm} />}
+          />
+          <Route
+            path="/office"
+            element={<ProtectedRoutes Component={Office} />}
+          />
+          <Route
+            path="/contactsalesperson"
+            element={<ProtectedRoutes Component={ContactSalesPerson} />}
+          />
+          <Route
+            path="/getintouch"
+            element={<ProtectedRoutes Component={GetInTouch} />}
+          />
+          <Route
+            path="/requestcallbackform"
+            element={<ProtectedRoutes Component={RequestCallbackForm} />}
+          />
+          <Route
+            path="/subscribe"
+            element={<ProtectedRoutes Component={Subscribe} />}
+          />
+          <Route
+            path="/productname"
+            element={<ProtectedRoutes Component={ProductName} />}
+          />
+          <Route
+            path="/productdetails"
+            element={<ProtectedRoutes Component={ProductDetails} />}
+          />
+          <Route
+            path="/technicaldata"
+            element={<ProtectedRoutes Component={TechnicalData} />}
+          />
+          <Route
+            path="/optionsdata"
+            element={<ProtectedRoutes Component={OptionsData} />}
+          />
+          <Route
+            path="/materialdata"
+            element={<ProtectedRoutes Component={MaterialData} />}
+          />
+          <Route
+            path="/projecttitilename"
+            element={<ProtectedRoutes Component={ProjectTitleName} />}
+          />
+          <Route
+            path="/logout"
+            element={<ProtectedRoutes Component={Logout} />}
+          />
         </Route>
       </Routes>
     </>

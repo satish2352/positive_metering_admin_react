@@ -14,7 +14,7 @@ import instance from "../../api/AxiosInstance";
 const OurTeam = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-  const { shows, toggleForm, toggleShow } = React.useContext(ShowContext);
+  const { shows,  } = React.useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -125,8 +125,7 @@ const OurTeam = () => {
           toast.success("Data Submitted Successfully");
         }
         fetchTeam();
-        toggleForm();
-        toggleShow();
+     
         setEditMode(false);
         setFormData({});
       } catch (error) {
@@ -182,8 +181,7 @@ const OurTeam = () => {
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-      toggleForm();
-      toggleShow();
+    
       setFormData(memberToEdit);
     }
   };
@@ -203,13 +201,13 @@ const OurTeam = () => {
   return (
     <Container>
       <Row>
-        <Col>
-          <SearchInput
-            searchQuery={searchQuery}
-            onSearch={handleSearch}
-            onExport={handleExport}
-          />
-        </Col>
+      {!shows && !editMode && (
+            <SearchInput
+              searchQuery={searchQuery}
+              onSearch={handleSearch}
+              onExport={handleExport}
+            />
+          )}
       </Row>
 
       <Row>
@@ -227,6 +225,13 @@ const OurTeam = () => {
               <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col md={6}>
+                  {formData.img && (
+                      <img
+                        src={formData.img}
+                        alt="current image for post"
+                        style={{ width: "100px", height: "auto", marginBottom: '10px' }}
+                      />
+                    )}
                     <NewResuableForm
                       label={"Image Upload"}
                       placeholder={"Upload Image"}
@@ -299,19 +304,7 @@ const OurTeam = () => {
                 </Row>
                 <Row>
                   <Col className="d-flex justify-content-end">
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      className="me-2"
-                      onClick={() => {
-                        setFormData({});
-                        toggleForm();
-                        toggleShow();
-                        setEditMode(false);
-                      }}
-                    >
-                      Cancel
-                    </Button>
+                  
                     <Button type="submit" variant="primary">
                       {editMode ? "Update" : "Submit"}
                     </Button>
@@ -323,13 +316,12 @@ const OurTeam = () => {
         </Col>
       </Row>
 
-      {!shows && !editMode && (
-        <Row>
-          <Col>
-            <TablePagination data={searchQuery.trim() ? filteredData : team} />
-          </Col>
-        </Row>
-      )}
+      <Row>
+  <Col className="mt-3">
+  <TablePagination />
+
+  </Col>
+</Row>
     </Container>
   );
 };

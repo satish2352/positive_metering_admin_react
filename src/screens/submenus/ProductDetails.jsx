@@ -1,5 +1,5 @@
-////sos
-//////working succssful using independent post delete and table 
+
+//sos
 import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Card, Button, Form, Table } from "react-bootstrap";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -15,7 +15,7 @@ import instance from "../../api/AxiosInstance";
 
 const ProductDetails = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } = useSearchExport();
-  const { shows, toggleForm, toggleShow } = useContext(ShowContext);
+  const { shows,  } = useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -53,7 +53,7 @@ const ProductDetails = () => {
         },
       });
       setTeam(response.data.responseData);
-      setData(response.data.responseData);
+    
     } catch (error) {
       console.error("Error fetching product data:", error);
     }
@@ -99,8 +99,7 @@ const ProductDetails = () => {
         });
         toast.success("Data Submitted Successfully");
         fetchTeam();
-        toggleForm();
-        toggleShow();
+     
         setFormData({});
       } catch (error) {
         console.error("Error handling form submission:", error);
@@ -129,8 +128,7 @@ const ProductDetails = () => {
         );
         toast.success("Data Updated Successfully");
         fetchTeam();
-        toggleForm();
-        toggleShow();
+   
         setEditMode(false);
         setFormData({});
       } catch (error) {
@@ -184,8 +182,7 @@ const ProductDetails = () => {
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-      toggleForm();
-      toggleShow();
+   
       setFormData(memberToEdit);
     }
   };
@@ -213,13 +210,13 @@ const ProductDetails = () => {
   return (
     <Container>
       <Row>
-        <Col>
-          <SearchInput
-            searchQuery={searchQuery}
-            onSearch={handleSearch}
-            onExport={handleExport}
-          />
-        </Col>
+      {!shows && !editMode && (
+            <SearchInput
+              searchQuery={searchQuery}
+              onSearch={handleSearch}
+              onExport={handleExport}
+            />
+          )}
       </Row>
 
       <Row>
@@ -270,6 +267,13 @@ const ProductDetails = () => {
               <Form>
                 <Row>
                 <Col md={6}>
+                {formData.img && (
+                      <img
+                        src={formData.img}
+                        alt="current image for post"
+                        style={{ width: "100px", height: "auto", marginBottom: '10px' }}
+                      />
+                    )}
                     <NewResuableForm
                       label="Image Upload"
                       placeholder="Upload Image"
@@ -311,26 +315,14 @@ const ProductDetails = () => {
                 </Row>
                 <Row>
                   <Col className="d-flex justify-content-end">
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      className="me-2"
-                      onClick={() => {
-                        setFormData({});
-                        toggleForm();
-                        toggleShow();
-                        setEditMode(false);
-                      }}
-                    >
-                      Cancel
-                    </Button>
+              
                     {!editMode && (
                       <Button type="button" variant="primary" onClick={handlePost}>
                         Submit
                       </Button>
                     )}
                     {editMode && (
-                      <Button type="button" variant="primary" onClick={handlePut}>
+                      <Button type="button" variant="success" onClick={handlePut}>
                         Update
                       </Button>
                     )}
@@ -342,9 +334,25 @@ const ProductDetails = () => {
         </Col>
       </Row>
 
-      {!shows && !editMode && <TablePagination />}
+      <Row>
+  <Col className="mt-3">
+  <TablePagination />
+
+  </Col>
+</Row>
     </Container>
   );
 };
 
 export default ProductDetails;
+
+
+
+
+
+
+
+
+
+
+////1

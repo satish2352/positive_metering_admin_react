@@ -8,7 +8,7 @@ const SearchInput = ({ searchQuery, onSearch, onExport }) => {
     <div className="d-flex justify-content-between align-items-center mb-3">
       <Form.Control
         type="text"
-        placeholder="Search by title"
+        placeholder="Search"
         value={searchQuery}
         onChange={(e) => onSearch(e.target.value)}
         className="me-2"
