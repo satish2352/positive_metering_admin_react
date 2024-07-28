@@ -1,4 +1,5 @@
-// ////error in download file . cors origin error backend error .
+////sos working success
+
 import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Table, Button } from "react-bootstrap";
 import { FaTrash, FaDownload } from "react-icons/fa";
@@ -82,18 +83,13 @@ const UploadCv = () => {
 
   const downloadCV = async (cvUrl) => {
     try {
-      const response = await fetch(cvUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(cvUrl);
       if (response.ok) {
         const blob = await response.blob();
-        const url = window.URL.createObjectURL(new Blob([blob]));
+        const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', cvUrl.split('/').pop()); // Extract filename from URL
+        link.setAttribute('download', cvUrl.split('/').pop());
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
@@ -139,11 +135,7 @@ const UploadCv = () => {
                   ))}
                   <td>
                     <div className="d-flex">
-                    
-                      <Button
-                        size="sm"
-                        onClick={() => downloadCV(item.cv)}
-                      >
+                      <Button size="sm" onClick={() => downloadCV(item.cv)}>
                         <FaDownload className="ms-1 me-1" />
                       </Button>
                     </div>
@@ -155,17 +147,13 @@ const UploadCv = () => {
         </Col>
       </Row>
 
-  
       <Row>
-  <Col className="mt-3">
-  <TablePagination />
-
-  </Col>
-</Row>
+        <Col className="mt-3">
+          <TablePagination />
+        </Col>
+      </Row>
     </Container>
   );
 };
 
 export default UploadCv;
-
-

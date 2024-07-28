@@ -1,5 +1,6 @@
 ////sos
-import React, { useState, useEffect, useContext } from "react";
+////view test 
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Row,
@@ -9,21 +10,21 @@ import {
   Form,
   Table,
 } from "react-bootstrap";
-import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
-import NewResuableForm from "../../components/form/NewResuableForm";
+import NewReusableForm from "../../components/form/NewResuableForm";
+
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TablePagination from "../../components/pagination/TablePagination";
-import ReusableDropdown from "../../components/dropdown/ReusableDropdown";
 import instance from "../../api/AxiosInstance";
+import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 
 const HomeSlider = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-  const { shows,  } = useContext(ShowContext);
+  const { shows } = React.useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -43,6 +44,11 @@ const HomeSlider = () => {
         />
       ),
     },
+    {
+      key: "view",
+      label: "View",
+      render: (value) => <span>{value}</span>,
+    },
   ];
 
   useEffect(() => {
@@ -54,13 +60,15 @@ const HomeSlider = () => {
     try {
       const response = await instance.get("homeslider/find-homeslider", {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: "Bearer " + accessToken,
           "Content-Type": "application/json",
         },
       });
       setTeam(response.data.responseData);
+      setData(response.data.responseData);
     } catch (error) {
-      console.error("Error fetching product data:", error);
+      console.error("Error fetching team:", error);
+      toast.error("Error fetching data");
     }
   };
 
@@ -73,11 +81,17 @@ const HomeSlider = () => {
       isValid = false;
     }
 
+    if (!formData.view) {
+      errors.view = "View selection is required";
+      isValid = false;
+    }
+
     setErrors(errors);
     return isValid;
   };
 
-  const handlePost = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (validateForm(formData)) {
       const accessToken = localStorage.getItem("accessToken");
       const data = new FormData();
@@ -86,44 +100,33 @@ const HomeSlider = () => {
       }
 
       try {
-        await instance.post("homeslider/create-homeslider", data, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        toast.success("Data Submitted Successfully");
-        fetchTeam();
-
-        setFormData({});
-      } catch (error) {
-        console.error("Error handling form submission:", error);
-      }
-    }
-  };
-
-  const handlePut = async () => {
-    if (validateForm(formData)) {
-      const accessToken = localStorage.getItem("accessToken");
-      const data = new FormData();
-      for (const key in formData) {
-        data.append(key, formData[key]);
-      }
-
-      try {
-        await instance.put(`homeslider/update-homeslider/${editingId}`, data, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        toast.success("Data Updated Successfully");
+        if (editMode) {
+          await instance.put(
+            `homeslider/update-homeslider/${editingId}`,
+            data,
+            {
+              headers: {
+                Authorization: "Bearer " + accessToken,
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          toast.success("Data Updated Successfully");
+        } else {
+          await instance.post("homeslider/create-homeslider", data, {
+            headers: {
+              Authorization: "Bearer " + accessToken,
+              "Content-Type": "multipart/form-data",
+            },
+          });
+          toast.success("Data Submitted Successfully");
+        }
         fetchTeam();
 
         setEditMode(false);
         setFormData({});
       } catch (error) {
-        console.error("Error handling form update:", error);
+        console.error("Error handling form submission:", error);
       }
     }
   };
@@ -136,7 +139,7 @@ const HomeSlider = () => {
         {},
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: "Bearer " + accessToken,
             "Content-Type": "application/json",
           },
         }
@@ -144,7 +147,8 @@ const HomeSlider = () => {
       toast.success("Data Deleted Successfully");
       fetchTeam();
     } catch (error) {
-      console.error("Error deleting product:", error);
+      console.error("Error deleting team member:", error);
+      toast.error("Error deleting data");
     }
   };
 
@@ -156,15 +160,16 @@ const HomeSlider = () => {
         { isVisible },
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: "Bearer " + accessToken,
             "Content-Type": "application/json",
           },
         }
       );
-      toast.success("Visibility Changed Successfully");
+      toast.success("Visibility Updated Successfully");
       fetchTeam();
     } catch (error) {
-      console.error("Error changing visibility:", error);
+      console.error("Error updating visibility:", error);
+      toast.error("Error updating data");
     }
   };
 
@@ -201,15 +206,13 @@ const HomeSlider = () => {
   return (
     <Container>
       <Row>
-        <Col>
-          {!shows && !editMode && (
-            <SearchInput
-              searchQuery={searchQuery}
-              onSearch={handleSearch}
-              onExport={handleExport}
-            />
-          )}
-        </Col>
+        {!shows && !editMode && (
+          <SearchInput
+            searchQuery={searchQuery}
+            onSearch={handleSearch}
+            onExport={handleExport}
+          />
+        )}
       </Row>
 
       <Row>
@@ -270,17 +273,23 @@ const HomeSlider = () => {
             </Table>
           ) : (
             <Card className="p-4">
-              <Form>
+              <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col md={6}>
-                  {formData.img && (
+               
+                    {formData.img && (
                       <img
                         src={formData.img}
                         alt="current image for post"
-                        style={{ width: "100px", height: "auto", marginBottom: '10px' }}
+                        style={{
+                          width: "100px",
+                          height: "auto",
+                          marginBottom: "10px",
+                        }}
                       />
                     )}
-                    <NewResuableForm
+              
+                    <NewReusableForm
                       label={"Image Upload"}
                       placeholder={"Upload Image"}
                       name={"img"}
@@ -290,42 +299,54 @@ const HomeSlider = () => {
                     />
                     {errors.img && <p className="text-danger">{errors.img}</p>}
                   </Col>
+
+                  <Col md={6}>
+                    <Form.Group controlId="formView">
+                      <Form.Label>View</Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="view"
+                        value={formData.view || ""}
+                        onChange={(e) => handleChange(e.target.name, e.target.value)}
+                      >
+                        <option value="">Select View</option>
+                        <option value="mobile">Mobile</option>
+                        <option value="desktop">Desktop</option>
+                      </Form.Control>
+                      {errors.view && <p className="text-danger">{errors.view}</p>}
+                    </Form.Group>
+                  </Col>
                 </Row>
                 <Row>
-                  <Col className="d-flex justify-content-end">
-                    {!editMode && (
-                      <Button
-                        type="button"
-                        variant="primary"
-                        onClick={handlePost}
-                      >
-                        Submit
-                      </Button>
-                    )}
-                    {editMode && (
-                      <Button
-                        type="button"
-                        variant="success"
-                        onClick={handlePut}
-                      >
-                        Update
-                      </Button>
-                    )}
-                  </Col>
+                  <div className="mt-3 d-flex justify-content-end">
+                    <Button
+                      type="submit"
+                      variant={editMode ? "success" : "primary"}
+                    >
+                      {editMode ? "Update" : "Submit"}
+                    </Button>
+                  </div>
                 </Row>
               </Form>
             </Card>
           )}
         </Col>
       </Row>
-
-      <Row>
-        <Col className="mt-3">
-          <TablePagination />
-        </Col>
-      </Row>
+      {!shows && !editMode && (
+        <TablePagination data={searchQuery.trim() ? filteredData : team} />
+      )}
     </Container>
   );
 };
 
 export default HomeSlider;
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,6 @@
 ////sos
 import React, { useState, useEffect, useContext } from "react";
-import { Container, Row, Col, Table, Button ,Form} from "react-bootstrap";
+import { Container, Row, Col, Table, Button, Form } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
@@ -11,7 +11,8 @@ import TablePagination from "../../components/pagination/TablePagination";
 import instance from "../../api/AxiosInstance";
 
 const CarousalForm = () => {
-  const { searchQuery, handleSearch, handleExport, setData, filteredData, data } = useSearchExport();
+  const { searchQuery, handleSearch, handleExport, setData, filteredData } =
+    useSearchExport();
   const { shows } = useContext(ShowContext);
   const [team, setTeam] = useState([]);
 
@@ -36,17 +37,14 @@ const CarousalForm = () => {
         },
       });
       setTeam(response.data.responseData);
-      setData(response.data.responseData); 
+      setData(response.data.responseData);
     } catch (error) {
       console.error("Error fetching team data:", error);
     }
   };
 
-
-
   useEffect(() => {
     if (shows) {
-
     }
   }, [shows]);
 
@@ -58,14 +56,12 @@ const CarousalForm = () => {
   return (
     <Container>
       <Row>
-      <Col>
-   
-            <SearchInput
-              searchQuery={searchQuery}
-              onSearch={handleSearch}
-              onExport={exportData}
-            />
-
+        <Col>
+          <SearchInput
+            searchQuery={searchQuery}
+            onSearch={handleSearch}
+            onExport={exportData}
+          />
         </Col>
       </Row>
 
@@ -77,7 +73,6 @@ const CarousalForm = () => {
                 {tableColumns.map((col) => (
                   <th key={col.key}>{col.label}</th>
                 ))}
-               
               </tr>
             </thead>
             <tbody>
@@ -86,7 +81,6 @@ const CarousalForm = () => {
                   {tableColumns.map((col) => (
                     <td key={col.key}>{item[col.key]}</td>
                   ))}
-               
                 </tr>
               ))}
             </tbody>
@@ -94,19 +88,13 @@ const CarousalForm = () => {
         </Col>
       </Row>
 
-<Row>
-  <Col className="mt-3">
-  <TablePagination />
-
-  </Col>
-</Row>
-
-   
+      <Row>
+        <Col className="mt-3">
+          <TablePagination />
+        </Col>
+      </Row>
     </Container>
   );
 };
 
 export default CarousalForm;
-
-
-
