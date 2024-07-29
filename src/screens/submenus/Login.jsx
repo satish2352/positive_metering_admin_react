@@ -214,7 +214,7 @@ const Login = () => {
                   <Image src={logo} alt="Logo" fluid style={{ maxWidth: "100px" }} />
                 </Col>
                 <Col xs={12}>
-                  <h2 className="text-center text-primary font-weight-bold">Positive Metering Admin Panel</h2>
+                  <h3 className="text-center text-primary font-weight-bold">POSITIVE METERING PUMPS PVT LTD</h3>
                 </Col>
               </Row>
               <Form onSubmit={handleSubmit}>
