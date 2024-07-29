@@ -175,11 +175,16 @@ const MaterialData = () => {
           },
         }
       );
-      toast.success("Visibility Changed Successfully");
+      if (isVisible) {
+        toast.success("Data hidden successfully");
+      } else {
+        toast.success("Data shown successfully");
+      }
+      
       fetchTeam();
     } catch (error) {
-      console.error("Error changing visibility:", error);
-      toast.error("Error changing visibility");
+      console.error("Error updating visibility:", error);
+      toast.error("Error updating visibility");
     }
   };
 

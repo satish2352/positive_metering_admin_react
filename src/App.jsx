@@ -47,7 +47,7 @@ import ProtectedRoutes from "./api/ProtectedRoutes";
 function App() {
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={2000}/>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="*" element={<PageNotFound />} />

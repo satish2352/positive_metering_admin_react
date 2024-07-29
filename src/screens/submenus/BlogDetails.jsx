@@ -540,11 +540,16 @@ const BlogDetails = () => {
           },
         }
       );
-      toast.success("Data Hide/Show Successfully");
+      if (isVisible) {
+        toast.success("Data hidden successfully");
+      } else {
+        toast.success("Data shown successfully");
+      }
+      
       fetchTeam();
     } catch (error) {
-      console.error("Error Hide/Show team member:", error);
-      toast.error("Error submitting data");
+      console.error("Error updating visibility:", error);
+      toast.error("Error updating visibility");
     }
   };
 

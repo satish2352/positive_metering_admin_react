@@ -176,11 +176,16 @@ const TechnicalData = () => {
           },
         }
       );
-      toast.success("Visibility Changed Successfully");
+      if (isVisible) {
+        toast.success("Data hidden successfully");
+      } else {
+        toast.success("Data shown successfully");
+      }
+      
       fetchTeam();
     } catch (error) {
-      console.error("Error changing visibility:", error);
-      toast.error("Error changing visibility");
+      console.error("Error updating visibility:", error);
+      toast.error("Error updating visibility");
     }
   };
 
@@ -314,14 +319,19 @@ const TechnicalData = () => {
                   </Col>
               </Row>
           
-              <div className="mt-3 d-flex justify-content-end">
-                    <Button
-                      type="submit"
-                      variant={editMode ? "success" : "primary"}
-                    >
-                      {editMode ? "Update" : "Submit"}
-                    </Button>
-                  </div>
+              <Col className="d-flex justify-content-end">
+              
+              {!editMode && (
+                <Button type="button" variant="primary" onClick={handlePost}>
+                  Submit
+                </Button>
+              )}
+              {editMode && (
+                <Button type="button" variant="success" onClick={handlePut}>
+                  Update
+                </Button>
+              )}
+            </Col>
             </Form>
           )}
         </Col>

@@ -172,11 +172,16 @@ const ContactSalesPerson = () => {
           },
         }
       );
-      toast.success("Visibility Changed Successfully");
+      if (isVisible) {
+        toast.success("Data hidden successfully");
+      } else {
+        toast.success("Data shown successfully");
+      }
+      
       fetchTeam();
     } catch (error) {
-      console.error("Error changing visibility:", error);
-      toast.error("Visibility change failed. Please try again.");
+      console.error("Error updating visibility:", error);
+      toast.error("Error updating visibility");
     }
   };
 

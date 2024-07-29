@@ -57,7 +57,7 @@ const AreaTop = () => {
         >
           <MdOutlineMenu size={24} />
         </button>
-        <h2 className="area-top-title">{title || "Home Contact"}</h2>
+        <h2 className="area-top-title">{title || "Header Contact"}</h2>
       </div>
       <div className="area-top-r">
         <Button onClick={handleButtonClick} variant="outline-danger">

@@ -59,22 +59,7 @@ const UploadCv = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    const accessToken = localStorage.getItem("accessToken");
-    try {
-      await instance.delete(`uploadcv/delete/${id}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-      toast.success("Data Deleted Successfully");
-      fetchTeam();
-    } catch (error) {
-      console.error("Error deleting data:", error);
-      toast.error("Error deleting data");
-    }
-  };
+
 
   const exportData = () => {
     const dataToExport = searchQuery.trim() ? filteredData : team;

@@ -111,7 +111,7 @@ const HeaderContact = () => {
     try {
       await instance.patch(
         `header-contact/isdelete/${id}`,
-        {},
+      
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         }
@@ -124,6 +124,26 @@ const HeaderContact = () => {
     }
   };
 
+  // const handleIsActive = async (id, isVisible) => {
+  //   const accessToken = localStorage.getItem("accessToken");
+  //   try {
+  //     await instance.patch(
+  //       `header-contact/isactive/${id}`,
+  //       { isVisible },
+  //       {
+  //         headers: { Authorization: `Bearer ${accessToken}` },
+  //       }
+  //     );
+  //     toast.success("Data Hide/Show Successfully");
+  //     fetchTeam();
+  //   } catch (error) {
+  //     console.error("Error Hide/Show team member:", error);
+  //     toast.error("Error updating visibility");
+  //   }
+  // };
+
+
+
   const handleIsActive = async (id, isVisible) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
@@ -134,10 +154,17 @@ const HeaderContact = () => {
           headers: { Authorization: `Bearer ${accessToken}` },
         }
       );
-      toast.success("Data Hide/Show Successfully");
+    
+      
+      if (isVisible) {
+        toast.success("Data hidden successfully");
+      } else {
+        toast.success("Data shown successfully");
+      }
+      
       fetchTeam();
     } catch (error) {
-      console.error("Error Hide/Show team member:", error);
+      console.error("Error updating visibility:", error);
       toast.error("Error updating visibility");
     }
   };

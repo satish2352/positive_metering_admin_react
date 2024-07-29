@@ -165,11 +165,16 @@ const HomeSlider = () => {
           },
         }
       );
-      toast.success("Visibility Updated Successfully");
+      if (isVisible) {
+        toast.success("Data hidden successfully");
+      } else {
+        toast.success("Data shown successfully");
+      }
+      
       fetchTeam();
     } catch (error) {
       console.error("Error updating visibility:", error);
-      toast.error("Error updating data");
+      toast.error("Error updating visibility");
     }
   };
 
