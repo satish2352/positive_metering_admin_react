@@ -12,7 +12,7 @@ import instance from "../../api/AxiosInstance";
 import NewResuableForm from "../../components/form/NewResuableForm";
 const MaterialData = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } = useSearchExport();
-  const { shows, } = useContext(ShowContext);
+  const { shows,  toggleShows} = useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [products, setProducts] = useState([]); // New state for product names
   const [errors, setErrors] = useState({});
@@ -40,8 +40,9 @@ const MaterialData = () => {
           "Content-Type": "application/json",
         },
       });
-      setTeam(response.data.responseData);
-      setData(response.data.responseData);
+      const reversedData = response.data.responseData.reverse();
+      setTeam(reversedData);
+      setData(reversedData);
     } catch (error) {
       console.error("Error fetching Option data:", error);
     }
@@ -93,8 +94,11 @@ const MaterialData = () => {
 
         if (response.status === 200) {
           toast.success("Data Submitted Successfully");
+                // Add the new entry to the top of the team array
+                const newTeamMember = response.data.responseData;
+                setTeam([newTeamMember, ...team]);
           fetchTeam();
-       
+          toggleShows(); 
           setFormData({});
         } else {
           toast.error("Failed to submit data");
@@ -127,8 +131,13 @@ const MaterialData = () => {
 
         if (response.status === 200) {
           toast.success("Data Updated Successfully");
+                  // Update the specific entry in the team array
+                  const updatedTeam = team.map((member) =>
+                    member.id === editingId ? formData : member
+                  );
+                  setTeam(updatedTeam);
           fetchTeam();
-      
+          toggleShows(); 
           setEditMode(false);
           setFormData({});
         } else {
@@ -144,7 +153,7 @@ const MaterialData = () => {
   const handleDelete = async (id) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
+      await instance.delete(
         `materialData/delete-material/${id}`,
         {},
         {
@@ -165,7 +174,7 @@ const MaterialData = () => {
   const handleIsActive = async (id, isVisible) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
+      await instance.put(
         `materialData/isactive-materialData/${id}`,
         { isVisible },
         {
@@ -193,7 +202,7 @@ const MaterialData = () => {
     if (itemToEdit) {
       setEditingId(id);
       setEditMode(true);
-
+      toggleShows(); 
       setFormData(itemToEdit); // Ensure this correctly sets `OptionDescription`
     }
   };
@@ -207,7 +216,7 @@ const MaterialData = () => {
   };
 
   useEffect(() => {
-    if (shows) {
+    if (!shows) {
       setEditMode(false);
       setEditingId(null);
       setFormData({});

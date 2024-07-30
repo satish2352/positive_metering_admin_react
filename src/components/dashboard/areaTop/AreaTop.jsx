@@ -1,15 +1,13 @@
-// t2 checjing view add btn name toggle
-
+////sos
 import { MdOutlineMenu } from "react-icons/md";
 import "./AreaTop.scss";
 import { useContext, useEffect, useRef, useState } from "react";
 import { SidebarContext } from "../../../context/SidebarContext";
-
 import { addDays } from "date-fns";
-
 import { TitleContext } from "../../../context/TitleContext";
 import { Button } from "react-bootstrap";
 import { ShowContext } from "../../../context/ShowContext";
+import { useLocation } from "react-router-dom";
 
 const AreaTop = () => {
   const { openSidebar } = useContext(SidebarContext);
@@ -23,11 +21,9 @@ const AreaTop = () => {
     },
   ]);
 
- 
   const [buttonText, setButtonText] = useState("Add");
   const dateRangeRef = useRef(null);
-
-
+  const location = useLocation();
 
   const handleClickOutside = (event) => {
     if (dateRangeRef.current && !dateRangeRef.current.contains(event.target)) {
@@ -47,6 +43,10 @@ const AreaTop = () => {
     setButtonText((prevText) => (prevText === "View" ? "Add" : "View"));
   };
 
+  //hidden from this
+  const hiddenPaths = ["/subscribe", "/carousalform", "/requestcallbackform","/uploadcv","/getintouch","/subscribe",""];
+  const isHiddenPath = hiddenPaths.includes(location.pathname);
+
   return (
     <section className="content-area-top bg-white p-3 mb-3">
       <div className="area-top-l">
@@ -60,9 +60,11 @@ const AreaTop = () => {
         <h2 className="area-top-title">{title || "Header Contact"}</h2>
       </div>
       <div className="area-top-r">
-        <Button onClick={handleButtonClick} variant="outline-danger">
-          {buttonText}
-        </Button>
+        {!isHiddenPath && (
+          <Button onClick={handleButtonClick} variant="outline-danger">
+            {buttonText}
+          </Button>
+        )}
       </div>
     </section>
   );

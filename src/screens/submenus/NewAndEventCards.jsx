@@ -15,7 +15,7 @@ import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 const NewsAndEventCards = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-  const { shows, } = React.useContext(ShowContext);
+  const { shows, toggleShows } = React.useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -53,8 +53,9 @@ const NewsAndEventCards = () => {
           "Content-Type": "application/json",
         },
       });
-      setTeam(response.data.responseData);
-      setData(response.data.responseData);
+      const reversedData = response.data.responseData.reverse();
+      setTeam(reversedData);
+      setData(reversedData);
     } catch (error) {
       console.error(
         "Error fetching team:",
@@ -111,6 +112,11 @@ const NewsAndEventCards = () => {
             }
           );
           toast.success("Data Updated Successfully");
+                    // Update the specific entry in the team array
+                    const updatedTeam = team.map((member) =>
+                      member.id === editingId ? formData : member
+                    );
+                    setTeam(updatedTeam);
         } else {
           await instance.post("newsandevent/create-newevent", data, {
             headers: {
@@ -119,9 +125,13 @@ const NewsAndEventCards = () => {
             },
           });
           toast.success("Data Submitted Successfully");
+          
+          // Add the new entry to the top of the team array
+          const newTeamMember = response.data.responseData;
+          setTeam([newTeamMember, ...team]);
         }
         fetchTeam();
-      
+        toggleShows(); 
         setEditMode(false);
         setFormData({});
       } catch (error) {
@@ -133,7 +143,7 @@ const NewsAndEventCards = () => {
   const handleDelete = async (id) => {
     const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
     try {
-      await instance.patch(
+      await instance.delete(
         `newsandevent/isdelete-newevent/${id}`,
         {},
         {
@@ -154,7 +164,7 @@ const NewsAndEventCards = () => {
   const handleIsActive = async (id, isVisible) => {
     const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
     try {
-      await instance.patch(
+      await instance.put(
         `newsandevent/isactive-newevent/${id}`,
         { isVisible },
         {
@@ -181,7 +191,7 @@ const NewsAndEventCards = () => {
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-  
+      toggleShows(); 
       setFormData(memberToEdit);
     }
   };
@@ -195,7 +205,7 @@ const NewsAndEventCards = () => {
   };
 
   useEffect(() => {
-    if (shows) {
+    if (!shows) {
       setEditMode(false);
       setEditingId(null);
       setFormData({});

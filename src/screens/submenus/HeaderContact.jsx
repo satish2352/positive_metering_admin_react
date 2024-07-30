@@ -1,5 +1,5 @@
-////sos
-////shubham sir changes
+// /////sos
+
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -13,18 +13,16 @@ import {
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
 import NewReusableForm from "../../components/form/NewResuableForm";
-import ReusableTable from "../../components/table/ReusableTable";
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
-
 import TablePagination from "../../components/pagination/TablePagination";
 import instance from "../../api/AxiosInstance";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
+
 const HeaderContact = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-
-  const { shows } = React.useContext(ShowContext);
+  const { shows, toggleShows } = React.useContext(ShowContext);
 
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
@@ -32,7 +30,7 @@ const HeaderContact = () => {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({});
   const [eyeVisibilityById, setEyeVisibilityById] = useState({});
-  console.log(team);
+
   const tableColumns = [
     { key: "phone1", label: "Phone 1" },
     { key: "phone2", label: "Phone 2" },
@@ -48,8 +46,9 @@ const HeaderContact = () => {
       const response = await instance.get("header-contact/findheaderContacts", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      setTeam(response.data.responseData);
-      setData(response.data.responseData);
+      const reversedData = response.data.responseData.reverse();
+      setTeam(reversedData);
+      setData(reversedData);
     } catch (error) {
       console.error("Error fetching team:", error);
       toast.error("Failed to fetch data");
@@ -90,18 +89,31 @@ const HeaderContact = () => {
             { headers: { Authorization: `Bearer ${accessToken}` } }
           );
           toast.success("Data Updated Successfully");
+
+          // Update the specific entry in the team array
+          const updatedTeam = team.map((member) =>
+            member.id === editingId ? formData : member
+          );
+          setTeam(updatedTeam);
         } else {
-          await instance.post("header-contact/createheadercontact", formData, {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          });
+          const response = await instance.post(
+            "header-contact/createheadercontact",
+            formData,
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          );
           toast.success("Data Submitted Successfully");
+
+          // Add the new entry to the top of the team array
+          const newTeamMember = response.data.responseData;
+          setTeam([newTeamMember, ...team]);
         }
-        fetchTeam();
 
         setEditMode(false);
         setFormData({});
+        toggleShows(); // Redirect to table view
       } catch (error) {
         console.error("Error handling form submission:", error);
+        toast.error("Error submitting data");
       }
     }
   };
@@ -109,60 +121,35 @@ const HeaderContact = () => {
   const handleDelete = async (id) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
-        `header-contact/isdelete/${id}`,
-      
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
+      await instance.delete(`header-contact/isdelete/${id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
       toast.success("Data Deleted Successfully");
-      fetchTeam();
+      fetchTeam(); // Refresh the data
     } catch (error) {
       console.error("Error deleting team member:", error);
       toast.error("Error deleting data");
     }
   };
 
-  // const handleIsActive = async (id, isVisible) => {
-  //   const accessToken = localStorage.getItem("accessToken");
-  //   try {
-  //     await instance.patch(
-  //       `header-contact/isactive/${id}`,
-  //       { isVisible },
-  //       {
-  //         headers: { Authorization: `Bearer ${accessToken}` },
-  //       }
-  //     );
-  //     toast.success("Data Hide/Show Successfully");
-  //     fetchTeam();
-  //   } catch (error) {
-  //     console.error("Error Hide/Show team member:", error);
-  //     toast.error("Error updating visibility");
-  //   }
-  // };
-
-
-
   const handleIsActive = async (id, isVisible) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
+      await instance.put(
         `header-contact/isactive/${id}`,
         { isVisible },
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         }
       );
-    
-      
+
       if (isVisible) {
         toast.success("Data hidden successfully");
       } else {
         toast.success("Data shown successfully");
       }
-      
-      fetchTeam();
+
+      fetchTeam(); // Refresh the data
     } catch (error) {
       console.error("Error updating visibility:", error);
       toast.error("Error updating visibility");
@@ -170,16 +157,12 @@ const HeaderContact = () => {
   };
 
   const toggleEdit = (leaderId) => {
-    console.log("leaderId", leaderId);
-    setFormData({
-      phone1: "test1",
-    });
     const memberToEdit = team.find((item) => item.id === leaderId);
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-
       setFormData(memberToEdit);
+      toggleShows(); // Redirect to form view
     }
   };
 
@@ -192,7 +175,7 @@ const HeaderContact = () => {
   };
 
   useEffect(() => {
-    if (shows) {
+    if (!shows) {
       setEditMode(false);
       setEditingId(null);
       setFormData({});
@@ -202,10 +185,12 @@ const HeaderContact = () => {
   const handleChange = (name, value) => {
     setFormData({ ...formData, [name]: value });
   };
+
   const exportData = () => {
     const dataToExport = searchQuery.trim() ? filteredData : team;
     handleExport(dataToExport);
   };
+
   return (
     <Container>
       <Row>
@@ -234,11 +219,8 @@ const HeaderContact = () => {
               <tbody>
                 {(searchQuery.trim() ? filteredData : team).map((item) => (
                   <tr key={item.id}>
-                    {tableColumns.map((col) => (
-                      <td key={col.key}>
-                        {col.render ? col.render(item[col.key]) : item[col.key]}
-                      </td>
-                    ))}
+                    <td>{item.phone1}</td>
+                    <td>{item.phone2}</td>
                     <td>
                       <div className="d-flex">
                         <Button

@@ -15,7 +15,7 @@ import instance from "../../api/AxiosInstance";
 
 const ProductDetails = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } = useSearchExport();
-  const { shows,  } = useContext(ShowContext);
+  const { shows, toggleShows } = useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -52,7 +52,9 @@ const ProductDetails = () => {
           "Content-Type": "application/json",
         },
       });
-      setTeam(response.data.responseData);
+      const reversedData = response.data.responseData.reverse();
+      setTeam(reversedData);
+      setData(reversedData);
     
     } catch (error) {
       console.error("Error fetching product data:", error);
@@ -98,8 +100,11 @@ const ProductDetails = () => {
           },
         });
         toast.success("Data Submitted Successfully");
+           // Add the new entry to the top of the team array
+           const newTeamMember = response.data.responseData;
+           setTeam([newTeamMember, ...team]);
         fetchTeam();
-     
+        toggleShows()
         setFormData({});
       } catch (error) {
         console.error("Error handling form submission:", error);
@@ -127,8 +132,13 @@ const ProductDetails = () => {
           }
         );
         toast.success("Data Updated Successfully");
+                  // Update the specific entry in the team array
+                  const updatedTeam = team.map((member) =>
+                    member.id === editingId ? formData : member
+                  );
+                  setTeam(updatedTeam);
         fetchTeam();
-   
+        toggleShows()
         setEditMode(false);
         setFormData({});
       } catch (error) {
@@ -140,7 +150,7 @@ const ProductDetails = () => {
   const handleDelete = async (id) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
+      await instance.delete(
         `productdetails/isdelete-productdetails/${id}`,
         {},
         {
@@ -160,7 +170,7 @@ const ProductDetails = () => {
   const handleIsActive = async (id, isVisible) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
+      await instance.put(
         `productdetails/isactive-productdetails/${id}`,
         { isVisible },
         {
@@ -187,7 +197,7 @@ const ProductDetails = () => {
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-   
+      toggleShows()
       setFormData(memberToEdit);
     }
   };

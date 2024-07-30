@@ -1,8 +1,7 @@
-////sos working success
-
+////sos
 import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Table, Button } from "react-bootstrap";
-import { FaTrash, FaDownload } from "react-icons/fa";
+import { FaDownload } from "react-icons/fa";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
 import SearchInput from "../../components/search/SearchInput";
@@ -52,14 +51,14 @@ const UploadCv = () => {
           "Content-Type": "application/json",
         },
       });
-      setTeam(response.data.responseData);
-      setData(response.data.responseData);
+      const reversedData = response.data.responseData.reverse();
+      setTeam(reversedData);
+      setData(reversedData);
     } catch (error) {
       console.error("Error fetching team data:", error);
+      toast.error('Error fetching team data');
     }
   };
-
-
 
   const exportData = () => {
     const dataToExport = searchQuery.trim() ? filteredData : team;
@@ -68,21 +67,21 @@ const UploadCv = () => {
 
   const downloadCV = async (cvUrl) => {
     try {
-      const response = await fetch(cvUrl);
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', cvUrl.split('/').pop());
-        document.body.appendChild(link);
-        link.click();
-        link.parentNode.removeChild(link);
-      } else {
-        throw new Error('Network response was not ok.');
+      const response = await fetch(`${encodeURIComponent(cvUrl)}`);
+      if (!response.ok) {
+        throw new Error(`Network response was not ok: ${response.statusText}`);
       }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', cvUrl.split('/').pop());
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('There was an error downloading the file:', error);
+      console.error('Error downloading the file:', error);
       toast.error('Error downloading the file');
     }
   };

@@ -34,8 +34,9 @@ const RequestCallbackForm = () => {
           "Content-Type": "application/json",
         },
       });
-      setTeam(response.data.responseData);
-      setData(response.data.responseData); // Update data in context
+      const reversedData = response.data.responseData.reverse();
+      setTeam(reversedData);
+      setData(reversedData);
     } catch (error) {
       console.error("Error fetching team data:", error);
     }

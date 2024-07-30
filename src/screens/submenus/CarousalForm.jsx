@@ -13,7 +13,7 @@ import instance from "../../api/AxiosInstance";
 const CarousalForm = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-  const { shows } = useContext(ShowContext);
+  const { shows, } = useContext(ShowContext);
   const [team, setTeam] = useState([]);
 
   const tableColumns = [
@@ -36,8 +36,9 @@ const CarousalForm = () => {
           "Content-Type": "application/json",
         },
       });
-      setTeam(response.data.responseData);
-      setData(response.data.responseData);
+      const reversedData = response.data.responseData.reverse();
+      setTeam(reversedData);
+      setData(reversedData);
     } catch (error) {
       console.error("Error fetching team data:", error);
     }

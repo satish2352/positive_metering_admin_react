@@ -1,4 +1,3 @@
-
 ////sos
 import { useContext, useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
@@ -11,16 +10,21 @@ import {
   MdLogout,
   MdOutlineContactMail,
   MdAccountBox,
-  MdOutlinePermContactCalendar ,
+  MdOutlinePermContactCalendar,
 } from "react-icons/md";
 import { SiStorybook } from "react-icons/si";
 import { GrServices } from "react-icons/gr";
 import { RiTeamFill, RiFileListLine, RiContactsBookLine } from "react-icons/ri";
 import { FiUsers, FiList, FiFileText, FiUploadCloud } from "react-icons/fi";
 import { AiOutlineAppstoreAdd, AiOutlineProject } from "react-icons/ai";
-import { BsNewspaper, BsChatSquareQuote, BsBuilding, BsCameraVideo } from "react-icons/bs";
+import {
+  BsNewspaper,
+  BsChatSquareQuote,
+  BsBuilding,
+  BsCameraVideo,
+} from "react-icons/bs";
 import { IoIosOptions, IoIosPeople } from "react-icons/io";
-import { FaRegNewspaper ,FaBusinessTime } from "react-icons/fa";
+import { FaRegNewspaper, FaBusinessTime } from "react-icons/fa";
 import "./Sidebar.scss";
 import { SidebarContext } from "../../context/SidebarContext";
 import { TitleContext } from "../../context/TitleContext";
@@ -41,7 +45,7 @@ const SidebarMenu = [
       //   url: "/heroform",
       //   icon: <AiOutlineAppstoreAdd style={{ color: "red" }} size={24} />,
       // },
-  
+
       {
         subMenus: "Home Slider",
         url: "/homeslider",
@@ -57,15 +61,13 @@ const SidebarMenu = [
         url: "/carousalform",
         icon: <RiFileListLine style={{ color: "red" }} size={24} />,
       },
-   
-  
+
       {
         subMenus: "Request Callback Form",
         url: "/requestcallbackform",
         icon: <MdOutlineContactMail style={{ color: "red" }} size={24} />,
       },
-  
- 
+
       {
         subMenus: "Testimonial",
         url: "/testimonial",
@@ -103,7 +105,6 @@ const SidebarMenu = [
         url: "/ourteam",
         icon: <FiUsers style={{ color: "red" }} size={24} />,
       },
-  
     ],
   },
   {
@@ -143,18 +144,17 @@ const SidebarMenu = [
       },
     ],
   },
-  {
-    menu: "Service",
-    url: "/service",
-    mainIcon: <GrServices size={24} />,
-    subMenu: [],
-  },
+  // {
+  //   menu: "Service",
+  //   url: "/service",
+  //   mainIcon: <GrServices size={24} />,
+  //   subMenu: [],
+  // },
   {
     menu: "Blog",
     url: "/blog",
     mainIcon: <FaRegNewspaper size={24} />,
     subMenu: [
- 
       {
         subMenus: "Blog Details",
         url: "/blogdetails",
@@ -178,21 +178,20 @@ const SidebarMenu = [
   {
     menu: "Career",
     url: "/career",
-    mainIcon: <FaBusinessTime  size={24} />,
+    mainIcon: <FaBusinessTime size={24} />,
     subMenu: [
       {
         subMenus: "Upload CV",
         url: "/uploadcv",
         icon: <FiUploadCloud style={{ color: "red" }} size={24} />,
       },
-
     ],
   },
 
   {
     menu: "Contact Us",
     url: "/contactus",
-    mainIcon: <MdOutlinePermContactCalendar  size={24} />,
+    mainIcon: <MdOutlinePermContactCalendar size={24} />,
     subMenu: [
       {
         subMenus: "Contact Sales Person",
@@ -216,7 +215,7 @@ const SidebarMenu = [
       },
     ],
   },
- 
+
   {
     menu: "Logout",
     url: "/logout",
@@ -260,10 +259,7 @@ const Sidebar = () => {
   };
 
   return (
-    <nav
-      className={`sidebar ${isSidebarOpen ? "sidebar-show" : ""}`}
-      ref={navbarRef}
-    >
+    <nav className={`sidebar ${isSidebarOpen ? "sidebar-show" : ""}`}>
       <div className="sidebar-top">
         <div className="sidebar-brand">
           <img className="w-25" src={logo} alt="Logo" />
@@ -282,7 +278,7 @@ const Sidebar = () => {
       <div className="sidebar-body">
         <div className="sidebar-menu">
           <MenuBar>
-            <Menu className="">
+            <Menu>
               {SidebarMenu.map((item, id) => (
                 <div key={id}>
                   {item.subMenu.length > 0 ? (
@@ -292,42 +288,43 @@ const Sidebar = () => {
                       }`}
                       icon={item.mainIcon}
                       label={item.menu}
-                      onClick={() => handleMenuClick(item.menu)}
                     >
                       {item.subMenu.map((subItem, subId) => (
-                        <MenuItem
+                        <div
                           key={subId}
-                          icon={subItem.icon}
                           className={`menu-link-text bg-white ${
                             activeSubMenu === subItem.subMenus ? "active" : ""
                           }`}
+                          style={{ cursor: "pointer" }}
                           onClick={() => handleSubMenuClick(subItem.subMenus)}
                         >
                           <Link
                             to={subItem.url}
                             className="text-decoration-none text-black"
                           >
-                            {subItem.subMenus}
+                            <MenuItem icon={subItem.icon}>
+                              {subItem.subMenus}
+                            </MenuItem>
                           </Link>
-                        </MenuItem>
+                        </div>
                       ))}
                     </SubMenu>
                   ) : (
-                    <MenuItem
+                    <div
                       key={id}
-                      icon={item.mainIcon}
                       className={`menu-link-text bg-white ${
                         activeMenu === item.menu ? "active" : ""
                       }`}
+                      style={{ cursor: "pointer" }}
                       onClick={() => handleMenuClick(item.menu)}
                     >
                       <Link
                         to={item.url}
                         className="text-decoration-none text-black"
                       >
-                        {item.menu}
+                        <MenuItem icon={item.mainIcon}>{item.menu}</MenuItem>
                       </Link>
-                    </MenuItem>
+                    </div>
                   )}
                 </div>
               ))}
@@ -340,8 +337,3 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
-
-
-
-
-

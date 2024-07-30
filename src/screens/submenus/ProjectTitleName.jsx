@@ -127,7 +127,7 @@ const ProjectTitleName = () => {
   const handleDelete = async (id) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
+      await instance.delete(
         `contactperson/isdelete-contactperson/${id}`,
         {},
         {
@@ -148,7 +148,7 @@ const ProjectTitleName = () => {
   const handleIsActive = async (id, isVisible) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
+      await instance.put(
         `contactperson/isactive-contactperson/${id}`,
         { isVisible },
         {

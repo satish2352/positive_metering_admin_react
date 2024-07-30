@@ -16,7 +16,7 @@ import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 const Carousal = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-  const { shows, } = React.useContext(ShowContext);
+  const { shows,   toggleShows} = React.useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -54,8 +54,9 @@ const Carousal = () => {
           "Content-Type": "application/json",
         },
       });
-      setTeam(response.data.responseData);
-      setData(response.data.responseData);
+      const reversedData = response.data.responseData.reverse();
+      setTeam(reversedData);
+      setData(reversedData);
     } catch (error) {
       console.error("Error fetching team:", error);
       toast.error("Error fetching data");
@@ -93,6 +94,11 @@ const Carousal = () => {
             },
           });
           toast.success("Data Updated Successfully");
+                 // Update the specific entry in the team array
+                 const updatedTeam = team.map((member) =>
+                  member.id === editingId ? formData : member
+                );
+                setTeam(updatedTeam);
         } else {
           await instance.post("carrousal/create-carrousal", data, {
             headers: {
@@ -101,11 +107,15 @@ const Carousal = () => {
             },
           });
           toast.success("Data Submitted Successfully");
+                 // Add the new entry to the top of the team array
+                 const newTeamMember = response.data.responseData;
+                 setTeam([newTeamMember, ...team]);
         }
         fetchTeam();
 
         setEditMode(false);
         setFormData({});
+        toggleShows(); // Redirect to table view
       } catch (error) {
         console.error("Error handling form submission:", error);
       }
@@ -115,7 +125,7 @@ const Carousal = () => {
   const handleDelete = async (id) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
+      await instance.delete(
         `carrousal/isdelete-carrousal/${id}`,
         {},
         {
@@ -136,7 +146,7 @@ const Carousal = () => {
   const handleIsActive = async (id, isVisible) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
+      await instance.put(
         `carrousal/isactive-carrousal/${id}`,
         { isVisible },
         {
@@ -159,7 +169,7 @@ const Carousal = () => {
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-
+      toggleShows(); // Redirect to form view
       setFormData(memberToEdit);
     }
   };
@@ -171,7 +181,7 @@ const Carousal = () => {
     setEyeVisibilityById(updatedEyeVisibilityById);
   };
   useEffect(() => {
-    if (shows) {
+    if (!shows) {
       setEditMode(false);
       setEditingId(null);
       setFormData({});

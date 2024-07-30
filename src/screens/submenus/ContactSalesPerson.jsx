@@ -15,7 +15,7 @@ import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 const ContactSalesPerson = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-  const { shows, } = useContext(ShowContext);
+  const { shows,  toggleShows} = useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -54,7 +54,9 @@ const ContactSalesPerson = () => {
           "Content-Type": "application/json",
         },
       });
-      setTeam(response.data.responseData);
+      const reversedData = response.data.responseData.reverse();
+      setTeam(reversedData);
+      setData(reversedData);
   
     } catch (error) {
       console.error("Error fetching office data:", error);
@@ -119,6 +121,11 @@ const ContactSalesPerson = () => {
             },
           });
           toast.success("Data Updated Successfully");
+                 // Update the specific entry in the team array
+                 const updatedTeam = team.map((member) =>
+                  member.id === editingId ? formData : member
+                );
+                setTeam(updatedTeam);
         } else {
           await instance.post("contactperson/create-contactperson", data, {
             headers: {
@@ -127,9 +134,13 @@ const ContactSalesPerson = () => {
             },
           });
           toast.success("Data Submitted Successfully");
+          
+   // Add the new entry to the top of the team array
+   const newTeamMember = response.data.responseData;
+   setTeam([newTeamMember, ...team]);
         }
         fetchTeam();
-
+        toggleShows(); 
         setEditMode(false);
         setFormData({});
       } catch (error) {
@@ -141,7 +152,7 @@ const ContactSalesPerson = () => {
   const handleDelete = async (id) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
+      await instance.delete(
         `contactperson/isdelete-contactperson/${id}`,
         {},
         {
@@ -162,7 +173,7 @@ const ContactSalesPerson = () => {
   const handleIsActive = async (id, isVisible) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
+      await instance.put(
         `contactperson/isactive-contactperson/${id}`,
         { isVisible },
         {
@@ -190,7 +201,7 @@ const ContactSalesPerson = () => {
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-
+      toggleShows(); 
       setFormData(memberToEdit);
     }
   };

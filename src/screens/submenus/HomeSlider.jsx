@@ -24,7 +24,7 @@ import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 const HomeSlider = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-  const { shows } = React.useContext(ShowContext);
+  const { shows,toggleShows } = React.useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -64,8 +64,9 @@ const HomeSlider = () => {
           "Content-Type": "application/json",
         },
       });
-      setTeam(response.data.responseData);
-      setData(response.data.responseData);
+      const reversedData = response.data.responseData.reverse();
+      setTeam(reversedData);
+      setData(reversedData);
     } catch (error) {
       console.error("Error fetching team:", error);
       toast.error("Error fetching data");
@@ -112,6 +113,11 @@ const HomeSlider = () => {
             }
           );
           toast.success("Data Updated Successfully");
+               // Update the specific entry in the team array
+               const updatedTeam = team.map((member) =>
+                member.id === editingId ? formData : member
+              );
+              setTeam(updatedTeam);
         } else {
           await instance.post("homeslider/create-homeslider", data, {
             headers: {
@@ -120,9 +126,12 @@ const HomeSlider = () => {
             },
           });
           toast.success("Data Submitted Successfully");
+             // Add the new entry to the top of the team array
+             const newTeamMember = response.data.responseData;
+             setTeam([newTeamMember, ...team]);
         }
         fetchTeam();
-
+        toggleShows();
         setEditMode(false);
         setFormData({});
       } catch (error) {
@@ -134,7 +143,7 @@ const HomeSlider = () => {
   const handleDelete = async (id) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
+      await instance.delete(
         `homeslider/isdelete-homeslider/${id}`,
         {},
         {
@@ -155,7 +164,7 @@ const HomeSlider = () => {
   const handleIsActive = async (id, isVisible) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await instance.patch(
+      await instance.put(
         `homeslider/isactive-homeslider/${id}`,
         { isVisible },
         {
@@ -185,6 +194,7 @@ const HomeSlider = () => {
       setEditMode(true);
 
       setFormData(memberToEdit);
+      toggleShows(); // Redirect to form view
     }
   };
 
@@ -197,10 +207,11 @@ const HomeSlider = () => {
   };
 
   useEffect(() => {
-    if (shows) {
+    if (!shows) {
       setEditMode(false);
       setEditingId(null);
       setFormData({});
+ 
     }
   }, [shows]);
 
