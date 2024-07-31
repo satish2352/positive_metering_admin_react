@@ -10,6 +10,8 @@ import "react-toastify/dist/ReactToastify.css";
 import TablePagination from "../../components/pagination/TablePagination";
 import instance from "../../api/AxiosInstance";
 import NewResuableForm from "../../components/form/NewResuableForm";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 const OptionsData = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } = useSearchExport();
   const { shows, toggleShows} = useContext(ShowContext);
@@ -152,56 +154,133 @@ const OptionsData = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    const accessToken = localStorage.getItem("accessToken");
-    try {
-      const response = await instance.delete(
-        `optionsData/delete-optionsdata/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
 
-      if (response.status === 200) {
-        toast.success("Data Deleted Successfully");
-        fetchTeam();
-      } else {
-        toast.error("Failed to delete data");
-      }
-    } catch (error) {
-      console.error("Error deleting data:", error);
-      toast.error("Error deleting data");
-    }
+
+  const handleDelete = async (id) => {
+    confirmAlert({
+      title: "Confirm to delete",
+      message: "Are you sure you want to delete this data?",
+      customUI: ({ onClose }) => (
+        <div
+          style={{
+            textAlign: "left", 
+            padding: "20px",
+            backgroundColor: "white",
+            borderRadius: "8px",
+            boxShadow: "0 4px 8px rgba(5, 5, 5, 0.2)",
+            maxWidth: "400px",
+            margin: "0 auto",
+          }}
+        >
+          <h2>Confirm to delete</h2>
+          <p>Are you sure you want to delete this data?</p>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end", 
+              marginTop: "20px",
+            }}
+          >
+            <button
+              style={{ marginRight: "10px" }}
+              className="btn btn-primary"
+              onClick={async () => {
+                const accessToken = localStorage.getItem("accessToken");
+                try {
+                  await instance.delete(`optionsData/delete-optionsdata/${id}`, {
+                    headers: {
+                      Authorization: `Bearer ${accessToken}`,
+                      "Content-Type": "application/json",
+                    },
+                  });
+                  toast.success("Data Deleted Successfully");
+                  fetchTeam();
+                } catch (error) {
+                  console.error("Error deleting data:", error);
+                  toast.error("Error deleting data");
+                }
+                onClose();
+              }}
+            >
+              Yes
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => onClose()}
+            >
+              No
+            </button>
+          </div>
+        </div>
+      ),
+    });
   };
 
   const handleIsActive = async (id, isVisible) => {
-    const accessToken = localStorage.getItem("accessToken");
-    try {
-      await instance.put(
-        `optionsData/isactive-optionsData/${id}`,
-        { isVisible },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (isVisible) {
-        toast.success("Data hidden successfully");
-      } else {
-        toast.success("Data shown successfully");
-      }
-      
-      fetchTeam();
-    } catch (error) {
-      console.error("Error updating visibility:", error);
-      toast.error("Error updating visibility");
-    }
+    confirmAlert({
+      title: "Confirm to change visibility",
+      customUI: ({ onClose }) => (
+        <div
+          style={{
+            textAlign: "left", 
+            padding: "20px",
+            backgroundColor: "white",
+            borderRadius: "8px",
+            boxShadow: "0 4px 8px rgba(5, 5, 5, 0.2)",
+            maxWidth: "400px",
+            margin: "0 auto",
+          }}
+        >
+          <h2>Confirm to change visibility</h2>
+          <p>Are you sure you want to {isVisible ? "hide" : "show"} this data?</p>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginTop: "20px", 
+            }}
+          >
+            <button
+              style={{ marginRight: "10px" }}
+              className="btn btn-primary"
+              onClick={async () => {
+                const accessToken = localStorage.getItem("accessToken");
+                try {
+                  await instance.put(
+                    `optionsData/isactive-optionsData/${id}`,
+                    { isVisible },
+                    {
+                      headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        "Content-Type": "application/json",
+                      },
+                    }
+                  );
+                  toast.success(
+                    `Data ${isVisible ? "hidden" : "shown"} successfully`
+                  );
+                  fetchTeam();
+                } catch (error) {
+                  console.error("Error updating visibility:", error);
+                  toast.error("Error updating visibility");
+                }
+                onClose();
+              }}
+            >
+              Yes
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => onClose()}
+            >
+              No
+            </button>
+          </div>
+        </div>
+      ),
+    });
   };
+
 
   const toggleEdit = (id) => {
     const itemToEdit = team.find((item) => item.id === id);
@@ -242,6 +321,7 @@ const OptionsData = () => {
               searchQuery={searchQuery}
               onSearch={handleSearch}
               onExport={handleExport}
+              showExportButton={false} 
             />
           )}
         </Col>
@@ -351,11 +431,12 @@ const OptionsData = () => {
       </Row>
       <Row>
       <Row>
-  <Col className="mt-3">
-  <TablePagination />
-
-  </Col>
-</Row>
+        {!shows && !editMode && (
+          <Col className="mt-3">
+            <TablePagination />
+          </Col>
+        )}
+      </Row>
       </Row>
     </Container>
   );

@@ -44,7 +44,7 @@ const AreaTop = () => {
   };
 
   //hidden from this
-  const hiddenPaths = ["/subscribe", "/carousalform", "/requestcallbackform","/uploadcv","/getintouch","/subscribe",""];
+  const hiddenPaths = ["/subscribe", "/carousalform", "/requestcallbackform","/uploadcv","/getintouch","/subscribe","/headercontact"];
   const isHiddenPath = hiddenPaths.includes(location.pathname);
 
   return (
