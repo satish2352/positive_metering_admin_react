@@ -1,4 +1,4 @@
-////sos
+// ////sos
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button, Form ,Table} from "react-bootstrap";
 import { useSearchExport } from "../../context/SearchExportContext";
@@ -21,6 +21,7 @@ const Testimonial = () => {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({});
   const [eyeVisibilityById, setEyeVisibilityById] = useState({});
+  const [imagePreview, setImagePreview] = useState("");
   const tableColumns = [
     {
       key: "img",
@@ -42,6 +43,20 @@ const Testimonial = () => {
     fetchTeam();
   }, []);
 
+  useEffect(() => {
+    if (formData.img && formData.img instanceof File) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(formData.img);
+    } else if (formData.img && typeof formData.img === 'string') {
+      setImagePreview(formData.img);
+    } else {
+      setImagePreview("");
+    }
+  }, [formData.img]);
+
   const fetchTeam = async () => {
     const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
     try {
@@ -54,6 +69,8 @@ const Testimonial = () => {
       const reversedData = response.data.responseData.reverse();
       setTeam(reversedData);
       setData(reversedData);
+      // setTeam(response.data.responseData);
+      // setData(response.data.responseData);
     } catch (error) {
       console.error(
         "Error fetching team:",
@@ -127,14 +144,12 @@ const Testimonial = () => {
           });
           toast.success("Data Submitted Successfully");
 
-             // Add the new entry to the top of the team array
-             const newTeamMember = response.data.responseData;
-             setTeam([newTeamMember, ...team]);
         }
         fetchTeam();
         toggleShows(); 
         setEditMode(false);
         setFormData({});
+        setImagePreview(""); 
       } catch (error) {
         console.error("Error handling form submission:", error);
       }
@@ -208,13 +223,18 @@ const Testimonial = () => {
       setEditMode(false);
       setEditingId(null);
       setFormData({});
+      setImagePreview("");
     }
   }, [shows]);
 
-  const handleChange = (name, value) => {
-    setFormData({ ...formData, [name]: value });
-  };
 
+  const handleChange = (name, value) => {
+    if (name === "img") {
+      setFormData({ ...formData, [name]: value });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
   return (
     <Container>
       <Row>
@@ -277,10 +297,10 @@ const Testimonial = () => {
               <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col md={6}>
-                  {formData.img && (
+                  {imagePreview && (
                       <img
-                        src={formData.img}
-                        alt="current image for post"
+                        src={imagePreview}
+                        alt="Selected Preview"
                         style={{ width: "100px", height: "auto", marginBottom: '10px' }}
                       />
                     )}
@@ -372,13 +392,6 @@ const Testimonial = () => {
 };
 
 export default Testimonial;
-
-
-
-
-
-
-
 
 
 

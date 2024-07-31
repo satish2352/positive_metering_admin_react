@@ -91,9 +91,7 @@ const ProductName = () => {
           });
           toast.success("Data Submitted Successfully");
           
-          // Add the new entry to the top of the team array
-          const newTeamMember = response.data.responseData;
-          setTeam([newTeamMember, ...team]);
+    
         }
         fetchTeam();
         toggleShows(); 

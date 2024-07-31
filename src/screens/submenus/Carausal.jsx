@@ -1,7 +1,15 @@
+////sos carousal to homeslider and vice versa
 
-//////sos
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Button, Form ,Table} from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Table,
+} from "react-bootstrap";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
 import NewReusableForm from "../../components/form/NewResuableForm";
@@ -16,13 +24,14 @@ import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 const Carousal = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-  const { shows,   toggleShows} = React.useContext(ShowContext);
+  const { shows,toggleShows } = React.useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({});
   const [eyeVisibilityById, setEyeVisibilityById] = useState({});
+  const [imagePreview, setImagePreview] = useState("");
   const tableColumns = [
     {
       key: "img",
@@ -33,22 +42,36 @@ const Carousal = () => {
           alt="Carousel"
           style={{ width: "100px", height: "auto" }}
         />
-
       ),
-
-
-   
+    },
+    {
+      key: "view",
+      label: "View",
+      render: (value) => <span>{value}</span>,
     },
   ];
 
   useEffect(() => {
     fetchTeam();
   }, []);
+  useEffect(() => {
+    if (formData.img && formData.img instanceof File) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(formData.img);
+    } else if (formData.img && typeof formData.img === 'string') {
+      setImagePreview(formData.img);
+    } else {
+      setImagePreview("");
+    }
+  }, [formData.img]);
 
   const fetchTeam = async () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      const response = await instance.get("carrousal/find-carrousal", {
+      const response = await instance.get("homeslider/find-homeslider", {
         headers: {
           Authorization: "Bearer " + accessToken,
           "Content-Type": "application/json",
@@ -72,6 +95,11 @@ const Carousal = () => {
       isValid = false;
     }
 
+    if (!formData.view) {
+      errors.view = "View selection is required";
+      isValid = false;
+    }
+
     setErrors(errors);
     return isValid;
   };
@@ -87,35 +115,37 @@ const Carousal = () => {
 
       try {
         if (editMode) {
-          await instance.put(`carrousal/update-carrousal/${editingId}`, data, {
-            headers: {
-              Authorization: "Bearer " + accessToken,
-              "Content-Type": "multipart/form-data",
-            },
-          });
+          await instance.put(
+            `homeslider/update-homeslider/${editingId}`,
+            data,
+            {
+              headers: {
+                Authorization: "Bearer " + accessToken,
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
           toast.success("Data Updated Successfully");
-                 // Update the specific entry in the team array
-                 const updatedTeam = team.map((member) =>
-                  member.id === editingId ? formData : member
-                );
-                setTeam(updatedTeam);
+               // Update the specific entry in the team array
+               const updatedTeam = team.map((member) =>
+                member.id === editingId ? formData : member
+              );
+              setTeam(updatedTeam);
         } else {
-          await instance.post("carrousal/create-carrousal", data, {
+          await instance.post("homeslider/create-homeslider", data, {
             headers: {
               Authorization: "Bearer " + accessToken,
               "Content-Type": "multipart/form-data",
             },
           });
           toast.success("Data Submitted Successfully");
-                 // Add the new entry to the top of the team array
-                 const newTeamMember = response.data.responseData;
-                 setTeam([newTeamMember, ...team]);
+      
         }
         fetchTeam();
-
+        toggleShows();
         setEditMode(false);
         setFormData({});
-        toggleShows(); // Redirect to table view
+        setImagePreview(""); 
       } catch (error) {
         console.error("Error handling form submission:", error);
       }
@@ -126,7 +156,7 @@ const Carousal = () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
       await instance.delete(
-        `carrousal/isdelete-carrousal/${id}`,
+        `homeslider/isdelete-homeslider/${id}`,
         {},
         {
           headers: {
@@ -147,7 +177,7 @@ const Carousal = () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
       await instance.put(
-        `carrousal/isactive-carrousal/${id}`,
+        `homeslider/isactive-homeslider/${id}`,
         { isVisible },
         {
           headers: {
@@ -156,11 +186,16 @@ const Carousal = () => {
           },
         }
       );
-      toast.success("Visibility Updated Successfully");
+      if (isVisible) {
+        toast.success("Data hidden successfully");
+      } else {
+        toast.success("Data shown successfully");
+      }
+      
       fetchTeam();
     } catch (error) {
       console.error("Error updating visibility:", error);
-      toast.error("Error updating data");
+      toast.error("Error updating visibility");
     }
   };
 
@@ -169,10 +204,12 @@ const Carousal = () => {
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-      toggleShows(); // Redirect to form view
+
       setFormData(memberToEdit);
+      toggleShows(); // Redirect to form view
     }
   };
+
   const toggleVisibility = (id) => {
     const updatedEyeVisibilityById = {
       ...eyeVisibilityById,
@@ -180,28 +217,34 @@ const Carousal = () => {
     };
     setEyeVisibilityById(updatedEyeVisibilityById);
   };
+
   useEffect(() => {
     if (!shows) {
       setEditMode(false);
       setEditingId(null);
       setFormData({});
+      setImagePreview(""); 
+ 
     }
   }, [shows]);
 
   const handleChange = (name, value) => {
-    setFormData({ ...formData, [name]: value });
+    if (name === "img") {
+      setFormData({ ...formData, [name]: value });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
-
   return (
     <Container>
       <Row>
-      {!shows && !editMode && (
-            <SearchInput
-              searchQuery={searchQuery}
-              onSearch={handleSearch}
-              onExport={handleExport}
-            />
-          )}
+        {!shows && !editMode && (
+          <SearchInput
+            searchQuery={searchQuery}
+            onSearch={handleSearch}
+            onExport={handleExport}
+          />
+        )}
       </Row>
 
       <Row>
@@ -226,20 +269,33 @@ const Carousal = () => {
                     ))}
                     <td>
                       <div className="d-flex">
-                        <Button className="ms-1" onClick={() => toggleEdit(item.id)}>
+                        <Button
+                          className="ms-1"
+                          onClick={() => toggleEdit(item.id)}
+                        >
                           <FaEdit />
                         </Button>
-                        <Button className="ms-1" onClick={() => handleDelete(item.id)}>
+                        <Button
+                          className="ms-1"
+                          onClick={() => handleDelete(item.id)}
+                        >
                           <FaTrash />
                         </Button>
                         <Button
                           className="ms-1"
                           onClick={() => {
                             toggleVisibility(item.id);
-                            handleIsActive(item.id, !eyeVisibilityById[item.id]);
+                            handleIsActive(
+                              item.id,
+                              !eyeVisibilityById[item.id]
+                            );
                           }}
                         >
-                          {eyeVisibilityById[item.id] ? <FaEyeSlash /> : <FaEye />}
+                          {eyeVisibilityById[item.id] ? (
+                            <FaEyeSlash />
+                          ) : (
+                            <FaEye />
+                          )}
                         </Button>
                       </div>
                     </td>
@@ -252,13 +308,15 @@ const Carousal = () => {
               <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col md={6}>
-                  {formData.img && (
+               
+                  {imagePreview && (
                       <img
-                        src={formData.img}
-                        alt="current image for post"
+                        src={imagePreview}
+                        alt="Selected Preview"
                         style={{ width: "100px", height: "auto", marginBottom: '10px' }}
                       />
                     )}
+              
                     <NewReusableForm
                       label={"Image Upload"}
                       placeholder={"Upload Image"}
@@ -269,10 +327,26 @@ const Carousal = () => {
                     />
                     {errors.img && <p className="text-danger">{errors.img}</p>}
                   </Col>
+
+                  <Col md={6}>
+                    <Form.Group controlId="formView">
+                      <Form.Label>View</Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="view"
+                        value={formData.view || ""}
+                        onChange={(e) => handleChange(e.target.name, e.target.value)}
+                      >
+                        <option value="">Select View</option>
+                        <option value="mobile">Mobile</option>
+                        <option value="desktop">Desktop</option>
+                      </Form.Control>
+                      {errors.view && <p className="text-danger">{errors.view}</p>}
+                    </Form.Group>
+                  </Col>
                 </Row>
                 <Row>
-                
-                <div className="mt-3 d-flex justify-content-end">
+                  <div className="mt-3 d-flex justify-content-end">
                     <Button
                       type="submit"
                       variant={editMode ? "success" : "primary"}
@@ -286,16 +360,12 @@ const Carousal = () => {
           )}
         </Col>
       </Row>
-
-    
-      <Row>
-  <Col className="mt-3">
-  <TablePagination />
-
-  </Col>
-</Row>
+      {!shows && !editMode && (
+        <TablePagination data={searchQuery.trim() ? filteredData : team} />
+      )}
     </Container>
   );
 };
 
 export default Carousal;
+

@@ -22,7 +22,7 @@ const ProductDetails = () => {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({});
   const [eyeVisibilityById, setEyeVisibilityById] = useState({});
-
+  const [imagePreview, setImagePreview] = useState("");
   const tableColumns = [
     {
       key: "img",
@@ -42,6 +42,22 @@ const ProductDetails = () => {
   useEffect(() => {
     fetchTeam();
   }, []);
+
+
+  useEffect(() => {
+    if (formData.img && formData.img instanceof File) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(formData.img);
+    } else if (formData.img && typeof formData.img === 'string') {
+      setImagePreview(formData.img);
+    } else {
+      setImagePreview("");
+    }
+  }, [formData.img]);
+
 
   const fetchTeam = async () => {
     const accessToken = localStorage.getItem("accessToken");
@@ -101,11 +117,11 @@ const ProductDetails = () => {
         });
         toast.success("Data Submitted Successfully");
            // Add the new entry to the top of the team array
-           const newTeamMember = response.data.responseData;
-           setTeam([newTeamMember, ...team]);
+
         fetchTeam();
         toggleShows()
         setFormData({});
+        setImagePreview(""); 
       } catch (error) {
         console.error("Error handling form submission:", error);
       }
@@ -215,11 +231,16 @@ const ProductDetails = () => {
       setEditMode(false);
       setEditingId(null);
       setFormData({});
+      setImagePreview("");
     }
   }, [shows]);
 
   const handleChange = (name, value) => {
-    setFormData({ ...formData, [name]: value });
+    if (name === "img") {
+      setFormData({ ...formData, [name]: value });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   return (
@@ -282,10 +303,10 @@ const ProductDetails = () => {
               <Form>
                 <Row>
                 <Col md={6}>
-                {formData.img && (
+                {imagePreview && (
                       <img
-                        src={formData.img}
-                        alt="current image for post"
+                        src={imagePreview}
+                        alt="Selected Preview"
                         style={{ width: "100px", height: "auto", marginBottom: '10px' }}
                       />
                     )}
@@ -312,7 +333,7 @@ const ProductDetails = () => {
                       <p className="text-danger">{errors.productName}</p>
                     )}
                   </Col>
-                  <Col md={6}>
+                  <Col md={12}>
                     <NewResuableForm
                       label="Application"
                       placeholder="Enter Application"

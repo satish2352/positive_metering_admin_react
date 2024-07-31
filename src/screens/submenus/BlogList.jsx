@@ -256,7 +256,7 @@ const BlogList = () => {
                       <span className="error text-danger">{errors.title}</span>
                     )}
                   </Col>
-                  <Col md={6}>
+                  <Col md={12}>
                     <NewResuableForm
                       label={"Description"}
                       placeholder={"Enter Description"}
@@ -264,7 +264,7 @@ const BlogList = () => {
                       name={"description"}
                     
                       textarea={true}
-                      useJodit={true} 
+                      
                       onChange={handleChange}
                       initialData={formData}
                     />

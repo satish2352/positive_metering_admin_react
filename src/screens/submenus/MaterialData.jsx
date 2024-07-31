@@ -94,9 +94,7 @@ const MaterialData = () => {
 
         if (response.status === 200) {
           toast.success("Data Submitted Successfully");
-                // Add the new entry to the top of the team array
-                const newTeamMember = response.data.responseData;
-                setTeam([newTeamMember, ...team]);
+
           fetchTeam();
           toggleShows(); 
           setFormData({});
@@ -309,7 +307,7 @@ const MaterialData = () => {
                   </Form.Group>
                 </Col>
            
-                <Col md={6}>
+                <Col md={12}>
                     <NewResuableForm
                       label="Material Description"
                       placeholder="Enter Material Description"

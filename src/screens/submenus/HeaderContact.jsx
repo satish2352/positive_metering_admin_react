@@ -1,5 +1,4 @@
-// /////sos
-
+///////sos
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -102,13 +101,10 @@ const HeaderContact = () => {
             { headers: { Authorization: `Bearer ${accessToken}` } }
           );
           toast.success("Data Submitted Successfully");
-
-          // Add the new entry to the top of the team array
-          const newTeamMember = response.data.responseData;
-          setTeam([newTeamMember, ...team]);
         }
 
         setEditMode(false);
+        fetchTeam();
         setFormData({});
         toggleShows(); // Redirect to table view
       } catch (error) {
@@ -304,12 +300,13 @@ const HeaderContact = () => {
       </Row>
 
       <Row>
-        <Col className="mt-3">
-          <TablePagination />
-        </Col>
+        {!shows && !editMode && (
+          <Col className="mt-3">
+            <TablePagination />
+          </Col>
+        )}
       </Row>
     </Container>
   );
 };
-
 export default HeaderContact;

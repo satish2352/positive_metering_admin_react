@@ -97,9 +97,7 @@ const OptionsData = () => {
         if (response.status === 200) {
           toast.success("Data Submitted Successfully");
           
-          // Add the new entry to the top of the team array
-          const newTeamMember = response.data.responseData;
-          setTeam([newTeamMember, ...team]);
+
           fetchTeam();
    
           toggleShows(); 
@@ -317,7 +315,7 @@ const OptionsData = () => {
                   </Form.Group>
                 </Col>
      
-                <Col md={6}>
+                <Col md={12}>
                     <NewResuableForm
                       label="Option Description"
                       placeholder="Enter Option Description"
