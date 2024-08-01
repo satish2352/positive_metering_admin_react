@@ -26,6 +26,11 @@ const ProductDetails = () => {
   const [imagePreview, setImagePreview] = useState("");
   const tableColumns = [
     {
+      key: "srNo",
+      label: "Sr. No.",
+      render: (value, index) => index + 1, // Adding serial number starting from 1
+    },
+    {
       key: "img",
       label: "Image",
       render: (value) => (
@@ -269,6 +274,11 @@ const ProductDetails = () => {
                   toast.success(
                     `Data ${isVisible ? "hidden" : "shown"} successfully`
                   );
+                  setEyeVisibilityById((prev) => ({
+                    ...prev,
+
+                    [id]: isVisible,
+                  }));
                   fetchTeam();
                 } catch (error) {
                   console.error("Error updating visibility:", error);
@@ -352,13 +362,18 @@ const ProductDetails = () => {
                 </tr>
               </thead>
               <tbody>
-                {(searchQuery.trim() ? filteredData : team).map((item) => (
-                  <tr key={item.id}>
-                    {tableColumns.map((col) => (
-                      <td key={col.key}>
-                        {col.render ? col.render(item[col.key]) : item[col.key]}
-                      </td>
-                    ))}
+              {(searchQuery.trim() ? filteredData : team).map(
+                  (item, index) => (
+                    <tr key={item.id}>
+                      {tableColumns.map((col) => (
+                        <td key={col.key}>
+                          {col.key === "srNo"
+                            ? index + 1
+                            : col.render
+                            ? col.render(item[col.key], index)
+                            : item[col.key]}
+                        </td>
+                      ))}
                     <td>
                       <div className="d-flex">
                         <Button className="ms-1" onClick={() => toggleEdit(item.id)}>
@@ -369,12 +384,15 @@ const ProductDetails = () => {
                         </Button>
                         <Button
                           className="ms-1"
-                          onClick={() => {
-                            toggleVisibility(item.id);
-                            handleIsActive(item.id, !eyeVisibilityById[item.id]);
-                          }}
+                          onClick={() =>
+                            handleIsActive(item.id, !eyeVisibilityById[item.id])
+                          }
                         >
-                          {eyeVisibilityById[item.id] ? <FaEyeSlash /> : <FaEye />}
+                          {eyeVisibilityById[item.id] ? (
+                            <FaEyeSlash />
+                          ) : (
+                            <FaEye />
+                          )}
                         </Button>
                       </div>
                     </td>

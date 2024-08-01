@@ -16,6 +16,11 @@ const RequestCallbackForm = () => {
   const [team, setTeam] = useState([]);
 
   const tableColumns = [
+    {
+      key: "srNo",
+      label: "Sr. No.",
+      render: (value, index) => index + 1, // Adding serial number starting from 1
+    },
     { key: "name", label: "Name" },
     { key: "email", label: "Email" },
     { key: "message", label: "Message" },
@@ -67,7 +72,7 @@ const RequestCallbackForm = () => {
 
   const exportData = () => {
     const dataToExport = searchQuery.trim() ? filteredData : team;
-    handleExport(dataToExport);
+    handleExport(dataToExport, tableColumns, "RequestCallbackForm");
   };
 
   return (
@@ -94,11 +99,18 @@ const RequestCallbackForm = () => {
               </tr>
             </thead>
             <tbody>
-              {(searchQuery.trim() ? filteredData : team).map((item) => (
-                <tr key={item.id}>
-                  {tableColumns.map((col) => (
-                    <td key={col.key}>{item[col.key]}</td>
-                  ))}
+            {(searchQuery.trim() ? filteredData : team).map(
+                  (item, index) => (
+                    <tr key={item.id}>
+                      {tableColumns.map((col) => (
+                        <td key={col.key}>
+                          {col.key === "srNo"
+                            ? index + 1
+                            : col.render
+                            ? col.render(item[col.key], index)
+                            : item[col.key]}
+                        </td>
+                      ))}
                
                 </tr>
               ))}

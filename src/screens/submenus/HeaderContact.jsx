@@ -554,7 +554,14 @@ const HeaderContact = () => {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({});
 
+  // const tableColumns = [
+  //   { key: "phone1", label: "Phone 1" },
+  //   { key: "phone2", label: "Phone 2" },
+  // ];
+
+
   const tableColumns = [
+    { key: "srNo", label: "Sr No" },  // Add this line
     { key: "phone1", label: "Phone 1" },
     { key: "phone2", label: "Phone 2" },
   ];
@@ -690,7 +697,7 @@ const HeaderContact = () => {
                     <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody>
+                {/* <tbody>
                   {(searchQuery.trim() ? filteredData : team).map((item) => (
                     <tr key={item.id}>
                       <td>{item.phone1}</td>
@@ -707,13 +714,28 @@ const HeaderContact = () => {
                       </td>
                     </tr>
                   ))}
-                </tbody>
+                </tbody> */}
+                <tbody>
+  {(searchQuery.trim() ? filteredData : team).map((item, index) => (
+    <tr key={item.id}>
+      <td>{index + 1}</td>  {/* Add this line */}
+      <td>{item.phone1}</td>
+      <td>{item.phone2}</td>
+      <td>
+        <div className="d-flex">
+          <Button
+            className="ms-1"
+            onClick={() => toggleEdit(item.id)}
+          >
+            <FaEdit />
+          </Button>
+        </div>
+      </td>
+    </tr>
+  ))}
+</tbody>
               </Table>
-              {/* <Row>
-                <Col className="mt-3">
-                  <TablePagination />
-                </Col>
-              </Row> */}
+       
             </>
           ) : (
             <Card className="p-4">

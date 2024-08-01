@@ -1,4 +1,5 @@
-/////sos
+
+////workable properly sos 
 import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Table, Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
@@ -16,6 +17,11 @@ const Subscribe = () => {
   const [team, setTeam] = useState([]);
 
   const tableColumns = [
+    {
+      key: "srNo",
+      label: "Sr. No.",
+      render: (value, index) => index + 1, // Adding serial number starting from 1
+    },
     { key: "email", label: "Email" },
   ];
 
@@ -59,13 +65,13 @@ const Subscribe = () => {
 
   useEffect(() => {
     if (shows) {
-
+   
     }
   }, [shows]);
 
   const exportData = () => {
     const dataToExport = searchQuery.trim() ? filteredData : team;
-    handleExport(dataToExport);
+    handleExport(dataToExport, tableColumns, "Subscribe");
   };
 
   return (
@@ -88,16 +94,21 @@ const Subscribe = () => {
                 {tableColumns.map((col) => (
                   <th key={col.key}>{col.label}</th>
                 ))}
-       
               </tr>
             </thead>
             <tbody>
-              {(searchQuery.trim() ? filteredData : team).map((item) => (
-                <tr key={item.id}>
-                  {tableColumns.map((col) => (
-                    <td key={col.key}>{item[col.key]}</td>
-                  ))}
-               
+            {(searchQuery.trim() ? filteredData : team).map(
+                  (item, index) => (
+                    <tr key={item.id}>
+                      {tableColumns.map((col) => (
+                        <td key={col.key}>
+                          {col.key === "srNo"
+                            ? index + 1
+                            : col.render
+                            ? col.render(item[col.key], index)
+                            : item[col.key]}
+                        </td>
+                      ))}
                 </tr>
               ))}
             </tbody>
@@ -105,13 +116,11 @@ const Subscribe = () => {
         </Col>
       </Row>
 
-     
       <Row>
-  <Col className="mt-3">
-  <TablePagination />
-
-  </Col>
-</Row>
+        <Col className="mt-3">
+          <TablePagination />
+        </Col>
+      </Row>
     </Container>
   );
 };

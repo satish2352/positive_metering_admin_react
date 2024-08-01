@@ -24,6 +24,11 @@ const UploadCv = () => {
 
   const tableColumns = [
     {
+      key: "srNo",
+      label: "Sr. No.",
+      render: (value, index) => index + 1, // Adding serial number starting from 1
+    },
+    {
       key: "cv",
       label: "Docs",
       render: (value) => (
@@ -32,7 +37,8 @@ const UploadCv = () => {
         </a>
       ),
     },
-    { key: "email", label: "Email" },
+ 
+    { key: "name", label: "Name" },
     { key: "phone", label: "Phone" },
     { key: "subject", label: "Subject" },
     { key: "message", label: "Message" },
@@ -62,7 +68,7 @@ const UploadCv = () => {
 
   const exportData = () => {
     const dataToExport = searchQuery.trim() ? filteredData : team;
-    handleExport(dataToExport);
+    handleExport(dataToExport, tableColumns, "UploadCV");
   };
 
   const downloadCV = async (cvUrl) => {
@@ -110,13 +116,18 @@ const UploadCv = () => {
               </tr>
             </thead>
             <tbody>
-              {(searchQuery.trim() ? filteredData : team).map((item) => (
-                <tr key={item.id}>
-                  {tableColumns.map((col) => (
-                    <td key={col.key}>
-                      {col.render ? col.render(item[col.key]) : item[col.key]}
-                    </td>
-                  ))}
+            {(searchQuery.trim() ? filteredData : team).map(
+                  (item, index) => (
+                    <tr key={item.id}>
+                      {tableColumns.map((col) => (
+                        <td key={col.key}>
+                          {col.key === "srNo"
+                            ? index + 1
+                            : col.render
+                            ? col.render(item[col.key], index)
+                            : item[col.key]}
+                        </td>
+                      ))}
                   <td>
                     <div className="d-flex">
                       <Button size="sm" onClick={() => downloadCV(item.cv)}>

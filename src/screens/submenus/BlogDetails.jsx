@@ -1,7 +1,14 @@
-
-// /////sos only image eor 
+// /////sos only image eor
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Button, Form ,Table} from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Table,
+} from "react-bootstrap";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
 import NewResuableForm from "../../components/form/NewResuableForm";
@@ -27,6 +34,11 @@ const BlogDetails = () => {
   const [imagePreview, setImagePreview] = useState("");
   const tableColumns = [
     {
+      key: "srNo",
+      label: "Sr. No.",
+      render: (value, index) => index + 1, // Adding serial number starting from 1
+    },
+    {
       key: "img",
       label: "Image",
       render: (value) => (
@@ -40,7 +52,6 @@ const BlogDetails = () => {
     { key: "title", label: "Title" },
     { key: "shortDesc", label: "Short Description" },
     { key: "longDesc", label: "Long Description" },
-
   ];
 
   useEffect(() => {
@@ -53,16 +64,15 @@ const BlogDetails = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(formData.img);
-    } else if (formData.img && typeof formData.img === 'string') {
+    } else if (formData.img && typeof formData.img === "string") {
       setImagePreview(formData.img);
     } else {
       setImagePreview("");
     }
   }, [formData.img]);
 
-
   const fetchTeam = async () => {
-    const accessToken = localStorage.getItem("accessToken"); 
+    const accessToken = localStorage.getItem("accessToken");
     try {
       const response = await instance.get("blogdetails/find-blogdetails", {
         headers: {
@@ -110,7 +120,7 @@ const BlogDetails = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm(formData)) {
-      const accessToken = localStorage.getItem("accessToken"); 
+      const accessToken = localStorage.getItem("accessToken");
       const data = new FormData();
       for (const key in formData) {
         data.append(key, formData[key]);
@@ -129,11 +139,11 @@ const BlogDetails = () => {
             }
           );
           toast.success("Data Updated Successfully");
-                 // Update the specific entry in the team array
-                 const updatedTeam = team.map((member) =>
-                  member.id === editingId ? formData : member
-                );
-                setTeam(updatedTeam);
+          // Update the specific entry in the team array
+          const updatedTeam = team.map((member) =>
+            member.id === editingId ? formData : member
+          );
+          setTeam(updatedTeam);
         } else {
           await instance.post("blogdetails/create-blogdetail", data, {
             headers: {
@@ -142,21 +152,17 @@ const BlogDetails = () => {
             },
           });
           toast.success("Data Submitted Successfully");
-
         }
         fetchTeam();
-        toggleShows(); 
+        toggleShows();
         setEditMode(false);
         setFormData({});
-        setImagePreview(""); 
+        setImagePreview("");
       } catch (error) {
         console.error("Error handling form submission:", error);
       }
     }
   };
-
-  
-
 
   const handleDelete = async (id) => {
     confirmAlert({
@@ -165,7 +171,7 @@ const BlogDetails = () => {
       customUI: ({ onClose }) => (
         <div
           style={{
-            textAlign: "left", 
+            textAlign: "left",
             padding: "20px",
             backgroundColor: "white",
             borderRadius: "8px",
@@ -179,7 +185,7 @@ const BlogDetails = () => {
           <div
             style={{
               display: "flex",
-              justifyContent: "flex-end", 
+              justifyContent: "flex-end",
               marginTop: "20px",
             }}
           >
@@ -189,12 +195,15 @@ const BlogDetails = () => {
               onClick={async () => {
                 const accessToken = localStorage.getItem("accessToken");
                 try {
-                  await instance.delete(`blogdetails/isdelete-blogdetail/${id}`, {
-                    headers: {
-                      Authorization: `Bearer ${accessToken}`,
-                      "Content-Type": "application/json",
-                    },
-                  });
+                  await instance.delete(
+                    `blogdetails/isdelete-blogdetail/${id}`,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        "Content-Type": "application/json",
+                      },
+                    }
+                  );
                   toast.success("Data Deleted Successfully");
                   fetchTeam();
                 } catch (error) {
@@ -206,10 +215,7 @@ const BlogDetails = () => {
             >
               Yes
             </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => onClose()}
-            >
+            <button className="btn btn-secondary" onClick={() => onClose()}>
               No
             </button>
           </div>
@@ -224,7 +230,7 @@ const BlogDetails = () => {
       customUI: ({ onClose }) => (
         <div
           style={{
-            textAlign: "left", 
+            textAlign: "left",
             padding: "20px",
             backgroundColor: "white",
             borderRadius: "8px",
@@ -234,12 +240,14 @@ const BlogDetails = () => {
           }}
         >
           <h2>Confirm to change visibility</h2>
-          <p>Are you sure you want to {isVisible ? "hide" : "show"} this data?</p>
+          <p>
+            Are you sure you want to {isVisible ? "hide" : "show"} this data?
+          </p>
           <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
-              marginTop: "20px", 
+              marginTop: "20px",
             }}
           >
             <button
@@ -261,6 +269,11 @@ const BlogDetails = () => {
                   toast.success(
                     `Data ${isVisible ? "hidden" : "shown"} successfully`
                   );
+                  setEyeVisibilityById((prev) => ({
+                    ...prev,
+
+                    [id]: isVisible,
+                  }));
                   fetchTeam();
                 } catch (error) {
                   console.error("Error updating visibility:", error);
@@ -271,10 +284,7 @@ const BlogDetails = () => {
             >
               Yes
             </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => onClose()}
-            >
+            <button className="btn btn-secondary" onClick={() => onClose()}>
               No
             </button>
           </div>
@@ -288,18 +298,11 @@ const BlogDetails = () => {
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-      toggleShows(); 
+      toggleShows();
       setFormData(memberToEdit);
     }
   };
 
-  const toggleVisibility = (id) => {
-    const updatedEyeVisibilityById = {
-      ...eyeVisibilityById,
-      [id]: !eyeVisibilityById[id],
-    };
-    setEyeVisibilityById(updatedEyeVisibilityById);
-  };
 
   useEffect(() => {
     if (!shows) {
@@ -320,13 +323,13 @@ const BlogDetails = () => {
   return (
     <Container>
       <Row>
-      <Col>
+        <Col>
           {!shows && !editMode && (
             <SearchInput
               searchQuery={searchQuery}
               onSearch={handleSearch}
               onExport={handleExport}
-              showExportButton={false} 
+              showExportButton={false}
             />
           )}
         </Col>
@@ -345,29 +348,45 @@ const BlogDetails = () => {
                 </tr>
               </thead>
               <tbody>
-                {(searchQuery.trim() ? filteredData : team).map((item) => (
-                  <tr key={item.id}>
-                    {tableColumns.map((col) => (
-                      <td key={col.key}>
-                        {col.render ? col.render(item[col.key]) : item[col.key]}
-                      </td>
-                    ))}
+              {(searchQuery.trim() ? filteredData : team).map(
+                  (item, index) => (
+                    <tr key={item.id}>
+                      {tableColumns.map((col) => (
+                        <td key={col.key}>
+                          {col.key === "srNo"
+                            ? index + 1
+                            : col.render
+                            ? col.render(item[col.key], index)
+                            : item[col.key]}
+                        </td>
+                      ))}
                     <td>
                       <div className="d-flex">
-                        <Button className="ms-1" onClick={() => toggleEdit(item.id)}>
+                        <Button
+                          className="ms-1"
+                          onClick={() => toggleEdit(item.id)}
+                        >
                           <FaEdit />
-                        </Button>
-                        <Button className="ms-1" onClick={() => handleDelete(item.id)}>
-                          <FaTrash />
                         </Button>
                         <Button
                           className="ms-1"
-                          onClick={() => {
-                            toggleVisibility(item.id);
-                            handleIsActive(item.id, !eyeVisibilityById[item.id]);
-                          }}
+                          onClick={() => handleDelete(item.id)}
                         >
-                          {eyeVisibilityById[item.id] ? <FaEyeSlash /> : <FaEye />}
+                          <FaTrash />
+                        </Button>
+            
+
+                        <Button
+                          className="ms-1"
+                          onClick={() =>
+                            handleIsActive(item.id, !eyeVisibilityById[item.id])
+                          }
+                        >
+                          {eyeVisibilityById[item.id] ? (
+                            <FaEyeSlash />
+                          ) : (
+                            <FaEye />
+                          )}
                         </Button>
                       </div>
                     </td>
@@ -380,11 +399,15 @@ const BlogDetails = () => {
               <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col md={6}>
-                  {imagePreview && (
+                    {imagePreview && (
                       <img
                         src={imagePreview}
                         alt="Selected Preview"
-                        style={{ width: "100px", height: "auto", marginBottom: '10px' }}
+                        style={{
+                          width: "100px",
+                          height: "auto",
+                          marginBottom: "10px",
+                        }}
                       />
                     )}
                     <NewResuableForm
@@ -395,9 +418,7 @@ const BlogDetails = () => {
                       onChange={handleChange}
                       initialData={formData}
                     />
-                    {errors.img && (
-                      <p className="text-danger">{errors.img}</p>
-                    )}
+                    {errors.img && <p className="text-danger">{errors.img}</p>}
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
@@ -412,7 +433,7 @@ const BlogDetails = () => {
                       <p className="text-danger">{errors.title}</p>
                     )}
                   </Col>
-                  <Col md={6}>
+                  <Col md={12}>
                     <NewResuableForm
                       label={"Short Description "}
                       placeholder={"Short Description "}
@@ -421,13 +442,13 @@ const BlogDetails = () => {
                       onChange={handleChange}
                       initialData={formData}
                       textarea
-                   
+                      useJodit={true}
                     />
                     {errors.shortDesc && (
                       <p className="text-danger">{errors.shortDesc}</p>
                     )}
                   </Col>
-                  <Col md={6}>
+                  <Col md={12}>
                     <NewResuableForm
                       label={"Long Description "}
                       placeholder={"Long Description "}
@@ -436,7 +457,7 @@ const BlogDetails = () => {
                       onChange={handleChange}
                       initialData={formData}
                       textarea
-                   
+                      useJodit={true}
                     />
                     {errors.longDesc && (
                       <p className="text-danger">{errors.longDesc}</p>
@@ -444,7 +465,6 @@ const BlogDetails = () => {
                   </Col>
                 </Row>
                 <Row>
-
                   <div className="mt-3 d-flex justify-content-end">
                     <Button
                       type="submit"
@@ -453,7 +473,6 @@ const BlogDetails = () => {
                       {editMode ? "Update" : "Submit"}
                     </Button>
                   </div>
-           
                 </Row>
               </Form>
             </Card>
@@ -461,7 +480,6 @@ const BlogDetails = () => {
         </Col>
       </Row>
 
-     
       <Row>
         {!shows && !editMode && (
           <Col className="mt-3">
@@ -474,14 +492,3 @@ const BlogDetails = () => {
 };
 
 export default BlogDetails;
-
-
-
-
-
-
-
-
-
-
-
