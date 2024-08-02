@@ -1,19 +1,19 @@
 // ////sos  working
 
-// ////done changes based on CTO
-// import { MdOutlineMenu } from "react-icons/md";
-// import "./AreaTop.scss";
+
 // import { useContext, useEffect, useRef, useState } from "react";
 // import { SidebarContext } from "../../../context/SidebarContext";
-// import { addDays } from "date-fns";
 // import { TitleContext } from "../../../context/TitleContext";
 // import { Button } from "react-bootstrap";
 // import { ShowContext } from "../../../context/ShowContext";
 // import { useLocation } from "react-router-dom";
+// import { MdOutlineMenu } from "react-icons/md";
+// import { addDays } from "date-fns";
+// import "./AreaTop.scss";
 
 // const AreaTop = () => {
-//   const { openSidebar } = useContext(SidebarContext);
-//   const { title } = useContext(TitleContext);
+//   const { openSidebar, activeMenuName } = useContext(SidebarContext);
+//   const { title, setTitle } = useContext(TitleContext);
 //   const { toggleShows } = useContext(ShowContext);
 //   const [state, setState] = useState([
 //     {
@@ -40,13 +40,15 @@
 //     };
 //   }, []);
 
+//   useEffect(() => {
+//     setTitle(activeMenuName);
+//   }, [activeMenuName, setTitle]);
+
 //   const handleButtonClick = () => {
 //     toggleShows();
 //     setButtonText((prevText) => (prevText === "View" ? "Add" : "View"));
 //   };
 
-//   //hidden from this
- 
 //   const hiddenPaths = [
 //     "/subscribe",
 //     "/carousalform",
@@ -68,8 +70,7 @@
 //         >
 //           <MdOutlineMenu size={24} />
 //         </button>
-       
-//         <h2 className="area-top-title">{title }</h2>
+//         <h2 className="area-top-title">{title || activeMenuName}</h2>
 //       </div>
 //       <div className="area-top-r">
 //         {!isHiddenPath && (
@@ -94,36 +95,22 @@
 
 
 
-
-
-
-
-
-
-
-
-////v2
-import { MdOutlineMenu } from "react-icons/md";
-import "./AreaTop.scss";
+////sir code
 import { useContext, useEffect, useRef, useState } from "react";
 import { SidebarContext } from "../../../context/SidebarContext";
-import { addDays } from "date-fns";
 import { TitleContext } from "../../../context/TitleContext";
-import { Button } from "react-bootstrap";
 import { ShowContext } from "../../../context/ShowContext";
+import { Button } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
+import { MdOutlineMenu } from "react-icons/md";
+import { addDays } from "date-fns";
+import "./AreaTop.scss";
 
 const AreaTop = () => {
   const { openSidebar, activeMenuName } = useContext(SidebarContext);
+  const [headerName, setHeader] = useState("");
   const { title, setTitle } = useContext(TitleContext);
   const { toggleShows } = useContext(ShowContext);
-  const [state, setState] = useState([
-    {
-      startDate: new Date(),
-      endDate: addDays(new Date(), 7),
-      key: "selection",
-    },
-  ]);
 
   const [buttonText, setButtonText] = useState("Add");
   const dateRangeRef = useRef(null);
@@ -143,7 +130,6 @@ const AreaTop = () => {
   }, []);
 
   useEffect(() => {
-    // Set the title in AreaTop based on SidebarContext
     setTitle(activeMenuName);
   }, [activeMenuName, setTitle]);
 
@@ -162,7 +148,79 @@ const AreaTop = () => {
     "/headercontact",
   ];
   const isHiddenPath = hiddenPaths.includes(location.pathname);
+  // let headerName = (window.location.pathname).replace(/^\/+/, '');
+  useEffect(() => {
+    if (window.location.pathname == "/testimonial") {
+      setHeader("Testimonial");
+    } 
+    else if (window.location.pathname == "/headercontact") {
+      setHeader("Header Contact");
+    }
+    else if (window.location.pathname == "/homeslider") {
+      setHeader("Image Slider");
+    }
+    else if (window.location.pathname == "/carousal") {
+      setHeader("Carousal");
+    }
+    else if (window.location.pathname == "/infrastructure") {
+      setHeader("Infrastructure");
+    }
 
+    else if (window.location.pathname == "/ourteam") {
+      setHeader("Our Team");
+    }
+    else if (window.location.pathname == "/productname") {
+      setHeader("Product Name");
+    }
+    else if (window.location.pathname == "/productdetails") {
+      setHeader("Product Details");
+    }
+    else if (window.location.pathname == "/technicaldata") {
+      setHeader("Technical Data");
+    }
+    else if (window.location.pathname == "/optionsdata") {
+      setHeader("Options Data");
+    }
+    else if (window.location.pathname == "/materialdata") {
+      setHeader("Material Data");
+    }
+    else if (window.location.pathname == "/blogdetails") {
+      setHeader("Blog Details");
+    }
+    else if (window.location.pathname == "/news") {
+      setHeader("News");
+    }
+    else if (window.location.pathname == "/events") {
+      setHeader("Events");
+    }
+    else if (window.location.pathname == "/contactsalesperson") {
+      setHeader("Contact Sales Person");
+    }
+    else if (window.location.pathname == "/office") {
+      setHeader("Our Offices");
+    }
+    else if (window.location.pathname == "/carousalform") {
+      setHeader("Carousal Form");
+    }
+    else if (window.location.pathname == "/requestcallbackform") {
+      setHeader("Request Callback Form");
+    }
+    else if (window.location.pathname == "/office") {
+      setHeader("Our Offices");
+    }
+    else if (window.location.pathname == "/getintouch") {
+      setHeader("Get In Touch");
+    }
+    else if (window.location.pathname == "/subscribe") {
+      setHeader("Subscribe");
+    }
+    else if (window.location.pathname == "/uploadcv") {
+      setHeader("Upload Cv");
+    }
+    else if (window.location.pathname == "/applicationdata") {
+      setHeader("Application Data");
+    }
+  }, [window.location.pathname]);
   return (
     <section className="content-area-top bg-white p-3 mb-3">
       <div className="area-top-l">
@@ -173,8 +231,7 @@ const AreaTop = () => {
         >
           <MdOutlineMenu size={24} />
         </button>
-       
-        <h2 className="area-top-title">{title || activeMenuName}</h2>
+        <h2 className="area-top-title text-capitalize">{headerName}</h2>
       </div>
       <div className="area-top-r">
         {!isHiddenPath && (

@@ -1,18 +1,9 @@
-////sos carousal to homeslider and vice versa
-
+/////sos
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Button,
-  Form,
-  Table,
-} from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Form ,Table} from "react-bootstrap";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
-import NewReusableForm from "../../components/form/NewResuableForm";
+import NewResuableForm from "../../components/form/NewResuableForm";
 
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
@@ -22,7 +13,7 @@ import instance from "../../api/AxiosInstance";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-const Carousal = () => {
+const NewsAndEventCards = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
   const { shows, toggleShows } = React.useContext(ShowContext);
@@ -45,16 +36,15 @@ const Carousal = () => {
       render: (value) => (
         <img
           src={value}
-          alt="Carousel"
+          alt="Testimonial"
           style={{ width: "100px", height: "auto" }}
         />
       ),
     },
-    {
-      key: "view",
-      label: "View",
-      render: (value) => <span>{value}</span>,
-    },
+    { key: "title", label: "Title" },
+    { key: "shortDesc", label: "Short Description" },
+    { key: "longDesc", label: "Long Description" },
+
   ];
 
   useEffect(() => {
@@ -67,17 +57,16 @@ const Carousal = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(formData.img);
-    } else if (formData.img && typeof formData.img === "string") {
+    } else if (formData.img && typeof formData.img === 'string') {
       setImagePreview(formData.img);
     } else {
       setImagePreview("");
     }
   }, [formData.img]);
-
   const fetchTeam = async () => {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
     try {
-      const response = await instance.get("homeslider/find-homeslider", {
+      const response = await instance.get("news/get-news", {
         headers: {
           Authorization: "Bearer " + accessToken,
           "Content-Type": "application/json",
@@ -87,8 +76,10 @@ const Carousal = () => {
       setTeam(reversedData);
       setData(reversedData);
     } catch (error) {
-      console.error("Error fetching team:", error);
-      toast.error("Error fetching data");
+      console.error(
+        "Error fetching team:",
+        error.response || error.message || error
+      );
     }
   };
 
@@ -101,55 +92,27 @@ const Carousal = () => {
       isValid = false;
     }
 
-    if (!formData.view) {
-      errors.view = "View selection is required";
+    if (!formData.title?.trim()) {
+      errors.title = "Title is required";
       isValid = false;
     }
 
+    if (!formData.shortDesc?.trim()) {
+      errors.shortDesc = "Short Description is required";
+      isValid = false;
+    }
+    if (!formData.longDesc?.trim()) {
+      errors.longDesc = "Long Description is required";
+      isValid = false;
+    }
     setErrors(errors);
     return isValid;
   };
 
-  const validateImageSize = (file) => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        if (img.width === 259 && img.height === 195) {
-          resolve();
-        } else {
-          reject("Uploaded image is not 259*195 pixels");
-        }
-      };
-      img.onerror = () => reject("Error loading image");
-      img.src = URL.createObjectURL(file);
-    });
-  };
-
-  
-  const handleChange = async (name, value) => {
-    if (name === "img" && value instanceof File) {
-      try {
-        await validateImageSize(value);
-         setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    if (errors[name]) {
-       setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-     }
-        setFormData({ ...formData, [name]: value });
-        setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
-      } catch (error) {
-        setErrors((prevErrors) => ({ ...prevErrors, img: error }));
-        setImagePreview("");
-      }
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm(formData)) {
-      const accessToken = localStorage.getItem("accessToken");
+      const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
       const data = new FormData();
       for (const key in formData) {
         data.append(key, formData[key]);
@@ -158,7 +121,7 @@ const Carousal = () => {
       try {
         if (editMode) {
           await instance.put(
-            `homeslider/update-homeslider/${editingId}`,
+            `news/update-news/${editingId}`,
             data,
             {
               headers: {
@@ -168,32 +131,35 @@ const Carousal = () => {
             }
           );
           toast.success("Data Updated Successfully");
-          // Update the specific entry in the team array
-          const updatedTeam = team.map((member) =>
-            member.id === editingId ? formData : member
-          );
-          setTeam(updatedTeam);
+                    // Update the specific entry in the team array
+                    const updatedTeam = team.map((member) =>
+                      member.id === editingId ? formData : member
+                    );
+                    setTeam(updatedTeam);
         } else {
-          await instance.post("homeslider/create-homeslider", data, {
+          await instance.post("news/create-news", data, {
             headers: {
               Authorization: "Bearer " + accessToken,
               "Content-Type": "multipart/form-data",
             },
           });
           toast.success("Data Submitted Successfully");
+          
+ 
         }
         fetchTeam();
-        toggleShows();
+        toggleShows(); 
         setEditMode(false);
         setFormData({});
-        setImagePreview("");
+        setImagePreview(""); 
       } catch (error) {
         console.error("Error handling form submission:", error);
       }
     }
   };
-  
-  
+
+
+
   const handleDelete = async (id) => {
     confirmAlert({
       title: "Confirm to delete",
@@ -201,7 +167,7 @@ const Carousal = () => {
       customUI: ({ onClose }) => (
         <div
           style={{
-            textAlign: "left",
+            textAlign: "left", 
             padding: "20px",
             backgroundColor: "white",
             borderRadius: "8px",
@@ -215,7 +181,7 @@ const Carousal = () => {
           <div
             style={{
               display: "flex",
-              justifyContent: "flex-end",
+              justifyContent: "flex-end", 
               marginTop: "20px",
             }}
           >
@@ -225,15 +191,12 @@ const Carousal = () => {
               onClick={async () => {
                 const accessToken = localStorage.getItem("accessToken");
                 try {
-                  await instance.delete(
-                    `homeslider/isdelete-homeslider/${id}`,
-                    {
-                      headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                        "Content-Type": "application/json",
-                      },
-                    }
-                  );
+                  await instance.delete(`news/isdelete-news/${id}`, {
+                    headers: {
+                      Authorization: `Bearer ${accessToken}`,
+                      "Content-Type": "application/json",
+                    },
+                  });
                   toast.success("Data Deleted Successfully");
                   fetchTeam();
                 } catch (error) {
@@ -245,7 +208,10 @@ const Carousal = () => {
             >
               Yes
             </button>
-            <button className="btn btn-secondary" onClick={() => onClose()}>
+            <button
+              className="btn btn-secondary"
+              onClick={() => onClose()}
+            >
               No
             </button>
           </div>
@@ -260,7 +226,7 @@ const Carousal = () => {
       customUI: ({ onClose }) => (
         <div
           style={{
-            textAlign: "left",
+            textAlign: "left", 
             padding: "20px",
             backgroundColor: "white",
             borderRadius: "8px",
@@ -270,14 +236,12 @@ const Carousal = () => {
           }}
         >
           <h2>Confirm to change visibility</h2>
-          <p>
-            Are you sure you want to {isVisible ? "hide" : "show"} this data?
-          </p>
+          <p>Are you sure you want to {isVisible ? "hide" : "show"} this data?</p>
           <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
-              marginTop: "20px",
+              marginTop: "20px", 
             }}
           >
             <button
@@ -287,7 +251,7 @@ const Carousal = () => {
                 const accessToken = localStorage.getItem("accessToken");
                 try {
                   await instance.put(
-                    `homeslider/isactive-homeslider/${id}`,
+                    `news/isactive-news/${id}`,
                     { isVisible },
                     {
                       headers: {
@@ -314,7 +278,10 @@ const Carousal = () => {
             >
               Yes
             </button>
-            <button className="btn btn-secondary" onClick={() => onClose()}>
+            <button
+              className="btn btn-secondary"
+              onClick={() => onClose()}
+            >
               No
             </button>
           </div>
@@ -323,16 +290,18 @@ const Carousal = () => {
     });
   };
 
+
   const toggleEdit = (leaderId) => {
     const memberToEdit = team.find((item) => item.id === leaderId);
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-
+      toggleShows(); 
       setFormData(memberToEdit);
-      toggleShows(); // Redirect to form view
     }
   };
+
+
 
   useEffect(() => {
     if (!shows) {
@@ -342,20 +311,31 @@ const Carousal = () => {
       setImagePreview("");
     }
   }, [shows]);
-
-
+  const handleChange = (name, value) => {
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    if (errors[name]) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    }
+    if (name === "img") {
+      setFormData({ ...formData, [name]: value });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
 
   return (
     <Container>
       <Row>
-        {!shows && !editMode && (
-          <SearchInput
-            searchQuery={searchQuery}
-            onSearch={handleSearch}
-            onExport={handleExport}
-            showExportButton={false}
-          />
-        )}
+      <Col>
+          {!shows && !editMode && (
+            <SearchInput
+              searchQuery={searchQuery}
+              onSearch={handleSearch}
+              onExport={handleExport}
+              showExportButton={false} 
+            />
+          )}
+        </Col>
       </Row>
 
       <Row>
@@ -371,7 +351,7 @@ const Carousal = () => {
                 </tr>
               </thead>
               <tbody>
-                {(searchQuery.trim() ? filteredData : team).map(
+              {(searchQuery.trim() ? filteredData : team).map(
                   (item, index) => (
                     <tr key={item.id}>
                       {tableColumns.map((col) => (
@@ -383,41 +363,31 @@ const Carousal = () => {
                             : item[col.key]}
                         </td>
                       ))}
-                      <td>
-                        <div className="d-flex">
-                          <Button
-                            className="ms-1"
-                            onClick={() => toggleEdit(item.id)}
-                          >
-                            <FaEdit />
-                          </Button>
-                          <Button
-                            className="ms-1"
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            <FaTrash />
-                          </Button>
-
-                          <Button
-                            className="ms-1"
-                            onClick={() =>
-                              handleIsActive(
-                                item.id,
-                                !eyeVisibilityById[item.id]
-                              )
-                            }
-                          >
-                            {eyeVisibilityById[item.id] ? (
-                              <FaEyeSlash />
-                            ) : (
-                              <FaEye />
-                            )}
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                )}
+                    <td>
+                      <div className="d-flex">
+                        <Button className="ms-1" onClick={() => toggleEdit(item.id)}>
+                          <FaEdit />
+                        </Button>
+                        <Button className="ms-1" onClick={() => handleDelete(item.id)}>
+                          <FaTrash />
+                        </Button>
+                   
+                        <Button
+                          className="ms-1"
+                          onClick={() =>
+                            handleIsActive(item.id, !eyeVisibilityById[item.id])
+                          }
+                        >
+                          {eyeVisibilityById[item.id] ? (
+                            <FaEyeSlash />
+                          ) : (
+                            <FaEye />
+                          )}
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </Table>
           ) : (
@@ -425,19 +395,14 @@ const Carousal = () => {
               <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col md={6}>
-                    {imagePreview && (
+                  {imagePreview && (
                       <img
                         src={imagePreview}
                         alt="Selected Preview"
-                        style={{
-                          width: "100px",
-                          height: "auto",
-                          marginBottom: "10px",
-                        }}
+                        style={{ width: "100px", height: "auto", marginBottom: '10px' }}
                       />
                     )}
-
-                    <NewReusableForm
+                    <NewResuableForm
                       label={"Image Upload"}
                       placeholder={"Upload Image"}
                       name={"img"}
@@ -445,32 +410,54 @@ const Carousal = () => {
                       onChange={handleChange}
                       initialData={formData}
                       error={errors.img}
-                      imageDimensiion="Image must be 259x195 pixels" 
                     />
+         
                   </Col>
-
                   <Col md={6}>
-                    <Form.Group controlId="formView">
-                      <Form.Label>View</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="view"
-                        value={formData.view || ""}
-                        onChange={(e) =>
-                          handleChange(e.target.name, e.target.value)
-                        }
-                      >
-                        <option value="">Select View</option>
-                        <option value="mobile">Mobile</option>
-                        <option value="desktop">Desktop</option>
-                      </Form.Control>
-                      {errors.view && (
-                        <p className="text-danger">{errors.view}</p>
-                      )}
-                    </Form.Group>
+                    <NewResuableForm
+                      label={"Title"}
+                      placeholder={"Enter Title"}
+                      name={"title"}
+                      type={"text"}
+                      onChange={handleChange}
+                      initialData={formData}
+                      error={errors.title}
+                    />
+      
+                  </Col>
+                  <Col md={12}>
+                    <NewResuableForm
+                      label={"Short Description "}
+                      placeholder={"Short Description "}
+                      name={"shortDesc"}
+                      type={"text"}
+                      onChange={handleChange}
+                      initialData={formData}
+                      textarea
+         
+                      error={errors.shortDesc}
+                    />
+   
+                  </Col>
+                  <Col md={12}>
+                    <NewResuableForm
+                      label={"Long Description "}
+                      placeholder={"Long Description "}
+                      name={"longDesc"}
+                      type={"text"}
+                      onChange={handleChange}
+                      initialData={formData}
+                      textarea
+                      useJodit={true}
+                      error={errors.longDesc}
+                    />
+        
                   </Col>
                 </Row>
                 <Row>
+             
+           
+                  
                   <div className="mt-3 d-flex justify-content-end">
                     <Button
                       type="submit"
@@ -479,17 +466,35 @@ const Carousal = () => {
                       {editMode ? "Update" : "Submit"}
                     </Button>
                   </div>
+           
                 </Row>
               </Form>
             </Card>
           )}
         </Col>
       </Row>
-      {!shows && !editMode && (
-        <TablePagination data={searchQuery.trim() ? filteredData : team} />
-      )}
+
+     
+      <Row>
+        {!shows && !editMode && (
+          <Col className="mt-3">
+            <TablePagination />
+          </Col>
+        )}
+      </Row>
     </Container>
   );
 };
 
-export default Carousal;
+export default NewsAndEventCards;
+
+
+
+
+
+
+
+
+
+
+

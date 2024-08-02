@@ -13,7 +13,7 @@ import instance from "../../api/AxiosInstance";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-const NewsAndEventCards = () => {
+const Events = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
   const { shows, toggleShows } = React.useContext(ShowContext);
@@ -41,9 +41,8 @@ const NewsAndEventCards = () => {
         />
       ),
     },
-    { key: "title", label: "Title" },
-    { key: "shortDesc", label: "Short Description" },
-    { key: "longDesc", label: "Long Description" },
+    { key: "name", label: "Title" },
+
 
   ];
 
@@ -66,7 +65,7 @@ const NewsAndEventCards = () => {
   const fetchTeam = async () => {
     const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
     try {
-      const response = await instance.get("newsandevent/get-newevents", {
+      const response = await instance.get("events/find-events", {
         headers: {
           Authorization: "Bearer " + accessToken,
           "Content-Type": "application/json",
@@ -92,19 +91,12 @@ const NewsAndEventCards = () => {
       isValid = false;
     }
 
-    if (!formData.title?.trim()) {
-      errors.title = "Title is required";
+    if (!formData.name?.trim()) {
+      errors.name = "Name is required";
       isValid = false;
     }
 
-    if (!formData.shortDesc?.trim()) {
-      errors.shortDesc = "Short Description is required";
-      isValid = false;
-    }
-    if (!formData.longDesc?.trim()) {
-      errors.longDesc = "Long Description is required";
-      isValid = false;
-    }
+  
     setErrors(errors);
     return isValid;
   };
@@ -121,7 +113,7 @@ const NewsAndEventCards = () => {
       try {
         if (editMode) {
           await instance.put(
-            `newsandevent/update-newevent/${editingId}`,
+            `events/update-event/${editingId}`,
             data,
             {
               headers: {
@@ -137,7 +129,7 @@ const NewsAndEventCards = () => {
                     );
                     setTeam(updatedTeam);
         } else {
-          await instance.post("newsandevent/create-newevent", data, {
+          await instance.post("events/create-event", data, {
             headers: {
               Authorization: "Bearer " + accessToken,
               "Content-Type": "multipart/form-data",
@@ -191,7 +183,7 @@ const NewsAndEventCards = () => {
               onClick={async () => {
                 const accessToken = localStorage.getItem("accessToken");
                 try {
-                  await instance.delete(`newsandevent/isdelete-newevent/${id}`, {
+                  await instance.delete(`events/isdelete-event/${id}`, {
                     headers: {
                       Authorization: `Bearer ${accessToken}`,
                       "Content-Type": "application/json",
@@ -251,7 +243,7 @@ const NewsAndEventCards = () => {
                 const accessToken = localStorage.getItem("accessToken");
                 try {
                   await instance.put(
-                    `newsandevent/isactive-newevent/${id}`,
+                    `events/isactive-event/${id}`,
                     { isVisible },
                     {
                       headers: {
@@ -301,13 +293,7 @@ const NewsAndEventCards = () => {
     }
   };
 
-  const toggleVisibility = (id) => {
-    const updatedEyeVisibilityById = {
-      ...eyeVisibilityById,
-      [id]: !eyeVisibilityById[id],
-    };
-    setEyeVisibilityById(updatedEyeVisibilityById);
-  };
+
 
   useEffect(() => {
     if (!shows) {
@@ -318,6 +304,10 @@ const NewsAndEventCards = () => {
     }
   }, [shows]);
   const handleChange = (name, value) => {
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    if (errors[name]) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    }
     if (name === "img") {
       setFormData({ ...formData, [name]: value });
     } else {
@@ -411,54 +401,23 @@ const NewsAndEventCards = () => {
                       type={"file"}
                       onChange={handleChange}
                       initialData={formData}
+                      error={errors.img}
                     />
-                    {errors.img && (
-                      <p className="text-danger">{errors.img}</p>
-                    )}
+       
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
                       label={"Title"}
                       placeholder={"Enter Title"}
-                      name={"title"}
+                      name={"name"}
                       type={"text"}
                       onChange={handleChange}
                       initialData={formData}
+                      error={errors.name}
                     />
-                    {errors.title && (
-                      <p className="text-danger">{errors.title}</p>
-                    )}
+        
                   </Col>
-                  <Col md={12}>
-                    <NewResuableForm
-                      label={"Short Description "}
-                      placeholder={"Short Description "}
-                      name={"shortDesc"}
-                      type={"text"}
-                      onChange={handleChange}
-                      initialData={formData}
-                      textarea
-                      useJodit={true}
-                    />
-                    {errors.shortDesc && (
-                      <p className="text-danger">{errors.shortDesc}</p>
-                    )}
-                  </Col>
-                  <Col md={12}>
-                    <NewResuableForm
-                      label={"Long Description "}
-                      placeholder={"Long Description "}
-                      name={"longDesc"}
-                      type={"text"}
-                      onChange={handleChange}
-                      initialData={formData}
-                      textarea
-                      useJodit={true}
-                    />
-                    {errors.longDesc && (
-                      <p className="text-danger">{errors.longDesc}</p>
-                    )}
-                  </Col>
+                
                 </Row>
                 <Row>
              
@@ -492,7 +451,7 @@ const NewsAndEventCards = () => {
   );
 };
 
-export default NewsAndEventCards;
+export default Events;
 
 
 

@@ -115,6 +115,35 @@ const Testimonial = () => {
     return isValid;
   };
 
+
+  const validateImageSize = (file) => {
+
+    return new Promise((resolve, reject) => {
+
+      const img = new Image();
+
+      img.onload = () => {
+
+        if (img.width === 259 && img.height === 195) {
+
+          resolve();
+
+        } else {
+
+          reject("Image must be 259*195 pixels");
+
+        }
+
+      };
+
+      img.onerror = () => reject("Error loading image");
+
+      img.src = URL.createObjectURL(file);
+
+    });
+
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm(formData)) {
@@ -317,7 +346,13 @@ const Testimonial = () => {
   }, [shows]);
 
 
-  const handleChange = (name, value) => {
+  const handleChange = async(name, value) => {
+    await validateImageSize(value);
+    setFormData({ ...formData, [name]: value });
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    if (errors[name]) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    }
     if (name === "img") {
       setFormData({ ...formData, [name]: value });
     } else {
@@ -409,10 +444,10 @@ const Testimonial = () => {
                       type={"file"}
                       onChange={handleChange}
                       initialData={formData}
+                      error={errors.img}
+                      imageDimensiion="Image must be 259x195 pixels" 
                     />
-                    {errors.img && (
-                      <p className="text-danger">{errors.img}</p>
-                    )}
+                
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
@@ -422,10 +457,9 @@ const Testimonial = () => {
                       type={"text"}
                       onChange={handleChange}
                       initialData={formData}
+                      error={errors.title}
                     />
-                    {errors.title && (
-                      <p className="text-danger">{errors.title}</p>
-                    )}
+               
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
@@ -436,11 +470,9 @@ const Testimonial = () => {
                       onChange={handleChange}
                       initialData={formData}
                       textarea
-                   
+                      error={errors.review}
                     />
-                    {errors.review && (
-                      <p className="text-danger">{errors.review}</p>
-                    )}
+             
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
@@ -453,10 +485,9 @@ const Testimonial = () => {
                       min={0}
                       max={5}
                       step={0.1}
+                      error={errors.star}
                     />
-                    {errors.star && (
-                      <p className="text-danger">{errors.star}</p>
-                    )}
+           
                   </Col>
                 </Row>
                 <Row>

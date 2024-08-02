@@ -152,7 +152,9 @@
 
 
 
-////s1
+
+////sos final
+
 import React, { useState, useEffect } from "react";
 import { Form } from "react-bootstrap";
 import JoditEditor from "jodit-react";
@@ -166,6 +168,8 @@ const NewReusableForm = ({
   useJodit,
   onChange,
   initialData,
+  error,
+  imageDimensiion 
 }) => {
   const [value, setValue] = useState(initialData[name] || "");
 
@@ -179,40 +183,60 @@ const NewReusableForm = ({
     onChange(name, type === "file" ? files[0] : value);
   };
 
+  const handleEditorChange = (newContent) => {
+    setValue(newContent);
+    onChange(name, newContent);
+  };
+
   return (
     <Form.Group>
       <Form.Label>{label}</Form.Label>
+    
+      {imageDimensiion && (
+          <span className="form-text text-danger ms-2">
+            ({imageDimensiion})
+          </span>
+        )}
       {type === "file" ? (
-        <Form.Control
-          type={type}
-          accept="image/*,.pdf,.doc,.docx"
-          onChange={handleChange}
-          required
-        />
+        <>
+          <Form.Control
+            type={type}
+            accept="image/*,.pdf,.doc,.docx"
+            onChange={handleChange}
+            isInvalid={!!error} // shows error if any
+          />
+          {error && <div className="invalid-feedback d-block">{error}</div>}
+        </>
       ) : useJodit ? (
-        <JoditEditor
-          value={value}
-          onChange={(newContent) => {
-            setValue(newContent);
-            onChange(name, newContent);
-          }}
-        />
+        <>
+          <JoditEditor
+            value={value}
+            onChange={handleEditorChange}
+          />
+          {error && <div className="invalid-feedback d-block">{error}</div>}
+        </>
       ) : textarea ? (
-        <Form.Control
-          as="textarea"
-          placeholder={placeholder}
-          value={value}
-          onChange={handleChange}
-          required
-        />
+        <>
+          <Form.Control
+            as="textarea"
+            placeholder={placeholder}
+            value={value}
+            onChange={handleChange}
+            isInvalid={!!error} // shows error if any
+          />
+          {error && <Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>}
+        </>
       ) : (
-        <Form.Control
-          type={type}
-          placeholder={placeholder}
-          value={value}
-          onChange={handleChange}
-          required
-        />
+        <>
+          <Form.Control
+            type={type}
+            placeholder={placeholder}
+            value={value}
+            onChange={handleChange}
+            isInvalid={!!error} // shows error if any
+          />
+          {error && <Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>}
+        </>
       )}
     </Form.Group>
   );

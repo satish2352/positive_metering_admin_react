@@ -13,7 +13,7 @@ import Infrastructure from "./screens/submenus/Infrastructure";
 import OurStory from "./screens/submenus/OurStory";
 import OurTeam from "./screens/submenus/OurTeam";
 
-import NewsAndEventCards from "./screens/submenus/NewAndEventCards";
+import News from "./screens/submenus/News";
 
 import HeaderContact from "./screens/submenus/HeaderContact";
 import HeroForm from "./screens/submenus/HeroForm";
@@ -43,6 +43,8 @@ import MaterialData from "./screens/submenus/MaterialData";
 import Logout from "./screens/submenus/Logout";
 import { Sidebar } from "./components";
 import ProtectedRoutes from "./api/ProtectedRoutes";
+import ApplicationData from "./screens/submenus/ApplicationData";
+import Events from "./screens/submenus/Events";
 
 function App() {
   return (
@@ -84,8 +86,12 @@ function App() {
             element={<ProtectedRoutes Component={Leadership} />}
           />
           <Route
-            path="/newsandeventcards"
-            element={<ProtectedRoutes Component={NewsAndEventCards} />}
+            path="/news"
+            element={<ProtectedRoutes Component={News} />}
+          />
+                  <Route
+            path="/events"
+            element={<ProtectedRoutes Component={Events} />}
           />
           <Route
             path="/headercontact"
@@ -170,6 +176,10 @@ function App() {
           <Route
             path="/projecttitilename"
             element={<ProtectedRoutes Component={ProjectTitleName} />}
+          />
+                    <Route
+            path="/applicationdata"
+            element={<ProtectedRoutes Component={ApplicationData} />}
           />
           <Route
             path="/logout"

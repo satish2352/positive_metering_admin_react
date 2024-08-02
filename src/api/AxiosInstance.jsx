@@ -105,13 +105,16 @@ instance.interceptors.response.use(
       }
       toast.error("Unauthorized access - please log in.");
       window.location.href = "/"; // Redirect to login page
-    } else if (error?.response?.status === 404) {
-      toast.error("Resource not found.");
-    } else if (error?.response?.status === 500) {
-      toast.error("Internal server error.");
-    } else {
-      toast.error("An error occurred.");
-    }
+    } 
+    //  if (error?.response?.status === 404) {
+    //   toast.error("Resource not found.");
+    // } 
+    // else if (error?.response?.status === 500) {
+    //   toast.error("Internal server error.");
+    // } 
+    // else {
+    //   toast.error("An error occurred.");
+    // }
     return Promise.reject(error);
   }
 );

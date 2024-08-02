@@ -68,7 +68,7 @@ const ProductDetails = () => {
   const fetchTeam = async () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      const response = await instance.get("productdetails/find-productdetails", {
+      const response = await instance.get("productdetails/get-productnames", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
@@ -329,6 +329,10 @@ const ProductDetails = () => {
   }, [shows]);
 
   const handleChange = (name, value) => {
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    if (errors[name]) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    }
     if (name === "img") {
       setFormData({ ...formData, [name]: value });
     } else {
@@ -419,21 +423,23 @@ const ProductDetails = () => {
                       type="file"
                       onChange={handleChange}
                       initialData={formData}
+                      error={errors.img}
                     />
-                    {errors.img && (
-                      <p className="text-danger">{errors.img}</p>
-                    )}
+         
                   </Col>
+             
                   <Col md={6}>
-                    <ReusableDropdown
+                    <NewResuableForm
                       label="Product Name"
+                      placeholder="Enter Product Name"
                       name="productName"
+                      type="text"
                       onChange={handleChange}
                       initialData={formData}
+                      error={errors.productName}
+                    
                     />
-                    {errors.productName && (
-                      <p className="text-danger">{errors.productName}</p>
-                    )}
+    
                   </Col>
                   <Col md={12}>
                     <NewResuableForm
@@ -445,10 +451,9 @@ const ProductDetails = () => {
                       initialData={formData}
                       textarea
                       useJodit={true}
+                      error={errors.application}
                     />
-                    {errors.application && (
-                      <p className="text-danger">{errors.application}</p>
-                    )}
+    
                   </Col>
                 </Row>
                 <Row>

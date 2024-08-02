@@ -59,7 +59,7 @@ const MaterialData = () => {
   const fetchProducts = async () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      const response = await instance.get("productname/find-productnames", { // Adjust the endpoint to fetch product names
+      const response = await instance.get("productdetails/get-productnames", { // Adjust the endpoint to fetch product names
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
@@ -307,6 +307,10 @@ const MaterialData = () => {
   }, [shows]);
 
   const handleChange = (name, value) => {
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    if (errors[name]) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    }
     setFormData({ ...formData, [name]: value });
   };
 
@@ -412,10 +416,9 @@ const MaterialData = () => {
                       initialData={formData}
                       textarea
                       useJodit={true}
+                      error={errors.materialDescription}
                     />
-                    {errors.materialDescription && (
-                      <p className="text-danger">{errors.materialDescription}</p>
-                    )}
+     
                   </Col>
               </Row>
               

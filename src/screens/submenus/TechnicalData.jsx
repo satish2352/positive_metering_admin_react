@@ -58,13 +58,13 @@ const TechnicalData = () => {
   const fetchProducts = async () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      const response = await instance.get("productname/find-productnames", { // Adjust the endpoint to fetch product names
+      const response = await instance.get("productdetails/get-productnames", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
       });
-      setProducts(response.data.responseData); // Assuming responseData contains product names
+      setProducts(response.data.responseData); 
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -88,6 +88,9 @@ const TechnicalData = () => {
     return isValid;
   };
 
+
+
+  
   const handlePost = async () => {
     console.log("Form data before submission:", formData); // Debug log
     try {
@@ -155,53 +158,6 @@ const TechnicalData = () => {
       }
     }
   };
-
-  // const handleDelete = async (id) => {
-  //   const accessToken = localStorage.getItem("accessToken");
-  //   try {
-  //     await instance.delete(
-  //       `technicalData/delete-technical/${id}`,
-  //       {},
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-  //     toast.success("Data Deleted Successfully");
-  //     fetchTeam();
-  //   } catch (error) {
-  //     console.error("Error deleting data:", error);
-  //     toast.error("Error deleting data");
-  //   }
-  // };
-
-  // const handleIsActive = async (id, isVisible) => {
-  //   const accessToken = localStorage.getItem("accessToken");
-  //   try {
-  //     await instance.put(
-  //       `technicalData/isactive-technicalData/${id}`,
-  //       { isVisible },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-  //     if (isVisible) {
-  //       toast.success("Data hidden successfully");
-  //     } else {
-  //       toast.success("Data shown successfully");
-  //     }
-      
-  //     fetchTeam();
-  //   } catch (error) {
-  //     console.error("Error updating visibility:", error);
-  //     toast.error("Error updating visibility");
-  //   }
-  // };
 
 
   const handleDelete = async (id) => {
@@ -355,6 +311,10 @@ const TechnicalData = () => {
   }, [shows]);
 
   const handleChange = (name, value) => {
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    if (errors[name]) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    }
     setFormData({ ...formData, [name]: value });
   };
 
@@ -460,10 +420,9 @@ const TechnicalData = () => {
                       initialData={formData}
                       textarea
                       useJodit={true}
+                      error={errors.technicalDescription}
                     />
-                    {errors.technicalDescription && (
-                      <p className="text-danger">{errors.technicalDescription}</p>
-                    )}
+         
                   </Col>
               </Row>
           

@@ -303,7 +303,6 @@ const BlogDetails = () => {
     }
   };
 
-
   useEffect(() => {
     if (!shows) {
       setEditMode(false);
@@ -314,12 +313,19 @@ const BlogDetails = () => {
   }, [shows]);
 
   const handleChange = (name, value) => {
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    if (errors[name]) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    }
     if (name === "img") {
       setFormData({ ...formData, [name]: value });
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
+
+
+
   return (
     <Container>
       <Row>
@@ -348,7 +354,7 @@ const BlogDetails = () => {
                 </tr>
               </thead>
               <tbody>
-              {(searchQuery.trim() ? filteredData : team).map(
+                {(searchQuery.trim() ? filteredData : team).map(
                   (item, index) => (
                     <tr key={item.id}>
                       {tableColumns.map((col) => (
@@ -360,38 +366,41 @@ const BlogDetails = () => {
                             : item[col.key]}
                         </td>
                       ))}
-                    <td>
-                      <div className="d-flex">
-                        <Button
-                          className="ms-1"
-                          onClick={() => toggleEdit(item.id)}
-                        >
-                          <FaEdit />
-                        </Button>
-                        <Button
-                          className="ms-1"
-                          onClick={() => handleDelete(item.id)}
-                        >
-                          <FaTrash />
-                        </Button>
-            
+                      <td>
+                        <div className="d-flex">
+                          <Button
+                            className="ms-1"
+                            onClick={() => toggleEdit(item.id)}
+                          >
+                            <FaEdit />
+                          </Button>
+                          <Button
+                            className="ms-1"
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            <FaTrash />
+                          </Button>
 
-                        <Button
-                          className="ms-1"
-                          onClick={() =>
-                            handleIsActive(item.id, !eyeVisibilityById[item.id])
-                          }
-                        >
-                          {eyeVisibilityById[item.id] ? (
-                            <FaEyeSlash />
-                          ) : (
-                            <FaEye />
-                          )}
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          <Button
+                            className="ms-1"
+                            onClick={() =>
+                              handleIsActive(
+                                item.id,
+                                !eyeVisibilityById[item.id]
+                              )
+                            }
+                          >
+                            {eyeVisibilityById[item.id] ? (
+                              <FaEyeSlash />
+                            ) : (
+                              <FaEye />
+                            )}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                )}
               </tbody>
             </Table>
           ) : (
@@ -417,8 +426,9 @@ const BlogDetails = () => {
                       type={"file"}
                       onChange={handleChange}
                       initialData={formData}
+                      error={errors.img}
                     />
-                    {errors.img && <p className="text-danger">{errors.img}</p>}
+                  
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
@@ -428,10 +438,9 @@ const BlogDetails = () => {
                       type={"text"}
                       onChange={handleChange}
                       initialData={formData}
+                      error={errors.title}
                     />
-                    {errors.title && (
-                      <p className="text-danger">{errors.title}</p>
-                    )}
+          
                   </Col>
                   <Col md={12}>
                     <NewResuableForm
@@ -442,11 +451,9 @@ const BlogDetails = () => {
                       onChange={handleChange}
                       initialData={formData}
                       textarea
-                      useJodit={true}
+                      error={errors.shortDesc}
                     />
-                    {errors.shortDesc && (
-                      <p className="text-danger">{errors.shortDesc}</p>
-                    )}
+            
                   </Col>
                   <Col md={12}>
                     <NewResuableForm
@@ -458,10 +465,9 @@ const BlogDetails = () => {
                       initialData={formData}
                       textarea
                       useJodit={true}
+                      error={errors.longDesc}
                     />
-                    {errors.longDesc && (
-                      <p className="text-danger">{errors.longDesc}</p>
-                    )}
+         
                   </Col>
                 </Row>
                 <Row>

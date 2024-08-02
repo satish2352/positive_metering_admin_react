@@ -1,6 +1,5 @@
-////sos carousal to homeslider and vice versa
-
-import React, { useState, useEffect } from "react";
+//// sos
+import React, { useState, useEffect, useContext } from "react";
 import {
   Container,
   Row,
@@ -10,85 +9,77 @@ import {
   Form,
   Table,
 } from "react-bootstrap";
+import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
-import NewReusableForm from "../../components/form/NewResuableForm";
-
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TablePagination from "../../components/pagination/TablePagination";
 import instance from "../../api/AxiosInstance";
-import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
+import NewResuableForm from "../../components/form/NewResuableForm";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-const Carousal = () => {
+const ApplicationData = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-  const { shows, toggleShows } = React.useContext(ShowContext);
+  const { shows, toggleShows } = useContext(ShowContext);
   const [team, setTeam] = useState([]);
+  const [products, setProducts] = useState([]); // New state for product names
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({});
   const [eyeVisibilityById, setEyeVisibilityById] = useState({});
-  const [imagePreview, setImagePreview] = useState("");
+
   const tableColumns = [
     {
       key: "srNo",
       label: "Sr. No.",
       render: (value, index) => index + 1, // Adding serial number starting from 1
     },
-    {
-      key: "img",
-      label: "Image",
-      render: (value) => (
-        <img
-          src={value}
-          alt="Carousel"
-          style={{ width: "100px", height: "auto" }}
-        />
-      ),
-    },
-    {
-      key: "view",
-      label: "View",
-      render: (value) => <span>{value}</span>,
-    },
+    { key: "productName", label: "Product Name" },
+    { key: "applicationDescription", label: "Application Description" },
   ];
 
   useEffect(() => {
     fetchTeam();
+    fetchProducts(); // Fetch products when the component mounts
   }, []);
-  useEffect(() => {
-    if (formData.img && formData.img instanceof File) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(formData.img);
-    } else if (formData.img && typeof formData.img === "string") {
-      setImagePreview(formData.img);
-    } else {
-      setImagePreview("");
-    }
-  }, [formData.img]);
 
   const fetchTeam = async () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      const response = await instance.get("homeslider/find-homeslider", {
-        headers: {
-          Authorization: "Bearer " + accessToken,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await instance.get(
+        "applicationData/get-applicationData",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const reversedData = response.data.responseData.reverse();
       setTeam(reversedData);
       setData(reversedData);
     } catch (error) {
-      console.error("Error fetching team:", error);
-      toast.error("Error fetching data");
+      console.error("Error fetching technical data:", error);
+    }
+  };
+
+  const fetchProducts = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    try {
+      const response = await instance.get("productdetails/get-productnames", {
+        // Adjust the endpoint to fetch product names
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      setProducts(response.data.responseData); // Assuming responseData contains product names
+    } catch (error) {
+      console.error("Error fetching products:", error);
     }
   };
 
@@ -96,13 +87,13 @@ const Carousal = () => {
     let errors = {};
     let isValid = true;
 
-    if (!formData.img) {
-      errors.img = "Image is required";
+    if (!formData.productName?.trim()) {
+      errors.productName = "Product Name is required";
       isValid = false;
     }
 
-    if (!formData.view) {
-      errors.view = "View selection is required";
+    if (!formData.applicationDescription?.trim()) {
+      errors.applicationDescription = "Technical Description is required";
       isValid = false;
     }
 
@@ -110,90 +101,76 @@ const Carousal = () => {
     return isValid;
   };
 
-  const validateImageSize = (file) => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        if (img.width === 259 && img.height === 195) {
-          resolve();
-        } else {
-          reject("Uploaded image is not 259*195 pixels");
-        }
-      };
-      img.onerror = () => reject("Error loading image");
-      img.src = URL.createObjectURL(file);
-    });
-  };
+  const handlePost = async () => {
+    console.log("Form data before submission:", formData); // Debug log
+    try {
+      if (validateForm(formData)) {
+        const accessToken = localStorage.getItem("accessToken");
+        const response = await instance.post(
+          "applicationData/create-applicationData",
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-  
-  const handleChange = async (name, value) => {
-    if (name === "img" && value instanceof File) {
-      try {
-        await validateImageSize(value);
-         setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    if (errors[name]) {
-       setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-     }
-        setFormData({ ...formData, [name]: value });
-        setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
-      } catch (error) {
-        setErrors((prevErrors) => ({ ...prevErrors, img: error }));
-        setImagePreview("");
+        if (response.status === 200) {
+          toast.success("Data Submitted Successfully");
+
+          fetchTeam();
+          toggleShows();
+          setFormData({});
+        } else {
+          toast.error("Failed to submit data");
+        }
       }
-    } else {
-      setFormData({ ...formData, [name]: value });
+    } catch (error) {
+      console.error("Error handling form submission:", error);
     }
   };
 
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handlePut = async () => {
+    console.log("Updating form data:", formData);
     if (validateForm(formData)) {
       const accessToken = localStorage.getItem("accessToken");
-      const data = new FormData();
-      for (const key in formData) {
-        data.append(key, formData[key]);
-      }
 
       try {
-        if (editMode) {
-          await instance.put(
-            `homeslider/update-homeslider/${editingId}`,
-            data,
-            {
-              headers: {
-                Authorization: "Bearer " + accessToken,
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+        const response = await instance.put(
+          `applicationData/update-applicationData/${editingId}`,
+          formData, // Send formData directly
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("PUT response:", response); // Debug log
+
+        if (response.status === 200) {
           toast.success("Data Updated Successfully");
           // Update the specific entry in the team array
           const updatedTeam = team.map((member) =>
             member.id === editingId ? formData : member
           );
           setTeam(updatedTeam);
+          fetchTeam();
+          toggleShows();
+          setEditMode(false);
+          setFormData({});
         } else {
-          await instance.post("homeslider/create-homeslider", data, {
-            headers: {
-              Authorization: "Bearer " + accessToken,
-              "Content-Type": "multipart/form-data",
-            },
-          });
-          toast.success("Data Submitted Successfully");
+          toast.error("Failed to update data");
         }
-        fetchTeam();
-        toggleShows();
-        setEditMode(false);
-        setFormData({});
-        setImagePreview("");
       } catch (error) {
-        console.error("Error handling form submission:", error);
+        console.error("Error handling form update:", error);
       }
     }
   };
-  
-  
+
   const handleDelete = async (id) => {
     confirmAlert({
       title: "Confirm to delete",
@@ -226,7 +203,7 @@ const Carousal = () => {
                 const accessToken = localStorage.getItem("accessToken");
                 try {
                   await instance.delete(
-                    `homeslider/isdelete-homeslider/${id}`,
+                    `applicationData/delete-technical/${id}`,
                     {
                       headers: {
                         Authorization: `Bearer ${accessToken}`,
@@ -287,7 +264,7 @@ const Carousal = () => {
                 const accessToken = localStorage.getItem("accessToken");
                 try {
                   await instance.put(
-                    `homeslider/isactive-homeslider/${id}`,
+                    `applicationData/isactive-applicationData/${id}`,
                     { isVisible },
                     {
                       headers: {
@@ -323,14 +300,13 @@ const Carousal = () => {
     });
   };
 
-  const toggleEdit = (leaderId) => {
-    const memberToEdit = team.find((item) => item.id === leaderId);
-    if (memberToEdit) {
-      setEditingId(leaderId);
+  const toggleEdit = (id) => {
+    const itemToEdit = team.find((item) => item.id === id);
+    if (itemToEdit) {
+      setEditingId(id);
       setEditMode(true);
-
-      setFormData(memberToEdit);
-      toggleShows(); // Redirect to form view
+      toggleShows();
+      setFormData(itemToEdit); // Ensure this correctly sets `applicationDescription`
     }
   };
 
@@ -339,23 +315,30 @@ const Carousal = () => {
       setEditMode(false);
       setEditingId(null);
       setFormData({});
-      setImagePreview("");
     }
   }, [shows]);
 
-
+  const handleChange = (name, value) => {
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    if (errors[name]) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    }
+    setFormData({ ...formData, [name]: value });
+  };
 
   return (
     <Container>
       <Row>
-        {!shows && !editMode && (
-          <SearchInput
-            searchQuery={searchQuery}
-            onSearch={handleSearch}
-            onExport={handleExport}
-            showExportButton={false}
-          />
-        )}
+        <Col>
+          {!shows && !editMode && (
+            <SearchInput
+              searchQuery={searchQuery}
+              onSearch={handleSearch}
+              onExport={handleExport}
+              showExportButton={false}
+            />
+          )}
+        </Col>
       </Row>
 
       <Row>
@@ -397,7 +380,6 @@ const Carousal = () => {
                           >
                             <FaTrash />
                           </Button>
-
                           <Button
                             className="ms-1"
                             onClick={() =>
@@ -421,75 +403,73 @@ const Carousal = () => {
               </tbody>
             </Table>
           ) : (
-            <Card className="p-4">
-              <Form onSubmit={handleSubmit}>
-                <Row>
-                  <Col md={6}>
-                    {imagePreview && (
-                      <img
-                        src={imagePreview}
-                        alt="Selected Preview"
-                        style={{
-                          width: "100px",
-                          height: "auto",
-                          marginBottom: "10px",
-                        }}
-                      />
-                    )}
-
-                    <NewReusableForm
-                      label={"Image Upload"}
-                      placeholder={"Upload Image"}
-                      name={"img"}
-                      type={"file"}
-                      onChange={handleChange}
-                      initialData={formData}
-                      error={errors.img}
-                      imageDimensiion="Image must be 259x195 pixels" 
-                    />
-                  </Col>
-
-                  <Col md={6}>
-                    <Form.Group controlId="formView">
-                      <Form.Label>View</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="view"
-                        value={formData.view || ""}
-                        onChange={(e) =>
-                          handleChange(e.target.name, e.target.value)
-                        }
-                      >
-                        <option value="">Select View</option>
-                        <option value="mobile">Mobile</option>
-                        <option value="desktop">Desktop</option>
-                      </Form.Control>
-                      {errors.view && (
-                        <p className="text-danger">{errors.view}</p>
-                      )}
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <Row>
-                  <div className="mt-3 d-flex justify-content-end">
-                    <Button
-                      type="submit"
-                      variant={editMode ? "success" : "primary"}
+            <Form onSubmit={handlePost}>
+              <Row>
+                <Col md={6}>
+                  <Form.Group controlId="productName">
+                    <Form.Label>Product Name</Form.Label>
+                    <Form.Control
+                      as="select"
+                      value={formData.productName || ""}
+                      onChange={(e) =>
+                        handleChange("productName", e.target.value)
+                      }
+                      isInvalid={!!errors.productName}
                     >
-                      {editMode ? "Update" : "Submit"}
-                    </Button>
-                  </div>
-                </Row>
-              </Form>
-            </Card>
+                      <option value="">Select Product Name</option>
+                      {products.map((product) => (
+                        <option key={product.id} value={product.productName}>
+                          {product.productName}
+                        </option>
+                      ))}
+                    </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.productName}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+
+                <Col md={12}>
+                  <NewResuableForm
+                    label="Application Description"
+                    placeholder="Enter Application Description"
+                    name="applicationDescription"
+                    type="text"
+                    initialData={formData}
+                    textarea
+                    useJodit={true}
+                    error={errors.applicationDescription}
+                  />
+                </Col>
+              </Row>
+
+              <Col className="d-flex justify-content-end">
+                {!editMode && (
+                  <Button type="button" variant="primary" onClick={handlePost}>
+                    Submit
+                  </Button>
+                )}
+                {editMode && (
+                  <Button type="button" variant="success" onClick={handlePut}>
+                    Update
+                  </Button>
+                )}
+              </Col>
+            </Form>
           )}
         </Col>
       </Row>
-      {!shows && !editMode && (
-        <TablePagination data={searchQuery.trim() ? filteredData : team} />
-      )}
+      <Row>
+        <Row>
+          {!shows && !editMode && (
+            <Col className="mt-3">
+              <TablePagination />
+            </Col>
+          )}
+        </Row>
+      </Row>
     </Container>
   );
 };
 
-export default Carousal;
+export default ApplicationData;
