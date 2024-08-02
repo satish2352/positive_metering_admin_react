@@ -1,10 +1,17 @@
 // ////sos
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Button, Form ,Table} from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Table,
+} from "react-bootstrap";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
 import NewResuableForm from "../../components/form/NewResuableForm";
-
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,7 +23,7 @@ import "react-confirm-alert/src/react-confirm-alert.css";
 const Testimonial = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-  const { shows,toggleShows } = React.useContext(ShowContext);
+  const { shows, toggleShows } = React.useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -28,20 +35,8 @@ const Testimonial = () => {
     {
       key: "srNo",
       label: "Sr. No.",
-      render: (value, index) => index + 1, // Adding serial number starting from 1
+      render: (value, index) => index + 1, 
     },
-    {
-      key: "img",
-      label: "Image",
-      render: (value) => (
-        <img
-          src={value}
-          alt="Testimonial"
-          style={{ width: "100px", height: "auto" }}
-        />
-      ),
-    },
-    { key: "title", label: "Title" },
     { key: "review", label: "Review" },
     { key: "star", label: "Star" },
   ];
@@ -50,22 +45,8 @@ const Testimonial = () => {
     fetchTeam();
   }, []);
 
-  useEffect(() => {
-    if (formData.img && formData.img instanceof File) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(formData.img);
-    } else if (formData.img && typeof formData.img === 'string') {
-      setImagePreview(formData.img);
-    } else {
-      setImagePreview("");
-    }
-  }, [formData.img]);
-
   const fetchTeam = async () => {
-    const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
+    const accessToken = localStorage.getItem("accessToken"); 
     try {
       const response = await instance.get("testimonials/get-testimonials", {
         headers: {
@@ -76,8 +57,7 @@ const Testimonial = () => {
       const reversedData = response.data.responseData.reverse();
       setTeam(reversedData);
       setData(reversedData);
-      // setTeam(response.data.responseData);
-      // setData(response.data.responseData);
+
     } catch (error) {
       console.error(
         "Error fetching team:",
@@ -89,16 +69,6 @@ const Testimonial = () => {
   const validateForm = (formData) => {
     let errors = {};
     let isValid = true;
-
-    if (!formData.img) {
-      errors.img = "Image is required";
-      isValid = false;
-    }
-
-    if (!formData.title?.trim()) {
-      errors.title = "Title is required";
-      isValid = false;
-    }
 
     if (!formData.review?.trim()) {
       errors.review = "Review is required";
@@ -116,32 +86,11 @@ const Testimonial = () => {
   };
 
 
-  const validateImageSize = (file) => {
-
-    return new Promise((resolve, reject) => {
-
-      const img = new Image();
-
-      img.onload = () => {
-
-        if (img.width === 259 && img.height === 195) {
-
-          resolve();
-
-        } else {
-
-          reject("Image must be 259*195 pixels");
-
-        }
-
-      };
-
-      img.onerror = () => reject("Error loading image");
-
-      img.src = URL.createObjectURL(file);
-
-    });
-
+  const handleChange = (name, value) => {
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    if (errors[name]) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -166,11 +115,11 @@ const Testimonial = () => {
             }
           );
           toast.success("Data Updated Successfully");
-              // Update the specific entry in the team array
-              const updatedTeam = team.map((member) =>
-                member.id === editingId ? formData : member
-              );
-              setTeam(updatedTeam);
+          // Update the specific entry in the team array
+          const updatedTeam = team.map((member) =>
+            member.id === editingId ? formData : member
+          );
+          setTeam(updatedTeam);
         } else {
           await instance.post("testimonials/create-testimonials", data, {
             headers: {
@@ -179,20 +128,17 @@ const Testimonial = () => {
             },
           });
           toast.success("Data Submitted Successfully");
-
         }
         fetchTeam();
-        toggleShows(); 
+        toggleShows();
         setEditMode(false);
         setFormData({});
-        setImagePreview(""); 
+        setImagePreview("");
       } catch (error) {
         console.error("Error handling form submission:", error);
       }
     }
   };
-
-
 
   const handleDelete = async (id) => {
     confirmAlert({
@@ -201,7 +147,7 @@ const Testimonial = () => {
       customUI: ({ onClose }) => (
         <div
           style={{
-            textAlign: "left", 
+            textAlign: "left",
             padding: "20px",
             backgroundColor: "white",
             borderRadius: "8px",
@@ -215,7 +161,7 @@ const Testimonial = () => {
           <div
             style={{
               display: "flex",
-              justifyContent: "flex-end", 
+              justifyContent: "flex-end",
               marginTop: "20px",
             }}
           >
@@ -225,12 +171,15 @@ const Testimonial = () => {
               onClick={async () => {
                 const accessToken = localStorage.getItem("accessToken");
                 try {
-                  await instance.delete(`testimonials/isdelete-testimonial/${id}`, {
-                    headers: {
-                      Authorization: `Bearer ${accessToken}`,
-                      "Content-Type": "application/json",
-                    },
-                  });
+                  await instance.delete(
+                    `testimonials/isdelete-testimonial/${id}`,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        "Content-Type": "application/json",
+                      },
+                    }
+                  );
                   toast.success("Data Deleted Successfully");
                   fetchTeam();
                 } catch (error) {
@@ -242,10 +191,7 @@ const Testimonial = () => {
             >
               Yes
             </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => onClose()}
-            >
+            <button className="btn btn-secondary" onClick={() => onClose()}>
               No
             </button>
           </div>
@@ -260,7 +206,7 @@ const Testimonial = () => {
       customUI: ({ onClose }) => (
         <div
           style={{
-            textAlign: "left", 
+            textAlign: "left",
             padding: "20px",
             backgroundColor: "white",
             borderRadius: "8px",
@@ -270,12 +216,14 @@ const Testimonial = () => {
           }}
         >
           <h2>Confirm to change visibility</h2>
-          <p>Are you sure you want to {isVisible ? "hide" : "show"} this data?</p>
+          <p>
+            Are you sure you want to {isVisible ? "hide" : "show"} this data?
+          </p>
           <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
-              marginTop: "20px", 
+              marginTop: "20px",
             }}
           >
             <button
@@ -312,10 +260,7 @@ const Testimonial = () => {
             >
               Yes
             </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => onClose()}
-            >
+            <button className="btn btn-secondary" onClick={() => onClose()}>
               No
             </button>
           </div>
@@ -324,14 +269,12 @@ const Testimonial = () => {
     });
   };
 
-
-
   const toggleEdit = (leaderId) => {
     const memberToEdit = team.find((item) => item.id === leaderId);
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-      toggleShows(); 
+      toggleShows();
       setFormData(memberToEdit);
     }
   };
@@ -345,30 +288,16 @@ const Testimonial = () => {
     }
   }, [shows]);
 
-
-  const handleChange = async(name, value) => {
-    await validateImageSize(value);
-    setFormData({ ...formData, [name]: value });
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    if (errors[name]) {
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-    }
-    if (name === "img") {
-      setFormData({ ...formData, [name]: value });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
   return (
     <Container>
       <Row>
-      <Col>
+        <Col>
           {!shows && !editMode && (
             <SearchInput
               searchQuery={searchQuery}
               onSearch={handleSearch}
               onExport={handleExport}
-              showExportButton={false} 
+              showExportButton={false}
             />
           )}
         </Col>
@@ -387,7 +316,7 @@ const Testimonial = () => {
                 </tr>
               </thead>
               <tbody>
-              {(searchQuery.trim() ? filteredData : team).map(
+                {(searchQuery.trim() ? filteredData : team).map(
                   (item, index) => (
                     <tr key={item.id}>
                       {tableColumns.map((col) => (
@@ -399,68 +328,46 @@ const Testimonial = () => {
                             : item[col.key]}
                         </td>
                       ))}
-                    <td>
-                      <div className="d-flex">
-                        <Button className="ms-1" onClick={() => toggleEdit(item.id)}>
-                          <FaEdit />
-                        </Button>
-                        <Button className="ms-1" onClick={() => handleDelete(item.id)}>
-                          <FaTrash />
-                        </Button>
-                        <Button
-                          className="ms-1"
-                          onClick={() =>
-                            handleIsActive(item.id, !eyeVisibilityById[item.id])
-                          }
-                        >
-                          {eyeVisibilityById[item.id] ? (
-                            <FaEyeSlash />
-                          ) : (
-                            <FaEye />
-                          )}
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      <td>
+                        <div className="d-flex">
+                          <Button
+                            className="ms-1"
+                            onClick={() => toggleEdit(item.id)}
+                          >
+                            <FaEdit />
+                          </Button>
+                          <Button
+                            className="ms-1"
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            <FaTrash />
+                          </Button>
+                          <Button
+                            className="ms-1"
+                            onClick={() =>
+                              handleIsActive(
+                                item.id,
+                                !eyeVisibilityById[item.id]
+                              )
+                            }
+                          >
+                            {eyeVisibilityById[item.id] ? (
+                              <FaEyeSlash />
+                            ) : (
+                              <FaEye />
+                            )}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                )}
               </tbody>
             </Table>
           ) : (
             <Card className="p-4">
               <Form onSubmit={handleSubmit}>
                 <Row>
-                  <Col md={6}>
-                  {imagePreview && (
-                      <img
-                        src={imagePreview}
-                        alt="Selected Preview"
-                        style={{ width: "100px", height: "auto", marginBottom: '10px' }}
-                      />
-                    )}
-                    <NewResuableForm
-                      label={"Image Upload"}
-                      placeholder={"Upload Image"}
-                      name={"img"}
-                      type={"file"}
-                      onChange={handleChange}
-                      initialData={formData}
-                      error={errors.img}
-                      imageDimensiion="Image must be 259x195 pixels" 
-                    />
-                
-                  </Col>
-                  <Col md={6}>
-                    <NewResuableForm
-                      label={"Title"}
-                      placeholder={"Enter Title"}
-                      name={"title"}
-                      type={"text"}
-                      onChange={handleChange}
-                      initialData={formData}
-                      error={errors.title}
-                    />
-               
-                  </Col>
                   <Col md={6}>
                     <NewResuableForm
                       label={"Review"}
@@ -472,7 +379,6 @@ const Testimonial = () => {
                       textarea
                       error={errors.review}
                     />
-             
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
@@ -487,21 +393,18 @@ const Testimonial = () => {
                       step={0.1}
                       error={errors.star}
                     />
-           
                   </Col>
                 </Row>
                 <Row>
                   <Col className="d-flex justify-content-end">
-              
-                   
-                  <div className="mt-3 d-flex justify-content-end">
-                    <Button
-                      type="submit"
-                      variant={editMode ? "success" : "primary"}
-                    >
-                      {editMode ? "Update" : "Submit"}
-                    </Button>
-                  </div>
+                    <div className="mt-3 d-flex justify-content-end">
+                      <Button
+                        type="submit"
+                        variant={editMode ? "success" : "primary"}
+                      >
+                        {editMode ? "Update" : "Submit"}
+                      </Button>
+                    </div>
                   </Col>
                 </Row>
               </Form>
@@ -509,7 +412,6 @@ const Testimonial = () => {
           )}
         </Col>
       </Row>
-
 
       <Row>
         {!shows && !editMode && (
@@ -523,7 +425,3 @@ const Testimonial = () => {
 };
 
 export default Testimonial;
-
-
-
-
