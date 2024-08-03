@@ -111,10 +111,10 @@ const HomeSlider = () => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        if (img.width === 338 && img.height === 220) {
+        if (img.width === 338 && img.height === 219) {
           resolve();
         } else {
-          reject("Image must be 338*220 pixels");
+          reject("Image must be 338*219 pixels");
         }
       };
       img.onerror = () => reject("Error loading image");
@@ -442,7 +442,7 @@ const HomeSlider = () => {
                       onChange={handleChange}
                       initialData={formData}
                       error={errors.img} 
-                      imageDimensiion="Image must be 338*220 pixels" 
+                      imageDimensiion="Image must be 338*219 pixels" 
                     />
                 
                   </Col>

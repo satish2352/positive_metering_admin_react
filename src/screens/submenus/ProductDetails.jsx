@@ -10,7 +10,7 @@ import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TablePagination from "../../components/pagination/TablePagination";
-import ReusableDropdown from "../../components/dropdown/ReusableDropdown";
+
 import instance from "../../api/AxiosInstance";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
@@ -105,6 +105,42 @@ const ProductDetails = () => {
     setErrors(errors);
     return isValid;
   };
+
+  const validateImageSize = (file) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width === 704 && img.height === 566) {
+          resolve();
+        } else {
+          reject("Image must be 704*566 pixels");
+        }
+      };
+      img.onerror = () => reject("Error loading image");
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+
+  const handleChange = async (name, value) => {
+    if (name === "img" && value instanceof File) {
+      try {
+        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+        if (errors[name]) {
+          setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+        }
+        await validateImageSize(value);
+        setFormData({ ...formData, [name]: value });
+        setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
+      } catch (error) {
+        setErrors((prevErrors) => ({ ...prevErrors, img: error }));
+        setImagePreview("");
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
 
   const handlePost = async () => {
     if (validateForm(formData)) {
@@ -311,13 +347,7 @@ const ProductDetails = () => {
     }
   };
 
-  const toggleVisibility = (id) => {
-    const updatedEyeVisibilityById = {
-      ...eyeVisibilityById,
-      [id]: !eyeVisibilityById[id],
-    };
-    setEyeVisibilityById(updatedEyeVisibilityById);
-  };
+
 
   useEffect(() => {
     if (shows) {
@@ -328,17 +358,7 @@ const ProductDetails = () => {
     }
   }, [shows]);
 
-  const handleChange = (name, value) => {
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    if (errors[name]) {
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-    }
-    if (name === "img") {
-      setFormData({ ...formData, [name]: value });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
+
 
   return (
     <Container>
@@ -409,11 +429,15 @@ const ProductDetails = () => {
               <Form>
                 <Row>
                 <Col md={6}>
-                {imagePreview && (
+                    {imagePreview && (
                       <img
                         src={imagePreview}
                         alt="Selected Preview"
-                        style={{ width: "100px", height: "auto", marginBottom: '10px' }}
+                        style={{
+                          width: "100px",
+                          height: "auto",
+                          marginBottom: "10px",
+                        }}
                       />
                     )}
                     <NewResuableForm
@@ -421,11 +445,17 @@ const ProductDetails = () => {
                       placeholder="Upload Image"
                       name="img"
                       type="file"
-                      onChange={handleChange}
+                      onChange={(name, value) => {
+                        const file = value;
+                        if (file) {
+                          handleChange(name, file);
+                        }
+                      }}
                       initialData={formData}
-                      error={errors.img}
+                      error={errors.img} 
+                      imageDimensiion="Image must be 704*566 pixels" 
                     />
-         
+                 
                   </Col>
              
                   <Col md={6}>

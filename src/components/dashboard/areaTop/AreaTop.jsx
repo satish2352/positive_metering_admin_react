@@ -200,7 +200,7 @@ const AreaTop = () => {
       setHeader("Our Offices");
     }
     else if (window.location.pathname == "/carousalform") {
-      setHeader("Carousal Form");
+      setHeader("User Data");
     }
     else if (window.location.pathname == "/requestcallbackform") {
       setHeader("Request Callback Form");
@@ -215,7 +215,7 @@ const AreaTop = () => {
       setHeader("Subscribe");
     }
     else if (window.location.pathname == "/uploadcv") {
-      setHeader("Upload Cv");
+      setHeader("Cv List");
     }
     else if (window.location.pathname == "/applicationdata") {
       setHeader("Application Data");

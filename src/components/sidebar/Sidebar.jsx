@@ -195,30 +195,30 @@ const SidebarMenu = [
     ],
   },
   {
-    menu: "Frontend Forms ",
+    menu: "Contact Person Details",
     url: "/contactus",
     mainIcon: <MdOutlinePermContactCalendar size={24} />,
     subMenu: [
       {
-        subMenus: "Carousal Form",
+        subMenus: "User Data",
         url: "/carousalform",
         icon: <RiFileListLine style={{ color: "red" }} size={24} />,
       },
+      // {
+      //   subMenus: "Request Callback Form",
+      //   url: "/requestcallbackform",
+      //   icon: <MdOutlineContactMail style={{ color: "red" }} size={24} />,
+      // },
       {
-        subMenus: "Request Callback Form",
-        url: "/requestcallbackform",
-        icon: <MdOutlineContactMail style={{ color: "red" }} size={24} />,
-      },
-      {
-        subMenus: "Upload Cv",
+        subMenus: "Cv List",
         url: "/uploadcv",
         icon: <FiUploadCloud style={{ color: "red" }} size={24} />,
       },
-      {
-        subMenus: "Get In Touch",
-        url: "/getintouch",
-        icon: <RiContactsBookLine style={{ color: "red" }} size={24} />,
-      },
+      // {
+      //   subMenus: "Get In Touch",
+      //   url: "/getintouch",
+      //   icon: <RiContactsBookLine style={{ color: "red" }} size={24} />,
+      // },
       {
         subMenus: "Subscribe",
         url: "/subscribe",

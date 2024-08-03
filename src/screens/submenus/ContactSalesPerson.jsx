@@ -666,10 +666,10 @@ const ContactSalesPerson = () => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        if (img.width === 259 && img.height === 195) {
+        if (img.width === 596 && img.height === 394) {
           resolve();
         } else {
-          reject("Image must be 259*195 pixels");
+          reject("Image must be 596*394 pixels");
         }
       };
       img.onerror = () => reject("Error loading image");
@@ -984,7 +984,7 @@ const ContactSalesPerson = () => {
                       type="file"
                       onChange={handleChange}
                       initialData={formData}
-                      imageDimensiion="Image must be 259x195 pixels" 
+                      imageDimensiion="Image must be 596x394 pixels" 
                     />
                     {errors.img && <p className="text-danger">{errors.img}</p>}
                   </Col>

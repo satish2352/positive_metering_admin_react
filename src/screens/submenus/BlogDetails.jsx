@@ -117,6 +117,43 @@ const BlogDetails = () => {
     return isValid;
   };
 
+
+  const validateImageSize = (file) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width === 1185 && img.height === 617) {
+          resolve();
+        } else {
+          reject("Image must be 1185*617 pixels");
+        }
+      };
+      img.onerror = () => reject("Error loading image");
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+
+  const handleChange = async (name, value) => {
+    if (name === "img" && value instanceof File) {
+      try {
+        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+        if (errors[name]) {
+          setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+        }
+        await validateImageSize(value);
+        setFormData({ ...formData, [name]: value });
+        setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
+      } catch (error) {
+        setErrors((prevErrors) => ({ ...prevErrors, img: error }));
+        setImagePreview("");
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm(formData)) {
@@ -312,19 +349,7 @@ const BlogDetails = () => {
     }
   }, [shows]);
 
-  const handleChange = (name, value) => {
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    if (errors[name]) {
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-    }
-    if (name === "img") {
-      setFormData({ ...formData, [name]: value });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
-
-
+ 
 
   return (
     <Container>
@@ -427,6 +452,7 @@ const BlogDetails = () => {
                       onChange={handleChange}
                       initialData={formData}
                       error={errors.img}
+                      imageDimensiion="Image must be 1185*617 pixels" 
                     />
                   
                   </Col>

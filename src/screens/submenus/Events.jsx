@@ -1,6 +1,14 @@
 /////sos
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Button, Form ,Table} from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Table,
+} from "react-bootstrap";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
 import NewResuableForm from "../../components/form/NewResuableForm";
@@ -36,14 +44,11 @@ const Events = () => {
       render: (value) => (
         <img
           src={value}
-          alt="Testimonial"
+          alt="Event"
           style={{ width: "100px", height: "auto" }}
         />
       ),
     },
-    { key: "name", label: "Title" },
-
-
   ];
 
   useEffect(() => {
@@ -56,7 +61,7 @@ const Events = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(formData.img);
-    } else if (formData.img && typeof formData.img === 'string') {
+    } else if (formData.img && typeof formData.img === "string") {
       setImagePreview(formData.img);
     } else {
       setImagePreview("");
@@ -91,15 +96,46 @@ const Events = () => {
       isValid = false;
     }
 
-    if (!formData.name?.trim()) {
-      errors.name = "Name is required";
-      isValid = false;
-    }
-
-  
     setErrors(errors);
     return isValid;
   };
+
+  const validateImageSize = (file) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width === 596 && img.height === 394) {
+          resolve();
+        } else {
+          reject("Image must be 596*394 pixels");
+        }
+      };
+      img.onerror = () => reject("Error loading image");
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+
+  const handleChange = async (name, value) => {
+    if (name === "img" && value instanceof File) {
+      try {
+        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+        if (errors[name]) {
+          setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+        }
+        await validateImageSize(value);
+        setFormData({ ...formData, [name]: value });
+        setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
+      } catch (error) {
+        setErrors((prevErrors) => ({ ...prevErrors, img: error }));
+        setImagePreview("");
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -112,22 +148,18 @@ const Events = () => {
 
       try {
         if (editMode) {
-          await instance.put(
-            `events/update-event/${editingId}`,
-            data,
-            {
-              headers: {
-                Authorization: "Bearer " + accessToken,
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+          await instance.put(`events/update-event/${editingId}`, data, {
+            headers: {
+              Authorization: "Bearer " + accessToken,
+              "Content-Type": "multipart/form-data",
+            },
+          });
           toast.success("Data Updated Successfully");
-                    // Update the specific entry in the team array
-                    const updatedTeam = team.map((member) =>
-                      member.id === editingId ? formData : member
-                    );
-                    setTeam(updatedTeam);
+          // Update the specific entry in the team array
+          const updatedTeam = team.map((member) =>
+            member.id === editingId ? formData : member
+          );
+          setTeam(updatedTeam);
         } else {
           await instance.post("events/create-event", data, {
             headers: {
@@ -136,21 +168,17 @@ const Events = () => {
             },
           });
           toast.success("Data Submitted Successfully");
-          
- 
         }
         fetchTeam();
-        toggleShows(); 
+        toggleShows();
         setEditMode(false);
         setFormData({});
-        setImagePreview(""); 
+        setImagePreview("");
       } catch (error) {
         console.error("Error handling form submission:", error);
       }
     }
   };
-
-
 
   const handleDelete = async (id) => {
     confirmAlert({
@@ -159,7 +187,7 @@ const Events = () => {
       customUI: ({ onClose }) => (
         <div
           style={{
-            textAlign: "left", 
+            textAlign: "left",
             padding: "20px",
             backgroundColor: "white",
             borderRadius: "8px",
@@ -173,7 +201,7 @@ const Events = () => {
           <div
             style={{
               display: "flex",
-              justifyContent: "flex-end", 
+              justifyContent: "flex-end",
               marginTop: "20px",
             }}
           >
@@ -200,10 +228,7 @@ const Events = () => {
             >
               Yes
             </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => onClose()}
-            >
+            <button className="btn btn-secondary" onClick={() => onClose()}>
               No
             </button>
           </div>
@@ -218,7 +243,7 @@ const Events = () => {
       customUI: ({ onClose }) => (
         <div
           style={{
-            textAlign: "left", 
+            textAlign: "left",
             padding: "20px",
             backgroundColor: "white",
             borderRadius: "8px",
@@ -228,12 +253,14 @@ const Events = () => {
           }}
         >
           <h2>Confirm to change visibility</h2>
-          <p>Are you sure you want to {isVisible ? "hide" : "show"} this data?</p>
+          <p>
+            Are you sure you want to {isVisible ? "hide" : "show"} this data?
+          </p>
           <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
-              marginTop: "20px", 
+              marginTop: "20px",
             }}
           >
             <button
@@ -270,10 +297,7 @@ const Events = () => {
             >
               Yes
             </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => onClose()}
-            >
+            <button className="btn btn-secondary" onClick={() => onClose()}>
               No
             </button>
           </div>
@@ -282,18 +306,15 @@ const Events = () => {
     });
   };
 
-
   const toggleEdit = (leaderId) => {
     const memberToEdit = team.find((item) => item.id === leaderId);
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-      toggleShows(); 
+      toggleShows();
       setFormData(memberToEdit);
     }
   };
-
-
 
   useEffect(() => {
     if (!shows) {
@@ -303,28 +324,18 @@ const Events = () => {
       setImagePreview("");
     }
   }, [shows]);
-  const handleChange = (name, value) => {
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    if (errors[name]) {
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-    }
-    if (name === "img") {
-      setFormData({ ...formData, [name]: value });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
+
 
   return (
     <Container>
       <Row>
-      <Col>
+        <Col>
           {!shows && !editMode && (
             <SearchInput
               searchQuery={searchQuery}
               onSearch={handleSearch}
               onExport={handleExport}
-              showExportButton={false} 
+              showExportButton={false}
             />
           )}
         </Col>
@@ -343,7 +354,7 @@ const Events = () => {
                 </tr>
               </thead>
               <tbody>
-              {(searchQuery.trim() ? filteredData : team).map(
+                {(searchQuery.trim() ? filteredData : team).map(
                   (item, index) => (
                     <tr key={item.id}>
                       {tableColumns.map((col) => (
@@ -355,31 +366,41 @@ const Events = () => {
                             : item[col.key]}
                         </td>
                       ))}
-                    <td>
-                      <div className="d-flex">
-                        <Button className="ms-1" onClick={() => toggleEdit(item.id)}>
-                          <FaEdit />
-                        </Button>
-                        <Button className="ms-1" onClick={() => handleDelete(item.id)}>
-                          <FaTrash />
-                        </Button>
-                   
-                        <Button
-                          className="ms-1"
-                          onClick={() =>
-                            handleIsActive(item.id, !eyeVisibilityById[item.id])
-                          }
-                        >
-                          {eyeVisibilityById[item.id] ? (
-                            <FaEyeSlash />
-                          ) : (
-                            <FaEye />
-                          )}
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      <td>
+                        <div className="d-flex">
+                          <Button
+                            className="ms-1"
+                            onClick={() => toggleEdit(item.id)}
+                          >
+                            <FaEdit />
+                          </Button>
+                          <Button
+                            className="ms-1"
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            <FaTrash />
+                          </Button>
+
+                          <Button
+                            className="ms-1"
+                            onClick={() =>
+                              handleIsActive(
+                                item.id,
+                                !eyeVisibilityById[item.id]
+                              )
+                            }
+                          >
+                            {eyeVisibilityById[item.id] ? (
+                              <FaEyeSlash />
+                            ) : (
+                              <FaEye />
+                            )}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                )}
               </tbody>
             </Table>
           ) : (
@@ -387,11 +408,15 @@ const Events = () => {
               <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col md={6}>
-                  {imagePreview && (
+                    {imagePreview && (
                       <img
                         src={imagePreview}
                         alt="Selected Preview"
-                        style={{ width: "100px", height: "auto", marginBottom: '10px' }}
+                        style={{
+                          width: "100px",
+                          height: "auto",
+                          marginBottom: "10px",
+                        }}
                       />
                     )}
                     <NewResuableForm
@@ -402,27 +427,11 @@ const Events = () => {
                       onChange={handleChange}
                       initialData={formData}
                       error={errors.img}
+                      imageDimensiion="Image must be 596*394 pixels" 
                     />
-       
                   </Col>
-                  <Col md={6}>
-                    <NewResuableForm
-                      label={"Title"}
-                      placeholder={"Enter Title"}
-                      name={"name"}
-                      type={"text"}
-                      onChange={handleChange}
-                      initialData={formData}
-                      error={errors.name}
-                    />
-        
-                  </Col>
-                
                 </Row>
                 <Row>
-             
-           
-                  
                   <div className="mt-3 d-flex justify-content-end">
                     <Button
                       type="submit"
@@ -431,7 +440,6 @@ const Events = () => {
                       {editMode ? "Update" : "Submit"}
                     </Button>
                   </div>
-           
                 </Row>
               </Form>
             </Card>
@@ -439,7 +447,6 @@ const Events = () => {
         </Col>
       </Row>
 
-     
       <Row>
         {!shows && !editMode && (
           <Col className="mt-3">
@@ -452,14 +459,3 @@ const Events = () => {
 };
 
 export default Events;
-
-
-
-
-
-
-
-
-
-
-

@@ -511,6 +511,44 @@ const Office = () => {
     return isValid;
   };
 
+
+  const validateImageSize = (file) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width === 710 && img.height === 307) {
+          resolve();
+        } else {
+          reject("Image must be 710*307 pixels");
+        }
+      };
+      img.onerror = () => reject("Error loading image");
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+
+  const handleChange = async (name, value) => {
+    if (name === "img" && value instanceof File) {
+      try {
+        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+        if (errors[name]) {
+          setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+        }
+        await validateImageSize(value);
+        setFormData({ ...formData, [name]: value });
+        setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
+      } catch (error) {
+        setErrors((prevErrors) => ({ ...prevErrors, img: error }));
+        setImagePreview("");
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+
+
   const handlePostSubmit = async (data) => {
     const accessToken = localStorage.getItem("accessToken");
     try {
@@ -730,13 +768,7 @@ const Office = () => {
     }
   }, [shows]);
 
-  const handleChange = (name, value) => {
-    if (name === "img") {
-      setFormData({ ...formData, [name]: value });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
+
 
   return (
     <Container>
@@ -808,12 +840,16 @@ const Office = () => {
             <Card className="p-4">
               <Form onSubmit={handleSubmit}>
                 <Row>
-                  <Col md={6}>
-                  {imagePreview && (
+                <Col md={6}>
+                    {imagePreview && (
                       <img
                         src={imagePreview}
                         alt="Selected Preview"
-                        style={{ width: "100px", height: "auto", marginBottom: '10px' }}
+                        style={{
+                          width: "100px",
+                          height: "auto",
+                          marginBottom: "10px",
+                        }}
                       />
                     )}
                     <NewResuableForm
@@ -821,10 +857,17 @@ const Office = () => {
                       placeholder="Upload Image"
                       name="img"
                       type="file"
-                      onChange={handleChange}
+                      onChange={(name, value) => {
+                        const file = value;
+                        if (file) {
+                          handleChange(name, file);
+                        }
+                      }}
                       initialData={formData}
+                      error={errors.img} 
+                      imageDimensiion="Image must be 710*307 pixels" 
                     />
-                    {errors.img && <p className="text-danger">{errors.img}</p>}
+                 
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
@@ -834,8 +877,9 @@ const Office = () => {
                       type="text"
                       onChange={handleChange}
                       initialData={formData}
+                      error={errors.title}
                     />
-                    {errors.title && <p className="text-danger">{errors.title}</p>}
+                  
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
@@ -846,8 +890,9 @@ const Office = () => {
                       onChange={handleChange}
                       initialData={formData}
                       textarea={true}
+                      error={errors.address}
                     />
-                    {errors.address && <p className="text-danger">{errors.address}</p>}
+                  
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
