@@ -97,7 +97,10 @@ const OurTeam = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required with 435*443 pixels";
+      errors.img = "Image is required with 500x700 pixels";
+      isValid = false;
+    } else if (formData.img instanceof File && !validateImageSize(formData.img)) {
+      errors.img = "Image is not 500x700 pixels";
       isValid = false;
     }
 
@@ -129,10 +132,10 @@ const OurTeam = () => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        if (img.width === 435 && img.height === 443) {
+        if (img.width === 500 && img.height === 700) {
           resolve();
         } else {
-          reject("Image must be 435*443 pixels");
+          reject("Image must be 500*700 pixels");
         }
       };
       img.onerror = () => reject("Error loading image");
@@ -144,12 +147,8 @@ const OurTeam = () => {
   const handleChange = async (name, value) => {
     if (name === "img" && value instanceof File) {
       try {
-        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-        if (errors[name]) {
-          setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-        }
         await validateImageSize(value);
-        setFormData({ ...formData, [name]: value });
+        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
         setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
       } catch (error) {
         setErrors((prevErrors) => ({ ...prevErrors, img: error }));
@@ -159,7 +158,6 @@ const OurTeam = () => {
       setFormData({ ...formData, [name]: value });
     }
   };
-
 
 
   const handleSubmit = async (e) => {
@@ -468,7 +466,7 @@ const OurTeam = () => {
                       }}
                       initialData={formData}
                       error={errors.img}
-                      imageDimensiion="Image must be 435*443 pixels" 
+                      imageDimensiion="Image must be 500*700 pixels" 
                     />
                   </Col>
                   <Col md={6}>

@@ -1,4 +1,5 @@
-/////sos
+// /////sos
+
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -12,7 +13,6 @@ import {
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
 import NewResuableForm from "../../components/form/NewResuableForm";
-
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -21,6 +21,7 @@ import instance from "../../api/AxiosInstance";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+
 const Events = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
@@ -54,6 +55,7 @@ const Events = () => {
   useEffect(() => {
     fetchTeam();
   }, []);
+
   useEffect(() => {
     if (formData.img && formData.img instanceof File) {
       const reader = new FileReader();
@@ -67,6 +69,7 @@ const Events = () => {
       setImagePreview("");
     }
   }, [formData.img]);
+
   const fetchTeam = async () => {
     const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
     try {
@@ -92,7 +95,10 @@ const Events = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required with 596*394 pixels";
+      errors.img = "Image is required with 596x394 pixels";
+      isValid = false;
+    } else if (formData.img instanceof File && !validateImageSize(formData.img)) {
+      errors.img = "Image is not 596x394 pixels";
       isValid = false;
     }
 
@@ -107,7 +113,7 @@ const Events = () => {
         if (img.width === 596 && img.height === 394) {
           resolve();
         } else {
-          reject("Image must be 596*394 pixels");
+          reject("Image must be 596x394 pixels");
         }
       };
       img.onerror = () => reject("Error loading image");
@@ -115,16 +121,11 @@ const Events = () => {
     });
   };
 
-
   const handleChange = async (name, value) => {
     if (name === "img" && value instanceof File) {
       try {
-        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-        if (errors[name]) {
-          setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-        }
         await validateImageSize(value);
-        setFormData({ ...formData, [name]: value });
+        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
         setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
       } catch (error) {
         setErrors((prevErrors) => ({ ...prevErrors, img: error }));
@@ -134,8 +135,6 @@ const Events = () => {
       setFormData({ ...formData, [name]: value });
     }
   };
-
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -155,7 +154,6 @@ const Events = () => {
             },
           });
           toast.success("Data Updated Successfully");
-          // Update the specific entry in the team array
           const updatedTeam = team.map((member) =>
             member.id === editingId ? formData : member
           );
@@ -284,7 +282,6 @@ const Events = () => {
                   );
                   setEyeVisibilityById((prev) => ({
                     ...prev,
-
                     [id]: isVisible,
                   }));
                   fetchTeam();
@@ -324,7 +321,6 @@ const Events = () => {
       setImagePreview("");
     }
   }, [shows]);
-
 
   return (
     <Container>
@@ -427,7 +423,7 @@ const Events = () => {
                       onChange={handleChange}
                       initialData={formData}
                       error={errors.img}
-                      imageDimensiion="Image must be 596*394 pixels" 
+                      imageDimensiion="Image must be 596x394 pixels" 
                     />
                   </Col>
                 </Row>

@@ -68,7 +68,7 @@ const UploadCv = () => {
 
   const exportData = () => {
     const dataToExport = searchQuery.trim() ? filteredData : team;
-    handleExport(dataToExport, tableColumns, "UploadCV");
+    handleExport(dataToExport, tableColumns, "CvList");
   };
 
   const downloadCV = async (cvUrl) => {

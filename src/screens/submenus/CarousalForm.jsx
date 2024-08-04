@@ -57,7 +57,7 @@ const CarousalForm = () => {
 
   const exportData = () => {
     const dataToExport = searchQuery.trim() ? filteredData : team;
-    handleExport(dataToExport, tableColumns, "CarousalForm");
+    handleExport(dataToExport, tableColumns, "UserData");
   };
   return (
     <Container>

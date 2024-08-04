@@ -86,7 +86,7 @@ const HomeSlider = () => {
       setData(reversedData);
     } catch (error) {
       console.error("Error fetching team:", error);
-      toast.error("Error fetching data");
+     
     }
   };
 
@@ -98,7 +98,10 @@ const HomeSlider = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required with 338*219 pixels";
+      errors.img = "Image is required with 338x220 pixels";
+      isValid = false;
+    } else if (formData.img instanceof File && !validateImageSize(formData.img)) {
+      errors.img = "Image is not 338x220 pixels";
       isValid = false;
     }
 
@@ -106,15 +109,14 @@ const HomeSlider = () => {
     return isValid;
   };
 
-
   const validateImageSize = (file) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        if (img.width === 338 && img.height === 219) {
+        if (img.width === 338 && img.height === 220) {
           resolve();
         } else {
-          reject("Image must be 338*219 pixels");
+          reject("Image must be 338x220 pixels");
         }
       };
       img.onerror = () => reject("Error loading image");
@@ -122,16 +124,11 @@ const HomeSlider = () => {
     });
   };
 
-
   const handleChange = async (name, value) => {
     if (name === "img" && value instanceof File) {
       try {
-        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-        if (errors[name]) {
-          setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-        }
         await validateImageSize(value);
-        setFormData({ ...formData, [name]: value });
+        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
         setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
       } catch (error) {
         setErrors((prevErrors) => ({ ...prevErrors, img: error }));
@@ -442,7 +439,7 @@ const HomeSlider = () => {
                       onChange={handleChange}
                       initialData={formData}
                       error={errors.img} 
-                      imageDimensiion="Image must be 338*219 pixels" 
+                      imageDimensiion="Image must be 338*220 pixels" 
                     />
                 
                   </Col>

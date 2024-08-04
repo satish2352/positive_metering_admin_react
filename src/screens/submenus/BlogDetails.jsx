@@ -96,7 +96,10 @@ const BlogDetails = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required with 1185*617 pixels";
+      errors.img = "Image is required with 700x645 pixels";
+      isValid = false;
+    } else if (formData.img instanceof File && !validateImageSize(formData.img)) {
+      errors.img = "Image is not 700x645 pixels";
       isValid = false;
     }
 
@@ -122,10 +125,10 @@ const BlogDetails = () => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        if (img.width === 1185 && img.height === 617) {
+        if (img.width === 700 && img.height === 645) {
           resolve();
         } else {
-          reject("Image must be 1185*617 pixels");
+          reject("Image must be 700*645 pixels");
         }
       };
       img.onerror = () => reject("Error loading image");
@@ -137,12 +140,8 @@ const BlogDetails = () => {
   const handleChange = async (name, value) => {
     if (name === "img" && value instanceof File) {
       try {
-        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-        if (errors[name]) {
-          setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-        }
         await validateImageSize(value);
-        setFormData({ ...formData, [name]: value });
+        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
         setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
       } catch (error) {
         setErrors((prevErrors) => ({ ...prevErrors, img: error }));
@@ -452,7 +451,7 @@ const BlogDetails = () => {
                       onChange={handleChange}
                       initialData={formData}
                       error={errors.img}
-                      imageDimensiion="Image must be 1185*617 pixels" 
+                      imageDimensiion="Image must be 700*645 pixels" 
                     />
                   
                   </Col>

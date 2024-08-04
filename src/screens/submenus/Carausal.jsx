@@ -1,4 +1,4 @@
-////sos carousal to homeslider and vice versa
+////sos
 
 import React, { useState, useEffect } from "react";
 import {
@@ -92,48 +92,78 @@ const Carousal = () => {
     }
   };
 
+  // const validateForm = (formData) => {
+  //   let errors = {};
+  //   let isValid = true;
+
+  //   if (!formData.img) {
+  //     errors.img = "Image is required with 259*195 pixels";
+  //     isValid = false;
+  //   }
+
+  //   if (!formData.view) {
+  //     errors.view = "View selection is required";
+  //     isValid = false;
+  //   }
+
+  //   setErrors(errors);
+  //   return isValid;
+  // };
+
+
   const validateForm = (formData) => {
     let errors = {};
     let isValid = true;
-
+  
     if (!formData.img) {
-      errors.img = "Image is required with 259*195 pixels";
+      errors.img = `Image is required with ${
+        formData.view === "desktop" ? "2548*1018" : "1307*1018"
+      } pixels`;
       isValid = false;
     }
-
+  
     if (!formData.view) {
       errors.view = "View selection is required";
       isValid = false;
     }
-
+  
     setErrors(errors);
     return isValid;
   };
 
-  const validateImageSize = (file) => {
+
+  const validateImageSize = (file, view) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        if (img.width === 259 && img.height === 195) {
+        const dimensions = {
+          desktop: { width: 2548, height: 1018, message: "Uploaded image is not 2548*1018 pixels for desktop view." },
+          mobile: { width: 1307, height: 1018, message: "Uploaded image is not 1307*1018 pixels for mobile view." }
+        };
+        
+        const { width, height, message } = dimensions[view] || {};
+        
+        if (img.width === width && img.height === height) {
           resolve();
         } else {
-          reject("Uploaded image is not 259*195 pixels");
+          reject(message);
         }
       };
       img.onerror = () => reject("Error loading image");
       img.src = URL.createObjectURL(file);
     });
   };
-
   
+
+
   const handleChange = async (name, value) => {
     if (name === "img" && value instanceof File) {
       try {
-        await validateImageSize(value);
-         setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    if (errors[name]) {
-       setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-     }
+        await validateImageSize(value, formData.view);
+        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+        if (errors[name]) {
+          setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+        }
         setFormData({ ...formData, [name]: value });
         setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
       } catch (error) {
@@ -144,7 +174,6 @@ const Carousal = () => {
       setFormData({ ...formData, [name]: value });
     }
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -192,8 +221,7 @@ const Carousal = () => {
       }
     }
   };
-  
-  
+
   const handleDelete = async (id) => {
     confirmAlert({
       title: "Confirm to delete",
@@ -343,8 +371,6 @@ const Carousal = () => {
     }
   }, [shows]);
 
-
-
   return (
     <Container>
       <Row>
@@ -424,7 +450,7 @@ const Carousal = () => {
             <Card className="p-4">
               <Form onSubmit={handleSubmit}>
                 <Row>
-                  <Col md={6}>
+                  <Col md={8}>
                     {imagePreview && (
                       <img
                         src={imagePreview}
@@ -445,11 +471,11 @@ const Carousal = () => {
                       onChange={handleChange}
                       initialData={formData}
                       error={errors.img}
-                      imageDimensiion="Image must be 259x195 pixels" 
+                      imageDimensiion="Image size: 2548x1018 for desktop view, 1307x1018 for mobile view."
                     />
                   </Col>
 
-                  <Col md={6}>
+                  <Col md={4}>
                     <Form.Group controlId="formView">
                       <Form.Label>View</Form.Label>
                       <Form.Control

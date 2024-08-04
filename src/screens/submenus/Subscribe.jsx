@@ -1,5 +1,5 @@
 
-////workable properly sos 
+// ////workable properly sos 
 import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Table, Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
@@ -126,3 +126,8 @@ const Subscribe = () => {
 };
 
 export default Subscribe;
+
+
+
+
+////v1

@@ -98,10 +98,12 @@ const Infrastructure = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required with 452*299 pixels";
+      errors.img = "Image is required with 338*220 pixels";
+      isValid = false;
+    } else if (formData.img instanceof File && !validateImageSize(formData.img)) {
+      errors.img = "Image is not 338*220 pixels";
       isValid = false;
     }
-
     if (!formData.title?.trim()) {
       errors.title = "Title is required";
       isValid = false;
@@ -120,10 +122,10 @@ const Infrastructure = () => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        if (img.width === 452 && img.height === 299) {
+        if (img.width === 338 && img.height === 220) {
           resolve();
         } else {
-          reject("Image must be 452*299 pixels");
+          reject("Image must be 338*220 pixels");
         }
       };
       img.onerror = () => reject("Error loading image");
@@ -135,12 +137,8 @@ const Infrastructure = () => {
   const handleChange = async (name, value) => {
     if (name === "img" && value instanceof File) {
       try {
-        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-        if (errors[name]) {
-          setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-        }
         await validateImageSize(value);
-        setFormData({ ...formData, [name]: value });
+        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
         setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
       } catch (error) {
         setErrors((prevErrors) => ({ ...prevErrors, img: error }));
@@ -454,7 +452,7 @@ const Infrastructure = () => {
                       }}
                       initialData={formData}
                       error={errors.img} 
-                      imageDimensiion="Image must be 452*299 pixels" 
+                      imageDimensiion="Image must be 338*220 pixels" 
                     />
                  
                   </Col>

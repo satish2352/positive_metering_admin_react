@@ -1,5 +1,5 @@
 
-//// sos
+// // //// sos
 import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Card, Button, Form, Table } from "react-bootstrap";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -52,7 +52,7 @@ const MaterialData = () => {
       setTeam(reversedData);
       setData(reversedData);
     } catch (error) {
-      console.error("Error fetching technical data:", error);
+      console.error("Error fetching material data:", error);
     }
   };
 
@@ -81,7 +81,7 @@ const MaterialData = () => {
     }
 
     if (!formData.materialDescription?.trim()) {
-      errors.materialDescription = "Technical Description is required";
+      errors.materialDescription = "Material Description is required";
       isValid = false;
     }
 
@@ -413,8 +413,8 @@ const MaterialData = () => {
 
                 <Col md={12}>
                     <NewResuableForm
-                      label="Technical Description"
-                      placeholder="Enter Technical Description"
+                      label="Material Description"
+                      placeholder="Enter Material Description"
                       name="materialDescription"
                       type="text"
                       onChange={handleChange}
@@ -459,3 +459,15 @@ const MaterialData = () => {
 };
 
 export default MaterialData;
+
+
+
+
+
+
+
+
+
+
+
+// ////v1

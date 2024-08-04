@@ -98,10 +98,12 @@ const ProductDetails = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required with 612*408 pixels";
+      errors.img = "Image is required with 612x408 pixels";
+      isValid = false;
+    } else if (formData.img instanceof File && !validateImageSize(formData.img)) {
+      errors.img = "Image is not 612x408 pixels";
       isValid = false;
     }
-
     if (!formData.productName?.trim()) {
       errors.productName = "Product Name is required";
       isValid = false;

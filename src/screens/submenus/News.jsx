@@ -87,8 +87,12 @@ const NewsAndEventCards = () => {
     let errors = {};
     let isValid = true;
 
+ 
     if (!formData.img) {
-      errors.img = "Image is required with 573*377 pixels";
+      errors.img = "Image is required with 574x378 pixels";
+      isValid = false;
+    } else if (formData.img instanceof File && !validateImageSize(formData.img)) {
+      errors.img = "Image is not 574x378 pixels";
       isValid = false;
     }
 
@@ -114,10 +118,10 @@ const NewsAndEventCards = () => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        if (img.width === 573 && img.height === 377) {
+        if (img.width === 574 && img.height === 378) {
           resolve();
         } else {
-          reject("Image must be 573*377 pixels");
+          reject("Image must be 574*378 pixels");
         }
       };
       img.onerror = () => reject("Error loading image");
@@ -129,12 +133,8 @@ const NewsAndEventCards = () => {
   const handleChange = async (name, value) => {
     if (name === "img" && value instanceof File) {
       try {
-        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-        if (errors[name]) {
-          setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-        }
         await validateImageSize(value);
-        setFormData({ ...formData, [name]: value });
+        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
         setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
       } catch (error) {
         setErrors((prevErrors) => ({ ...prevErrors, img: error }));
@@ -437,7 +437,7 @@ const NewsAndEventCards = () => {
                       onChange={handleChange}
                       initialData={formData}
                       error={errors.img}
-                      imageDimensiion="Image must be 573*377 pixels" 
+                      imageDimensiion="Image must be 574*378 pixels" 
                     />
          
                   </Col>
