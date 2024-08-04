@@ -1,3 +1,4 @@
+
 //// sos
 import React, { useState, useEffect, useContext } from "react";
 import { Container, Row, Col, Card, Button, Form, Table } from "react-bootstrap";
@@ -12,10 +13,9 @@ import instance from "../../api/AxiosInstance";
 import NewResuableForm from "../../components/form/NewResuableForm";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-
 const MaterialData = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } = useSearchExport();
-  const { shows,  toggleShows} = useContext(ShowContext);
+  const { shows, toggleShows } = useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [products, setProducts] = useState([]); // New state for product names
   const [errors, setErrors] = useState({});
@@ -52,20 +52,20 @@ const MaterialData = () => {
       setTeam(reversedData);
       setData(reversedData);
     } catch (error) {
-      console.error("Error fetching Option data:", error);
+      console.error("Error fetching technical data:", error);
     }
   };
 
   const fetchProducts = async () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      const response = await instance.get("productdetails/get-productnames", { // Adjust the endpoint to fetch product names
+      const response = await instance.get("productdetails/get-productnames", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
       });
-      setProducts(response.data.responseData); // Assuming responseData contains product names
+      setProducts(response.data.responseData); 
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -79,8 +79,9 @@ const MaterialData = () => {
       errors.productName = "Product Name is required";
       isValid = false;
     }
+
     if (!formData.materialDescription?.trim()) {
-      errors.materialDescription = "Material Description is required";
+      errors.materialDescription = "Technical Description is required";
       isValid = false;
     }
 
@@ -88,6 +89,9 @@ const MaterialData = () => {
     return isValid;
   };
 
+
+
+  
   const handlePost = async () => {
     console.log("Form data before submission:", formData); // Debug log
     try {
@@ -102,9 +106,9 @@ const MaterialData = () => {
 
         if (response.status === 200) {
           toast.success("Data Submitted Successfully");
-
+      
           fetchTeam();
-          toggleShows(); 
+          toggleShows();
           setFormData({});
         } else {
           toast.error("Failed to submit data");
@@ -112,7 +116,7 @@ const MaterialData = () => {
       }
     } catch (error) {
       console.error("Error handling form submission:", error);
-    
+ 
     }
   };
 
@@ -137,13 +141,13 @@ const MaterialData = () => {
 
         if (response.status === 200) {
           toast.success("Data Updated Successfully");
-                  // Update the specific entry in the team array
-                  const updatedTeam = team.map((member) =>
+                   // Update the specific entry in the team array
+                   const updatedTeam = team.map((member) =>
                     member.id === editingId ? formData : member
                   );
                   setTeam(updatedTeam);
           fetchTeam();
-          toggleShows(); 
+          toggleShows()
           setEditMode(false);
           setFormData({});
         } else {
@@ -151,11 +155,10 @@ const MaterialData = () => {
         }
       } catch (error) {
         console.error("Error handling form update:", error);
-
+     
       }
     }
   };
-
 
 
   const handleDelete = async (id) => {
@@ -287,16 +290,18 @@ const MaterialData = () => {
       ),
     });
   };
-
+  
   const toggleEdit = (id) => {
     const itemToEdit = team.find((item) => item.id === id);
     if (itemToEdit) {
       setEditingId(id);
       setEditMode(true);
-      toggleShows(); 
-      setFormData(itemToEdit); // Ensure this correctly sets `OptionDescription`
+      toggleShows()
+      setFormData(itemToEdit); // Ensure this correctly sets `materialDescription`
     }
   };
+
+
 
   useEffect(() => {
     if (!shows) {
@@ -362,7 +367,6 @@ const MaterialData = () => {
                         <Button className="ms-1" onClick={() => handleDelete(item.id)}>
                           <FaTrash />
                         </Button>
-            
                         <Button
                           className="ms-1"
                           onClick={() =>
@@ -405,11 +409,12 @@ const MaterialData = () => {
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
-           
+     
+
                 <Col md={12}>
                     <NewResuableForm
-                      label="Material Description"
-                      placeholder="Enter Material Description"
+                      label="Technical Description"
+                      placeholder="Enter Technical Description"
                       name="materialDescription"
                       type="text"
                       onChange={handleChange}
@@ -418,10 +423,10 @@ const MaterialData = () => {
                       useJodit={true}
                       error={errors.materialDescription}
                     />
-     
+         
                   </Col>
               </Row>
-              
+          
               <Col className="d-flex justify-content-end">
               
               {!editMode && (
@@ -454,7 +459,3 @@ const MaterialData = () => {
 };
 
 export default MaterialData;
-
-
-
-

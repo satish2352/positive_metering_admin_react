@@ -1,22 +1,31 @@
-
-//sos
-import React, { useState, useEffect, useContext } from "react";
-import { Container, Row, Col, Card, Button, Form, Table } from "react-bootstrap";
-import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
+// ////1
+/////sos
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Table,
+} from "react-bootstrap";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
-import NewResuableForm from "../../components/form/NewResuableForm";
+import NewReusableForm from "../../components/form/NewResuableForm";
+
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TablePagination from "../../components/pagination/TablePagination";
-
 import instance from "../../api/AxiosInstance";
+import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 const ProductDetails = () => {
-  const { searchQuery, handleSearch, handleExport, setData, filteredData } = useSearchExport();
-  const { shows, toggleShows } = useContext(ShowContext);
+  const { searchQuery, handleSearch, handleExport, setData, filteredData } =
+    useSearchExport();
+  const { shows, toggleShows } = React.useContext(ShowContext);
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -48,8 +57,6 @@ const ProductDetails = () => {
   useEffect(() => {
     fetchTeam();
   }, []);
-
-
   useEffect(() => {
     if (formData.img && formData.img instanceof File) {
       const reader = new FileReader();
@@ -57,29 +64,32 @@ const ProductDetails = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(formData.img);
-    } else if (formData.img && typeof formData.img === 'string') {
+    } else if (formData.img && typeof formData.img === "string") {
       setImagePreview(formData.img);
     } else {
       setImagePreview("");
     }
   }, [formData.img]);
-
-
   const fetchTeam = async () => {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
     try {
-      const response = await instance.get("productdetails/get-productnames", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await instance.get(
+        "productdetails/find-productdetails",
+        {
+          headers: {
+            Authorization: "Bearer " + accessToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const reversedData = response.data.responseData.reverse();
       setTeam(reversedData);
       setData(reversedData);
-    
     } catch (error) {
-      console.error("Error fetching product data:", error);
+      console.error(
+        "Error fetching team:",
+        error.response || error.message || error
+      );
     }
   };
 
@@ -88,7 +98,7 @@ const ProductDetails = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required";
+      errors.img = "Image is required with 612*408 pixels";
       isValid = false;
     }
 
@@ -110,10 +120,10 @@ const ProductDetails = () => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        if (img.width === 704 && img.height === 566) {
+        if (img.width === 612 && img.height === 408) {
           resolve();
         } else {
-          reject("Image must be 704*566 pixels");
+          reject("Uploaded image is not 612*408 pixels");
         }
       };
       img.onerror = () => reject("Error loading image");
@@ -121,15 +131,15 @@ const ProductDetails = () => {
     });
   };
 
-
+  
   const handleChange = async (name, value) => {
     if (name === "img" && value instanceof File) {
       try {
-        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-        if (errors[name]) {
-          setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-        }
         await validateImageSize(value);
+         setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    if (errors[name]) {
+       setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+     }
         setFormData({ ...formData, [name]: value });
         setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
       } catch (error) {
@@ -141,71 +151,52 @@ const ProductDetails = () => {
     }
   };
 
-
-  const handlePost = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (validateForm(formData)) {
-      const accessToken = localStorage.getItem("accessToken");
+      const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
       const data = new FormData();
       for (const key in formData) {
         data.append(key, formData[key]);
       }
 
       try {
-        await instance.post("productdetails/create-productdetails", data, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        toast.success("Data Submitted Successfully");
-           // Add the new entry to the top of the team array
-
+        if (editMode) {
+          await instance.put(
+            `productdetails/update-productdetails/${editingId}`,
+            data,
+            {
+              headers: {
+                Authorization: "Bearer " + accessToken,
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          toast.success("Data Updated Successfully");
+          // Update the specific entry in the team array
+          const updatedTeam = team.map((member) =>
+            member.id === editingId ? formData : member
+          );
+          setTeam(updatedTeam);
+        } else {
+          await instance.post("productdetails/create-productdetails", data, {
+            headers: {
+              Authorization: "Bearer " + accessToken,
+              "Content-Type": "multipart/form-data",
+            },
+          });
+          toast.success("Data Submitted Successfully");
+        }
         fetchTeam();
-        toggleShows()
+        toggleShows();
+        setEditMode(false);
         setFormData({});
-        setImagePreview(""); 
+        setImagePreview("");
       } catch (error) {
         console.error("Error handling form submission:", error);
       }
     }
   };
-
-  const handlePut = async () => {
-    if (validateForm(formData)) {
-      const accessToken = localStorage.getItem("accessToken");
-      const data = new FormData();
-      for (const key in formData) {
-        data.append(key, formData[key]);
-      }
-
-      try {
-        await instance.put(
-          `productdetails/update-productdetails/${editingId}`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        toast.success("Data Updated Successfully");
-                  // Update the specific entry in the team array
-                  const updatedTeam = team.map((member) =>
-                    member.id === editingId ? formData : member
-                  );
-                  setTeam(updatedTeam);
-        fetchTeam();
-        toggleShows()
-        setEditMode(false);
-        setFormData({});
-      } catch (error) {
-        console.error("Error handling form update:", error);
-      }
-    }
-  };
-
-  
 
   const handleDelete = async (id) => {
     confirmAlert({
@@ -214,7 +205,7 @@ const ProductDetails = () => {
       customUI: ({ onClose }) => (
         <div
           style={{
-            textAlign: "left", 
+            textAlign: "left",
             padding: "20px",
             backgroundColor: "white",
             borderRadius: "8px",
@@ -228,7 +219,7 @@ const ProductDetails = () => {
           <div
             style={{
               display: "flex",
-              justifyContent: "flex-end", 
+              justifyContent: "flex-end",
               marginTop: "20px",
             }}
           >
@@ -238,12 +229,15 @@ const ProductDetails = () => {
               onClick={async () => {
                 const accessToken = localStorage.getItem("accessToken");
                 try {
-                  await instance.delete(`productdetails/isdelete-productdetails/${id}`, {
-                    headers: {
-                      Authorization: `Bearer ${accessToken}`,
-                      "Content-Type": "application/json",
-                    },
-                  });
+                  await instance.delete(
+                    `productdetails/isdelete-productdetails/${id}`,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        "Content-Type": "application/json",
+                      },
+                    }
+                  );
                   toast.success("Data Deleted Successfully");
                   fetchTeam();
                 } catch (error) {
@@ -255,10 +249,7 @@ const ProductDetails = () => {
             >
               Yes
             </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => onClose()}
-            >
+            <button className="btn btn-secondary" onClick={() => onClose()}>
               No
             </button>
           </div>
@@ -273,7 +264,7 @@ const ProductDetails = () => {
       customUI: ({ onClose }) => (
         <div
           style={{
-            textAlign: "left", 
+            textAlign: "left",
             padding: "20px",
             backgroundColor: "white",
             borderRadius: "8px",
@@ -283,12 +274,14 @@ const ProductDetails = () => {
           }}
         >
           <h2>Confirm to change visibility</h2>
-          <p>Are you sure you want to {isVisible ? "hide" : "show"} this data?</p>
+          <p>
+            Are you sure you want to {isVisible ? "hide" : "show"} this data?
+          </p>
           <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
-              marginTop: "20px", 
+              marginTop: "20px",
             }}
           >
             <button
@@ -325,10 +318,7 @@ const ProductDetails = () => {
             >
               Yes
             </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => onClose()}
-            >
+            <button className="btn btn-secondary" onClick={() => onClose()}>
               No
             </button>
           </div>
@@ -342,15 +332,14 @@ const ProductDetails = () => {
     if (memberToEdit) {
       setEditingId(leaderId);
       setEditMode(true);
-      toggleShows()
+
       setFormData(memberToEdit);
+      toggleShows(); // Redirect to form view
     }
   };
 
-
-
   useEffect(() => {
-    if (shows) {
+    if (!shows) {
       setEditMode(false);
       setEditingId(null);
       setFormData({});
@@ -358,19 +347,19 @@ const ProductDetails = () => {
     }
   }, [shows]);
 
-
-
   return (
     <Container>
       <Row>
-      {!shows && !editMode && (
+        <Col>
+          {!shows && !editMode && (
             <SearchInput
               searchQuery={searchQuery}
               onSearch={handleSearch}
               onExport={handleExport}
-              showExportButton={false} 
+              showExportButton={false}
             />
           )}
+        </Col>
       </Row>
 
       <Row>
@@ -386,7 +375,7 @@ const ProductDetails = () => {
                 </tr>
               </thead>
               <tbody>
-              {(searchQuery.trim() ? filteredData : team).map(
+                {(searchQuery.trim() ? filteredData : team).map(
                   (item, index) => (
                     <tr key={item.id}>
                       {tableColumns.map((col) => (
@@ -398,35 +387,46 @@ const ProductDetails = () => {
                             : item[col.key]}
                         </td>
                       ))}
-                    <td>
-                      <div className="d-flex">
-                        <Button className="ms-1" onClick={() => toggleEdit(item.id)}>
-                          <FaEdit />
-                        </Button>
-                        <Button className="ms-1" onClick={() => handleDelete(item.id)}>
-                          <FaTrash />
-                        </Button>
-                        <Button
-                          className="ms-1"
-                          onClick={() =>
-                            handleIsActive(item.id, !eyeVisibilityById[item.id])
-                          }
-                        >
-                          {eyeVisibilityById[item.id] ? (
-                            <FaEyeSlash />
-                          ) : (
-                            <FaEye />
-                          )}
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      <td>
+                        <div className="d-flex">
+                          <Button
+                            className="ms-1"
+                            onClick={() => toggleEdit(item.id)}
+                          >
+                            <FaEdit />
+                          </Button>
+                          <Button
+                            className="ms-1"
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            <FaTrash />
+                          </Button>
+
+                          <Button
+                            className="ms-1"
+                            onClick={() =>
+                              handleIsActive(
+                                item.id,
+                                !eyeVisibilityById[item.id]
+                              )
+                            }
+                          >
+                            {eyeVisibilityById[item.id] ? (
+                              <FaEyeSlash />
+                            ) : (
+                              <FaEye />
+                            )}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                )}
               </tbody>
             </Table>
           ) : (
             <Card className="p-4">
-              <Form>
+              <Form onSubmit={handleSubmit}>
                 <Row>
                 <Col md={6}>
                     {imagePreview && (
@@ -440,26 +440,20 @@ const ProductDetails = () => {
                         }}
                       />
                     )}
-                    <NewResuableForm
-                      label="Image Upload"
-                      placeholder="Upload Image"
-                      name="img"
-                      type="file"
-                      onChange={(name, value) => {
-                        const file = value;
-                        if (file) {
-                          handleChange(name, file);
-                        }
-                      }}
+
+                    <NewReusableForm
+                      label={"Upload Product Image"}
+                      placeholder={"Upload Image"}
+                      name={"img"}
+                      type={"file"}
+                      onChange={handleChange}
                       initialData={formData}
-                      error={errors.img} 
-                      imageDimensiion="Image must be 704*566 pixels" 
+                      error={errors.img}
+                      imageDimensiion="Image must be 612*408 pixels" 
                     />
-                 
                   </Col>
-             
                   <Col md={6}>
-                    <NewResuableForm
+                    <NewReusableForm
                       label="Product Name"
                       placeholder="Enter Product Name"
                       name="productName"
@@ -467,13 +461,11 @@ const ProductDetails = () => {
                       onChange={handleChange}
                       initialData={formData}
                       error={errors.productName}
-                    
                     />
-    
                   </Col>
                   <Col md={12}>
-                    <NewResuableForm
-                      label="Application"
+                    <NewReusableForm
+                      label="Product Description"
                       placeholder="Enter Application"
                       name="application"
                       type="text"
@@ -483,29 +475,24 @@ const ProductDetails = () => {
                       useJodit={true}
                       error={errors.application}
                     />
-    
                   </Col>
                 </Row>
                 <Row>
-                  <Col className="d-flex justify-content-end">
-              
-                    {!editMode && (
-                      <Button type="button" variant="primary" onClick={handlePost}>
-                        Submit
-                      </Button>
-                    )}
-                    {editMode && (
-                      <Button type="button" variant="success" onClick={handlePut}>
-                        Update
-                      </Button>
-                    )}
-                  </Col>
+                  <div className="mt-3 d-flex justify-content-end">
+                    <Button
+                      type="submit"
+                      variant={editMode ? "success" : "primary"}
+                    >
+                      {editMode ? "Update" : "Submit"}
+                    </Button>
+                  </div>
                 </Row>
               </Form>
             </Card>
           )}
         </Col>
       </Row>
+
       <Row>
         {!shows && !editMode && (
           <Col className="mt-3">
@@ -518,14 +505,3 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
-
-
-
-
-
-
-
-
-
-
-////1

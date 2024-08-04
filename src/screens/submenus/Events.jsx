@@ -92,7 +92,7 @@ const Events = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required";
+      errors.img = "Image is required with 596*394 pixels";
       isValid = false;
     }
 
@@ -420,7 +420,7 @@ const Events = () => {
                       />
                     )}
                     <NewResuableForm
-                      label={"Image Upload"}
+                      label={"Upload Event Image"}
                       placeholder={"Upload Image"}
                       name={"img"}
                       type={"file"}

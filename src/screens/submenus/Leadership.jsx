@@ -73,7 +73,7 @@ const Leadership = () => {
     }
 
     if (!formData.imageupload?.trim()) {
-      errors.imageupload = "Image is required";
+      errors.imageupload = "Image is required with ";
       isValid = false;
     }
 

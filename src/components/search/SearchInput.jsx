@@ -68,7 +68,7 @@ import { Button, Form, Row, Col } from "react-bootstrap";
 const SearchInput = ({ searchQuery, onSearch, onExport, showExportButton = true }) => {
   return (
     <Row className="align-items-center mb-3">
-      <Col md={{ span: 3, offset: 8 }} className="d-flex justify-content-end">
+      <Col md={{ span: 3, offset: 9 }} className="d-flex justify-content-end">
         <Form.Control
           type="text"
           placeholder="Search"
@@ -87,3 +87,7 @@ const SearchInput = ({ searchQuery, onSearch, onExport, showExportButton = true 
 };
 
 export default SearchInput;
+
+
+
+

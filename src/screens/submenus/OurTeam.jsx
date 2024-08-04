@@ -97,7 +97,7 @@ const OurTeam = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required";
+      errors.img = "Image is required with 435*443 pixels";
       isValid = false;
     }
 
@@ -456,8 +456,8 @@ const OurTeam = () => {
                       />
                     )}
                     <NewResuableForm
-                      label={"Image Upload"}
-                      placeholder={"Upload Image"}
+                      label={"Upload Team Image"}
+                      placeholder={""}
                       name={"img"}
                       type={"file"}
                       onChange={(name, value) => {

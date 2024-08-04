@@ -217,3 +217,10 @@ ul {
   display: inline-flex !important;
 }
 
+.css-12w9als {
+  -webkit-box-flex: 1;
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre-wrap !important;
+}

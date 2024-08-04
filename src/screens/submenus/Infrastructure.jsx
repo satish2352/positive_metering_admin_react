@@ -98,7 +98,7 @@ const Infrastructure = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required";
+      errors.img = "Image is required with 452*299 pixels";
       isValid = false;
     }
 
@@ -442,7 +442,7 @@ const Infrastructure = () => {
                       />
                     )}
                     <NewResuableForm
-                      label="Image Upload"
+                      label="Upload Infrastructure Image"
                       placeholder="Upload Image"
                       name="img"
                       type="file"

@@ -93,7 +93,7 @@ const ApplicationData = () => {
     }
 
     if (!formData.applicationDescription?.trim()) {
-      errors.applicationDescription = "Technical Description is required";
+      errors.applicationDescription = "Application Description is required";
       isValid = false;
     }
 
@@ -439,6 +439,7 @@ const ApplicationData = () => {
                     textarea
                     useJodit={true}
                     error={errors.applicationDescription}
+                    onChange={handleChange}
                   />
                 </Col>
               </Row>

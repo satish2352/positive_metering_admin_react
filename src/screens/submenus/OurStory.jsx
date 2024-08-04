@@ -56,7 +56,7 @@ const OurStory = () => {
     let isValid = true;
 
     if (!formData.image?.trim()) {
-      errors.image = "Image is required";
+      errors.image = "Image is required with ";
       isValid = false;
     }
 

@@ -98,7 +98,7 @@ const HomeSlider = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required";
+      errors.img = "Image is required with 338*219 pixels";
       isValid = false;
     }
 
@@ -435,7 +435,7 @@ const HomeSlider = () => {
                       />
                     )}
                     <NewReusableForm
-                      label={"Image Upload"}
+                      label={"Upload Slider Image"}
                       placeholder={"Upload Image"}
                       name={"img"}
                       type={"file"}

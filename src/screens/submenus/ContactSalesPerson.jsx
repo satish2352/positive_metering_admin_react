@@ -628,7 +628,7 @@ const ContactSalesPerson = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required";
+      errors.img = "Image is required with 596*394 pixels";
       isValid = false;
     }
 
@@ -978,7 +978,7 @@ const ContactSalesPerson = () => {
                       />
                     )}
                     <NewResuableForm
-                      label="Image Upload"
+                      label="Upload Contact Sales person Image"
                       placeholder="Upload Image"
                       name="img"
                       type="file"

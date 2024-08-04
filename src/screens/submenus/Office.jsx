@@ -496,7 +496,7 @@ const Office = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required";
+      errors.img = "Image is required with 710*307 pixels";
     }
 
     if (!formData.title?.trim()) {
@@ -853,7 +853,7 @@ const Office = () => {
                       />
                     )}
                     <NewResuableForm
-                      label="Image Upload"
+                      label="Upload Office Image"
                       placeholder="Upload Image"
                       name="img"
                       type="file"

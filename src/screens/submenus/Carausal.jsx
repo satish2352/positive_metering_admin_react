@@ -97,7 +97,7 @@ const Carousal = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required";
+      errors.img = "Image is required with 259*195 pixels";
       isValid = false;
     }
 
@@ -438,7 +438,7 @@ const Carousal = () => {
                     )}
 
                     <NewReusableForm
-                      label={"Image Upload"}
+                      label={"Upload Carousal Image"}
                       placeholder={"Upload Image"}
                       name={"img"}
                       type={"file"}

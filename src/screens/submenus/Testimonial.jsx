@@ -45,6 +45,20 @@ const Testimonial = () => {
     fetchTeam();
   }, []);
 
+  useEffect(() => {
+    if (formData.img && formData.img instanceof File) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(formData.img);
+    } else if (formData.img && typeof formData.img === 'string') {
+      setImagePreview(formData.img);
+    } else {
+      setImagePreview("");
+    }
+  }, [formData.img]);
+
   const fetchTeam = async () => {
     const accessToken = localStorage.getItem("accessToken"); 
     try {
@@ -288,6 +302,8 @@ const Testimonial = () => {
     }
   }, [shows]);
 
+ 
+
   return (
     <Container>
       <Row>
@@ -302,6 +318,7 @@ const Testimonial = () => {
           )}
         </Col>
       </Row>
+ 
 
       <Row>
         <Col>

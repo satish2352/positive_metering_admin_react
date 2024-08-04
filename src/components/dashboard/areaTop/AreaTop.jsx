@@ -104,6 +104,7 @@ import { Button } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import { MdOutlineMenu } from "react-icons/md";
 import { addDays } from "date-fns";
+
 import "./AreaTop.scss";
 
 const AreaTop = () => {
@@ -111,10 +112,10 @@ const AreaTop = () => {
   const [headerName, setHeader] = useState("");
   const { title, setTitle } = useContext(TitleContext);
   const { toggleShows } = useContext(ShowContext);
-
-  const [buttonText, setButtonText] = useState("Add");
+  const [buttonText, setButtonText] = useState("View");
   const dateRangeRef = useRef(null);
   const location = useLocation();
+
 
   const handleClickOutside = (event) => {
     if (dateRangeRef.current && !dateRangeRef.current.contains(event.target)) {
@@ -132,6 +133,8 @@ const AreaTop = () => {
   useEffect(() => {
     setTitle(activeMenuName);
   }, [activeMenuName, setTitle]);
+
+
 
   const handleButtonClick = () => {
     toggleShows();

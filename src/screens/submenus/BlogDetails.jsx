@@ -96,7 +96,7 @@ const BlogDetails = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required";
+      errors.img = "Image is required with 1185*617 pixels";
       isValid = false;
     }
 
@@ -445,7 +445,7 @@ const BlogDetails = () => {
                       />
                     )}
                     <NewResuableForm
-                      label={"Image Upload"}
+                      label={"Upload Blog Image"}
                       placeholder={"Upload Image"}
                       name={"img"}
                       type={"file"}

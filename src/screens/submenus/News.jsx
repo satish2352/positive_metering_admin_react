@@ -88,7 +88,7 @@ const NewsAndEventCards = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required";
+      errors.img = "Image is required with 573*377 pixels";
       isValid = false;
     }
 
@@ -430,7 +430,7 @@ const NewsAndEventCards = () => {
                       />
                     )}
                     <NewResuableForm
-                      label={"Image Upload"}
+                      label={"Upload News Image"}
                       placeholder={"Upload Image"}
                       name={"img"}
                       type={"file"}
