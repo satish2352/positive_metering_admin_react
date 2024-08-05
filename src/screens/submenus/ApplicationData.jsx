@@ -380,7 +380,7 @@ const ApplicationData = () => {
                           >
                             <FaTrash />
                           </Button>
-                          <Button
+                          {/* <Button
                             className="ms-1"
                             onClick={() =>
                               handleIsActive(
@@ -394,7 +394,7 @@ const ApplicationData = () => {
                             ) : (
                               <FaEye />
                             )}
-                          </Button>
+                          </Button> */}
                         </div>
                       </td>
                     </tr>

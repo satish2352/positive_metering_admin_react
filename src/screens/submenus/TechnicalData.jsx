@@ -366,7 +366,7 @@ const TechnicalData = () => {
                         <Button className="ms-1" onClick={() => handleDelete(item.id)}>
                           <FaTrash />
                         </Button>
-                        <Button
+                        {/* <Button
                           className="ms-1"
                           onClick={() =>
                             handleIsActive(item.id, !eyeVisibilityById[item.id])
@@ -377,7 +377,7 @@ const TechnicalData = () => {
                           ) : (
                             <FaEye />
                           )}
-                        </Button>
+                        </Button> */}
                       </div>
                     </td>
                   </tr>
