@@ -1,4 +1,4 @@
-////sos
+// ////sos
 import { useContext, useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import logo from "../../assets/images/logo.png";
@@ -195,7 +195,7 @@ const SidebarMenu = [
     ],
   },
   {
-    menu: "Contact Person Details",
+    menu: "Contact Forms Details",
     url: "/contactus",
     mainIcon: <MdOutlinePermContactCalendar size={24} />,
     subMenu: [
@@ -241,7 +241,7 @@ const SidebarMenu = [
 
 
 
-// ////v1
+// ////
 const Sidebar = () => {
   const { isSidebarOpen, closeSidebar, setActiveMenu, activeMenuName } =
     useContext(SidebarContext);
@@ -280,6 +280,10 @@ const Sidebar = () => {
   }, [activeMenuName, setTitle]);
 
   const handleMenuClick = (menu) => {
+    if (activeMenuName === menu) {
+      // If the clicked menu is already active, do nothing
+      return;
+    }
     setActiveMenu(menu);
     setActiveSubMenu(""); // Reset active submenu when a menu is clicked
     setTitle(menu); // Update title when menu is clicked
@@ -323,6 +327,7 @@ const Sidebar = () => {
                       }`}
                       icon={item.mainIcon}
                       label={item.menu}
+                      onClick={() => handleMenuClick(item.menu)} // Handle click to open/close menu
                     >
                       {item.subMenu.map((subItem, subId) => (
                         <div
@@ -377,9 +382,3 @@ export default Sidebar;
 
 
 
-
-
-
-
-
-////

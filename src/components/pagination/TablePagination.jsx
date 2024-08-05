@@ -2,11 +2,10 @@
 // TablePagination.js
 import React from 'react';
 import ReactPaginate from 'react-paginate';
-import { usePagination, usePaginationUpdate } from '../../context/PaginationContext';
+
 
 const TablePagination = ({ totalPages, handlePageClick }) => {
-  const currentPage = usePagination();
-  const goToPage = usePaginationUpdate();
+
 
   const handlePageChange = (selectedPage) => {
     goToPage(selectedPage);

@@ -232,7 +232,8 @@ const ProductDetails = () => {
                 const accessToken = localStorage.getItem("accessToken");
                 try {
                   await instance.delete(
-                    `productdetails/isdelete-productdetails/${id}`,
+                    // `productdetails/isdelete-productdetails/${id}`,
+                    `productAggregate/delete-products/${id}`,
                     {
                       headers: {
                         Authorization: `Bearer ${accessToken}`,

@@ -1,5 +1,5 @@
 
-////sos comfirmation added by 
+////sos comfirmation added by carousal to homeslider and vice versa. home slider is image silder
 import React, { useState, useEffect } from "react";
 import {
   Container,
