@@ -1,4 +1,3 @@
-// ////sos
 import { useContext, useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import logo from "../../assets/images/logo.png";
@@ -41,13 +40,6 @@ const SidebarMenu = [
         url: "/headercontact",
         icon: <RiContactsBookLine style={{ color: "red" }} size={24} />,
       },
-      // {
-      //   subMenus: "Hero Form",
-      //   url: "/heroform",
-      //   icon: <AiOutlineAppstoreAdd style={{ color: "red" }} size={24} />,
-      // },
-
-      
       {
         subMenus: "Carousal",
         url: "/carousal",
@@ -58,18 +50,11 @@ const SidebarMenu = [
         url: "/homeslider",
         icon: <AiOutlineProject style={{ color: "red" }} size={24} />,
       },
-
       {
         subMenus: "Testimonial",
         url: "/testimonial",
         icon: <BsChatSquareQuote style={{ color: "red" }} size={24} />,
       },
-   
-      // {
-      //   subMenus: "Bg Video Form",
-      //   url: "/bgvideoform",
-      //   icon: <BsCameraVideo style={{ color: "red" }} size={24} />,
-      // },
     ],
   },
   {
@@ -77,11 +62,6 @@ const SidebarMenu = [
     url: "/about",
     mainIcon: <RiTeamFill size={24} />,
     subMenu: [
-      // {
-      //   subMenus: "Leadership",
-      //   url: "/leadership",
-      //   icon: <IoIosPeople style={{ color: "red" }} size={24} />,
-      // },
       {
         subMenus: "Infrastructure",
         url: "/infrastructure",
@@ -99,12 +79,6 @@ const SidebarMenu = [
     url: "/product",
     mainIcon: <FiList size={24} />,
     subMenu: [
-      // {
-      //   subMenus: "Product List",
-      //   url: "/productlist",
-      //   icon: <RiFileListLine style={{ color: "red" }} size={24} />,
-      // },
-
       {
         subMenus: "Product Details",
         url: "/productdetails",
@@ -132,12 +106,6 @@ const SidebarMenu = [
       },
     ],
   },
-  // {
-  //   menu: "Service",
-  //   url: "/service",
-  //   mainIcon: <GrServices size={24} />,
-  //   subMenu: [],
-  // },
   {
     menu: "Blog",
     url: "/blog",
@@ -167,16 +135,6 @@ const SidebarMenu = [
       },
     ],
   },
-
-  // {
-  //   menu: "Career",
-  //   url: "/career",
-  //   mainIcon: <FaBusinessTime size={24} />,
-  //   subMenu: [
-
-  //   ],
-  // },
-
   {
     menu: "Contact Us",
     url: "/contactus",
@@ -195,7 +153,7 @@ const SidebarMenu = [
     ],
   },
   {
-    menu: "Contact Forms Details",
+    menu: "Contact Person Details",
     url: "/contactus",
     mainIcon: <MdOutlinePermContactCalendar size={24} />,
     subMenu: [
@@ -204,21 +162,11 @@ const SidebarMenu = [
         url: "/carousalform",
         icon: <RiFileListLine style={{ color: "red" }} size={24} />,
       },
-      // {
-      //   subMenus: "Request Callback Form",
-      //   url: "/requestcallbackform",
-      //   icon: <MdOutlineContactMail style={{ color: "red" }} size={24} />,
-      // },
       {
         subMenus: "Cv List",
         url: "/uploadcv",
         icon: <FiUploadCloud style={{ color: "red" }} size={24} />,
       },
-      // {
-      //   subMenus: "Get In Touch",
-      //   url: "/getintouch",
-      //   icon: <RiContactsBookLine style={{ color: "red" }} size={24} />,
-      // },
       {
         subMenus: "Subscribe",
         url: "/subscribe",
@@ -231,17 +179,9 @@ const SidebarMenu = [
     url: "/logout",
     mainIcon: <MdLogout size={24} />,
     subMenu: [],
-  },  
+  },
 ];
 
-
-
-
-
-
-
-
-// ////
 const Sidebar = () => {
   const { isSidebarOpen, closeSidebar, setActiveMenu, activeMenuName } =
     useContext(SidebarContext);
@@ -280,18 +220,15 @@ const Sidebar = () => {
   }, [activeMenuName, setTitle]);
 
   const handleMenuClick = (menu) => {
-    if (activeMenuName === menu) {
-      // If the clicked menu is already active, do nothing
-      return;
-    }
     setActiveMenu(menu);
     setActiveSubMenu(""); // Reset active submenu when a menu is clicked
     setTitle(menu); // Update title when menu is clicked
   };
 
-  const handleSubMenuClick = (subMenu) => {
+  const handleSubMenuClick = (subMenu, parentMenu) => {
     setTitle(subMenu);
     setActiveSubMenu(subMenu);
+    setActiveMenu(parentMenu); // Set the parent menu as active
   };
 
   return (
@@ -327,43 +264,36 @@ const Sidebar = () => {
                       }`}
                       icon={item.mainIcon}
                       label={item.menu}
-                      onClick={() => handleMenuClick(item.menu)} // Handle click to open/close menu
+                      open={activeMenuName === item.menu}
+                      onClick={() => handleMenuClick(item.menu)}
                     >
-                      {item.subMenu.map((subItem, subId) => (
-                        <div
+                      {item.subMenu.map((sub, subId) => (
+                        <MenuItem
                           key={subId}
-                          className={`menu-link-text bg-white ${
-                            activeSubMenu === subItem.subMenus ? "active" : ""
+                          className={`menu-link-text ${
+                            activeSubMenu === sub.subMenus ? "active" : ""
                           }`}
-                          style={{ cursor: "pointer" }}
-                          onClick={() => handleSubMenuClick(subItem.subMenus)}
+                          icon={sub.icon}
+                          component={<Link to={sub.url} />}
+                          onClick={() =>
+                            handleSubMenuClick(sub.subMenus, item.menu)
+                          }
                         >
-                          <Link
-                            to={subItem.url}
-                            className="text-decoration-none text-black"
-                          >
-                            <MenuItem icon={subItem.icon}>
-                              {subItem.subMenus} {/* Display subMenu name */}
-                            </MenuItem>
-                          </Link>
-                        </div>
+                          {sub.subMenus}
+                        </MenuItem>
                       ))}
                     </SubMenu>
                   ) : (
-                    <div
+                    <MenuItem
                       className={`menu-link-text bg-white ${
                         activeMenuName === item.menu ? "active" : ""
                       }`}
-                      style={{ cursor: "pointer" }}
+                      icon={item.mainIcon}
+                      component={<Link to={item.url} />}
                       onClick={() => handleMenuClick(item.menu)}
                     >
-                      <Link
-                        to={item.url}
-                        className="text-decoration-none text-black"
-                      >
-                        <MenuItem icon={item.mainIcon}>{item.menu}</MenuItem>
-                      </Link>
-                    </div>
+                      {item.menu}
+                    </MenuItem>
                   )}
                 </div>
               ))}
@@ -376,9 +306,3 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
-
-
-
-
-
-
