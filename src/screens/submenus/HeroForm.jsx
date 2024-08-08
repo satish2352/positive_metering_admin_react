@@ -218,11 +218,11 @@ const HeroForm = () => {
           )}
         </Col>
       </Row>
-      <Row>
+      {/* <Row>
         <Col>
           <TablePagination />
         </Col>
-      </Row>
+      </Row> */}
     </Container>
   );
 };

@@ -221,11 +221,11 @@ const OurStory = () => {
           )}
         </Col>
       </Row>
-      <Row>
+      {/* <Row>
         <Col>
           <TablePagination />
         </Col>
-      </Row>
+      </Row> */}
     </Container>
   );
 };

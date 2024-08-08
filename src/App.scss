@@ -5,6 +5,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 /*** Common variables ***/
 :root {
   // colors
@@ -223,4 +224,46 @@ ul {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: pre-wrap !important;
+}
+
+
+
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+
+
+
+
+
+
+
+
+
+
+.action-btn {
+  margin-left: 0.25rem;
+}
+
+.action-btn:hover.edit {
+  background-color: green;
+  color: black;
+}
+
+.action-btn:hover.delete {
+  background-color: red;
+  color: black;
+}
+
+.action-btn:hover.visibility {
+  background-color: yellow;
+  color: black;
 }

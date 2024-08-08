@@ -105,12 +105,12 @@ const GetInTouch = () => {
       </Row>
 
      
-      <Row>
+      {/* <Row>
   <Col className="mt-3">
   <TablePagination />
 
   </Col>
-</Row>
+</Row> */}
     </Container>
   );
 };

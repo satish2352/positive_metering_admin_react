@@ -1,5 +1,6 @@
-// /////sos
 
+///////sos
+////v1 datatable added
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -10,22 +11,24 @@ import {
   Form,
   Table,
 } from "react-bootstrap";
+import DataTable from "react-data-table-component";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
 import NewResuableForm from "../../components/form/NewResuableForm";
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import TablePagination from "../../components/pagination/TablePagination";
 import instance from "../../api/AxiosInstance";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-
+import { ThreeDots  } from 'react-loader-spinner'; 
+import { Tooltip, OverlayTrigger,  } from 'react-bootstrap';
+import "../../App.scss";
 const Events = () => {
-  const { searchQuery, handleSearch, handleExport, setData, filteredData } =
+  const {  setData, filteredData } =
     useSearchExport();
-  const { shows, toggleShows } = React.useContext(ShowContext);
+
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -33,23 +36,55 @@ const Events = () => {
   const [formData, setFormData] = useState({});
   const [eyeVisibilityById, setEyeVisibilityById] = useState({});
   const [imagePreview, setImagePreview] = useState("");
-  const tableColumns = [
+  const [showTable, setShowTable] = useState(true); // New state for toggling form and table view
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [loading, setLoading] = useState(false);
+  const CustomHeader = ({ name }) => (
+    <div style={{ fontWeight: "bold", color: "black", fontSize: "16px" }}>
+      {name}
+    </div>
+  );
+
+
+
+  const tableColumns = (currentPage, rowsPerPage) => [
     {
-      key: "srNo",
-      label: "Sr. No.",
-      render: (value, index) => index + 1, // Adding serial number starting from 1
+      name: <CustomHeader name="Sr. No." />,
+      selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
     },
     {
-      key: "img",
-      label: "Image",
-      render: (value) => (
+      name: <CustomHeader name="Image" />,
+      cell: (row) => (
         <img
-          src={value}
+          src={row.img}
           alt="Event"
           style={{ width: "100px", height: "auto" }}
         />
       ),
     },
+    {
+      name: <CustomHeader name="Actions" />,
+      cell: (row) => (
+        <div className="d-flex">
+          <Button className="ms-1" onClick={() => toggleEdit(row.id)}>
+            <FaEdit />
+          </Button>
+          <Button className="ms-1" onClick={() => handleDelete(row.id)}>
+            <FaTrash />
+          </Button>
+          <Button
+            className="ms-1"
+            onClick={() => handleIsActive(row.id, !eyeVisibilityById[row.id])}
+          >
+            {eyeVisibilityById[row.id] ? <FaEyeSlash /> : <FaEye />}
+          </Button>
+        </div>
+  
+      ),
+    },
+
+ 
   ];
 
   useEffect(() => {
@@ -71,6 +106,7 @@ const Events = () => {
   }, [formData.img]);
 
   const fetchTeam = async () => {
+    setLoading(true);
     const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
     try {
       const response = await instance.get("events/find-events", {
@@ -87,24 +123,58 @@ const Events = () => {
         "Error fetching team:",
         error.response || error.message || error
       );
+    }    finally {
+      setLoading(false);
     }
   };
 
-  const validateForm = (formData) => {
+  // const validateForm = (formData) => {
+  //   let errors = {};
+  //   let isValid = true;
+
+  //   if (!formData.img) {
+  //     errors.img = "Image is required with 596x394 pixels";
+  //     isValid = false;
+  //   } else if (
+  //     formData.img instanceof File &&
+  //     !validateImageSize(formData.img)
+  //   ) {
+  //     errors.img = "Image is not 596x394 pixels";
+  //     isValid = false;
+  //   }
+
+  //   setErrors(errors);
+  //   return isValid;
+  // };
+
+
+
+  const validateForm = async (formData) => {
     let errors = {};
     let isValid = true;
-
+  
     if (!formData.img) {
-      errors.img = "Image is required with 596x394 pixels";
+      errors.img = "Image is required with 596x394 pixels and no larger than 400KB";
       isValid = false;
-    } else if (formData.img instanceof File && !validateImageSize(formData.img)) {
-      errors.img = "Image is not 596x394 pixels";
-      isValid = false;
+    } else if (formData.img instanceof File) {
+      if (formData.img.size > 400 * 1024) { // 400KB size limit
+        errors.img = "Image size must be no larger than 400KB";
+        isValid = false;
+      } else {
+        const isImageValid = await validateImageSize(formData.img);
+        if (!isImageValid) {
+          errors.img = "Image is not 596x394 pixels";
+          isValid = false;
+        }
+      }
     }
-
+  
     setErrors(errors);
     return isValid;
   };
+
+
+
 
   const validateImageSize = (file) => {
     return new Promise((resolve, reject) => {
@@ -139,6 +209,7 @@ const Events = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm(formData)) {
+      setLoading(true);
       const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
       const data = new FormData();
       for (const key in formData) {
@@ -168,12 +239,15 @@ const Events = () => {
           toast.success("Data Submitted Successfully");
         }
         fetchTeam();
-        toggleShows();
+
         setEditMode(false);
         setFormData({});
         setImagePreview("");
+        setShowTable(true); // Switch back to table view after submission
       } catch (error) {
         console.error("Error handling form submission:", error);
+      } finally {
+        setLoading(false); // Set loading to false
       }
     }
   };
@@ -207,6 +281,7 @@ const Events = () => {
               style={{ marginRight: "10px" }}
               className="btn btn-primary"
               onClick={async () => {
+                setLoading(true);
                 const accessToken = localStorage.getItem("accessToken");
                 try {
                   await instance.delete(`events/isdelete-event/${id}`, {
@@ -220,7 +295,9 @@ const Events = () => {
                 } catch (error) {
                   console.error("Error deleting data:", error);
                   toast.error("Error deleting data");
-                }
+                } finally {
+        setLoading(false); 
+      }
                 onClose();
               }}
             >
@@ -265,6 +342,7 @@ const Events = () => {
               style={{ marginRight: "10px" }}
               className="btn btn-primary"
               onClick={async () => {
+                setLoading(true);
                 const accessToken = localStorage.getItem("accessToken");
                 try {
                   await instance.put(
@@ -288,7 +366,9 @@ const Events = () => {
                 } catch (error) {
                   console.error("Error updating visibility:", error);
                   toast.error("Error updating visibility");
-                }
+                } finally {
+        setLoading(false); // Set loading to false
+      }
                 onClose();
               }}
             >
@@ -303,104 +383,82 @@ const Events = () => {
     });
   };
 
-  const toggleEdit = (leaderId) => {
-    const memberToEdit = team.find((item) => item.id === leaderId);
-    if (memberToEdit) {
-      setEditingId(leaderId);
-      setEditMode(true);
-      toggleShows();
-      setFormData(memberToEdit);
-    }
+  const toggleEdit = (id) => {
+    const selectedMember = team.find((member) => member.id === id);
+    setEditingId(id);
+    setFormData(selectedMember);
+    setEditMode(true);
+    setShowTable(false); // Switch to form view when editing
   };
 
-  useEffect(() => {
-    if (!shows) {
-      setEditMode(false);
-      setEditingId(null);
-      setFormData({});
-      setImagePreview("");
-    }
-  }, [shows]);
+  const handleAdd = () => {
+    setFormData({});
+    setEditMode(false);
+    setShowTable(false); // Switch to form view when adding new item
+  };
+
+  const handleView = () => {
+    setFormData({});
+    setEditMode(false);
+    setShowTable(true); // Switch to table view
+  };
 
   return (
-    <Container>
-      <Row>
-        <Col>
-          {!shows && !editMode && (
-            <SearchInput
-              searchQuery={searchQuery}
-              onSearch={handleSearch}
-              onExport={handleExport}
-              showExportButton={false}
-            />
-          )}
-        </Col>
-      </Row>
+  
 
-      <Row>
-        <Col>
-          {!shows && !editMode ? (
-            <Table striped bordered hover responsive>
-              <thead>
-                <tr>
-                  {tableColumns.map((col) => (
-                    <th key={col.key}>{col.label}</th>
-                  ))}
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(searchQuery.trim() ? filteredData : team).map(
-                  (item, index) => (
-                    <tr key={item.id}>
-                      {tableColumns.map((col) => (
-                        <td key={col.key}>
-                          {col.key === "srNo"
-                            ? index + 1
-                            : col.render
-                            ? col.render(item[col.key], index)
-                            : item[col.key]}
-                        </td>
-                      ))}
-                      <td>
-                        <div className="d-flex">
-                          <Button
-                            className="ms-1"
-                            onClick={() => toggleEdit(item.id)}
-                          >
-                            <FaEdit />
-                          </Button>
-                          <Button
-                            className="ms-1"
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            <FaTrash />
-                          </Button>
+    <Container fluid>
+    <Row>
+      <Col>
+        <Card>
+          <Card.Header>
+            <Row>
+              {showTable ? (
+                <Col className="d-flex justify-content-end align-items-center">
+                  <Button
+                    variant="outline-success"
+                    onClick={handleAdd}
+                    className="ms-2 mb-3"
+                  >
+                    Add
+                  </Button>
+                </Col>
+              ) : (
+                <Col className="d-flex justify-content-end align-items-center">
+                  <Button   variant="outline-secondary" onClick={handleView}>
+                    View
+                  </Button>
+                </Col>
+              )}
+            </Row>
+          </Card.Header>
 
-                          <Button
-                            className="ms-1"
-                            onClick={() =>
-                              handleIsActive(
-                                item.id,
-                                !eyeVisibilityById[item.id]
-                              )
-                            }
-                          >
-                            {eyeVisibilityById[item.id] ? (
-                              <FaEyeSlash />
-                            ) : (
-                              <FaEye />
-                            )}
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </Table>
-          ) : (
-            <Card className="p-4">
+          <Card.Body>
+            {loading ? ( // Check loading state
+              <div className="d-flex justify-content-center align-items-center" style={{ height: '100px' }}>
+                <ThreeDots  
+                  height="80"
+                  width="80"
+                  radius="9"
+                  color="#000"
+                  ariaLabel="three-dots-loading"
+            
+                  visible={true}
+                />
+              </div>
+            ) : showTable ? (
+              <DataTable
+                columns={tableColumns(currentPage, rowsPerPage)}
+                data={filteredData.length > 0 ? filteredData : team}
+                pagination
+                responsive
+                striped
+                noDataComponent="No Data Available"
+                onChangePage={(page) => setCurrentPage(page)}
+                onChangeRowsPerPage={(rowsPerPage) =>
+                  setRowsPerPage(rowsPerPage)
+                }
+              />
+            ) : (
               <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col md={6}>
@@ -423,7 +481,7 @@ const Events = () => {
                       onChange={handleChange}
                       initialData={formData}
                       error={errors.img}
-                      imageDimensiion="Image must be 596x394 pixels" 
+                      imageDimensiion="Image must be 596x394 pixels"
                     />
                   </Col>
                 </Row>
@@ -438,19 +496,12 @@ const Events = () => {
                   </div>
                 </Row>
               </Form>
-            </Card>
-          )}
-        </Col>
-      </Row>
-
-      <Row>
-        {!shows && !editMode && (
-          <Col className="mt-3">
-            <TablePagination />
-          </Col>
-        )}
-      </Row>
-    </Container>
+            )}
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
+  </Container>
   );
 };
 

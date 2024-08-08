@@ -1,5 +1,6 @@
-// ////1
-/////sos
+
+///////sos
+////v1 datatable added
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -10,22 +11,24 @@ import {
   Form,
   Table,
 } from "react-bootstrap";
+import DataTable from "react-data-table-component";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
 import NewReusableForm from "../../components/form/NewResuableForm";
-
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import TablePagination from "../../components/pagination/TablePagination";
 import instance from "../../api/AxiosInstance";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import { ThreeDots  } from 'react-loader-spinner'; 
+import { Tooltip, OverlayTrigger,  } from 'react-bootstrap';
+import "../../App.scss";
 const ProductDetails = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-  const { shows, toggleShows } = React.useContext(ShowContext);
+
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -33,55 +36,100 @@ const ProductDetails = () => {
   const [formData, setFormData] = useState({});
   const [eyeVisibilityById, setEyeVisibilityById] = useState({});
   const [imagePreview, setImagePreview] = useState("");
-  const tableColumns = [
+  const [showTable, setShowTable] = useState(true); // New state for toggling form and table view
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [loading, setLoading] = useState(false);
+  const CustomHeader = ({ name }) => (
+    <div style={{ fontWeight: "bold", color: "black", fontSize: "16px" }}>
+      {name}
+    </div>
+  );
+
+
+
+  const tableColumns = (currentPage, rowsPerPage) => [
     {
-      key: "srNo",
-      label: "Sr. No.",
-      render: (value, index) => index + 1, // Adding serial number starting from 1
+      name: <CustomHeader name="Sr. No." />,
+      selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
     },
     {
-      key: "img",
-      label: "Image",
-      render: (value) => (
+      name: <CustomHeader name="Image" />,
+      cell: (row) => 
+        (
         <img
-          src={value}
-          alt="Product Details"
+          src={row.images[0].img}
+          alt="ProductDetails"
           style={{ width: "100px", height: "auto" }}
         />
       ),
     },
-    { key: "productName", label: "Product Name" },
-    { key: "application", label: "Application" },
+
+
+
+  
+    {
+      name: <CustomHeader name="Product Name" />,
+      cell: (row) => <span>{row.productName}</span>,
+    },
+    {
+      name: <CustomHeader name="Application" />,
+      cell: (row) => <span>{row.application}</span>,
+    },
+    {
+      name: <CustomHeader name="Actions" />,
+      cell: (row) => (
+        <div className="d-flex">
+          <Button className="ms-1" onClick={() => toggleEdit(row.id)}>
+            <FaEdit />
+          </Button>
+          <Button className="ms-1" onClick={() => handleDelete(row.id)}>
+            <FaTrash />
+          </Button>
+          <Button
+            className="ms-1"
+            onClick={() => handleIsActive(row.id, !eyeVisibilityById[row.id])}
+          >
+            {eyeVisibilityById[row.id] ? <FaEyeSlash /> : <FaEye />}
+          </Button>
+        </div>
+  
+      ),
+    },
+
+ 
   ];
 
   useEffect(() => {
     fetchTeam();
   }, []);
-  useEffect(() => {
-    if (formData.img && formData.img instanceof File) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(formData.img);
-    } else if (formData.img && typeof formData.img === "string") {
-      setImagePreview(formData.img);
-    } else {
-      setImagePreview("");
-    }
-  }, [formData.img]);
+
+
+
+  // useEffect(() => {
+  //   if (formData.img && formData.img instanceof File) {
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       setImagePreview(reader.result);
+  //     };
+  //     reader.readAsDataURL(formData.img);
+  //   } else if (formData.img && typeof formData.img === "string") {
+  //     setImagePreview(formData.img);
+  //   } else {
+  //     setImagePreview("");
+  //   }
+  // }, [formData.img]);
+
   const fetchTeam = async () => {
+    setLoading(true);
     const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
     try {
-      const response = await instance.get(
-        "productdetails/find-productdetails",
-        {
-          headers: {
-            Authorization: "Bearer " + accessToken,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await instance.get("productdetails/find-productdetails", {
+        headers: {
+          Authorization: "Bearer " + accessToken,
+          "Content-Type": "application/json",
+        },
+      });
       const reversedData = response.data.responseData.reverse();
       setTeam(reversedData);
       setData(reversedData);
@@ -90,6 +138,8 @@ const ProductDetails = () => {
         "Error fetching team:",
         error.response || error.message || error
       );
+    }    finally {
+      setLoading(false);
     }
   };
 
@@ -98,19 +148,26 @@ const ProductDetails = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required with 612x408 pixels";
+      // errors.img = "Image is required with 612x408 pixels";
+      errors.img = "Image is required ";
       isValid = false;
-    } else if (formData.img instanceof File && !validateImageSize(formData.img)) {
-      errors.img = "Image is not 612x408 pixels";
-      isValid = false;
-    }
+    } 
+    // else if (formData.img instanceof File && !validateImageSize(formData.img)) {
+    //   errors.img = "Image is not 612x408 pixels";
+    //   isValid = false;
+    // }
     if (!formData.productName?.trim()) {
       errors.productName = "Product Name is required";
       isValid = false;
     }
 
+  
+
     if (!formData.application?.trim()) {
-      errors.application = "Application is required";
+      errors.application = "Product Description is required";
+      isValid = false;
+    } else if (formData.application.length > 1000) {
+      errors.application = "Product Description must be 1000 characters or less";
       isValid = false;
     }
 
@@ -118,44 +175,70 @@ const ProductDetails = () => {
     return isValid;
   };
 
-  const validateImageSize = (file) => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        if (img.width === 612 && img.height === 408) {
-          resolve();
-        } else {
-          reject("Uploaded image is not 612*408 pixels");
-        }
-      };
-      img.onerror = () => reject("Error loading image");
-      img.src = URL.createObjectURL(file);
-    });
-  };
+  // const validateImageSize = (file) => {
+  //   return new Promise((resolve, reject) => {
+  //     const img = new Image();
+  //     img.onload = () => {
+  //       if (img.width === 612 && img.height === 408) {
+  //         resolve();
+  //       } else {
+  //         reject("Image must be 612x408 pixels");
+  //       }
+  //     };
+  //     img.onerror = () => reject("Error loading image");
+  //     img.src = URL.createObjectURL(file);
+  //   });
+  // };
 
-  
-  const handleChange = async (name, value) => {
-    if (name === "img" && value instanceof File) {
-      try {
-        await validateImageSize(value);
-         setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    if (errors[name]) {
-       setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-     }
-        setFormData({ ...formData, [name]: value });
-        setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
-      } catch (error) {
-        setErrors((prevErrors) => ({ ...prevErrors, img: error }));
-        setImagePreview("");
+  // const handleChange = async (name, value) => {
+  //   if (name === "img" && value instanceof File) {
+  //     try {
+  //       await validateImageSize(value);
+  //       setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+  //       setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
+  //     } catch (error) {
+  //       setErrors((prevErrors) => ({ ...prevErrors, img: error }));
+  //       setImagePreview("");
+  //     }
+  //   } else if (name === "application") {
+  //     const charLimit = 1000; // Set your character limit here
+  //     if (value.length > charLimit) {
+  //       setErrors((prevErrors) => ({
+  //         ...prevErrors,
+  //         application: `Character limit of ${charLimit} exceeded`,
+  //       }));
+  //     } else {
+  //       setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+  //       setErrors((prevErrors) => ({ ...prevErrors, application: "" }));
+  //     }
+  //   } else {
+  //     setFormData({ ...formData, [name]: value });
+  //   }
+  // };
+
+
+
+  const handleChange = (name, value) => {
+    if (name === "application") {
+      const charLimit = 1000; // Set your character limit here
+      if (value.length > charLimit) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          application: `Character limit of ${charLimit} exceeded`,
+        }));
+      } else {
+        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+        setErrors((prevErrors) => ({ ...prevErrors, application: "" }));
       }
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm(formData)) {
+      setLoading(true);
       const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
       const data = new FormData();
       for (const key in formData) {
@@ -164,18 +247,13 @@ const ProductDetails = () => {
 
       try {
         if (editMode) {
-          await instance.put(
-            `productdetails/update-productdetails/${editingId}`,
-            data,
-            {
-              headers: {
-                Authorization: "Bearer " + accessToken,
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+          await instance.put(`productdetails/update-productdetails/${editingId}`, data, {
+            headers: {
+              Authorization: "Bearer " + accessToken,
+              "Content-Type": "multipart/form-data",
+            },
+          });
           toast.success("Data Updated Successfully");
-          // Update the specific entry in the team array
           const updatedTeam = team.map((member) =>
             member.id === editingId ? formData : member
           );
@@ -190,12 +268,16 @@ const ProductDetails = () => {
           toast.success("Data Submitted Successfully");
         }
         fetchTeam();
-        toggleShows();
+
         setEditMode(false);
         setFormData({});
         setImagePreview("");
+        setShowTable(true); // Switch back to table view after submission
       } catch (error) {
         console.error("Error handling form submission:", error);
+        toast.error(error.response.data.message);
+      } finally {
+        setLoading(false); // Set loading to false
       }
     }
   };
@@ -229,24 +311,23 @@ const ProductDetails = () => {
               style={{ marginRight: "10px" }}
               className="btn btn-primary"
               onClick={async () => {
+                setLoading(true);
                 const accessToken = localStorage.getItem("accessToken");
                 try {
-                  await instance.delete(
-                    // `productdetails/isdelete-productdetails/${id}`,
-                    `productAggregate/delete-products/${id}`,
-                    {
-                      headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                        "Content-Type": "application/json",
-                      },
-                    }
-                  );
+                  await instance.delete(`productdetails/isdelete-productdetails/${id}`, {
+                    headers: {
+                      Authorization: `Bearer ${accessToken}`,
+                      "Content-Type": "application/json",
+                    },
+                  });
                   toast.success("Data Deleted Successfully");
                   fetchTeam();
                 } catch (error) {
                   console.error("Error deleting data:", error);
                   toast.error("Error deleting data");
-                }
+                } finally {
+        setLoading(false); 
+      }
                 onClose();
               }}
             >
@@ -291,6 +372,7 @@ const ProductDetails = () => {
               style={{ marginRight: "10px" }}
               className="btn btn-primary"
               onClick={async () => {
+                setLoading(true);
                 const accessToken = localStorage.getItem("accessToken");
                 try {
                   await instance.put(
@@ -308,14 +390,15 @@ const ProductDetails = () => {
                   );
                   setEyeVisibilityById((prev) => ({
                     ...prev,
-
                     [id]: isVisible,
                   }));
                   fetchTeam();
                 } catch (error) {
                   console.error("Error updating visibility:", error);
                   toast.error("Error updating visibility");
-                }
+                } finally {
+        setLoading(false); // Set loading to false
+      }
                 onClose();
               }}
             >
@@ -330,108 +413,93 @@ const ProductDetails = () => {
     });
   };
 
-  const toggleEdit = (leaderId) => {
-    const memberToEdit = team.find((item) => item.id === leaderId);
-    if (memberToEdit) {
-      setEditingId(leaderId);
-      setEditMode(true);
 
-      setFormData(memberToEdit);
-      toggleShows(); // Redirect to form view
-    }
+  const toggleEdit = (id) => {
+    setEditMode(true);
+    setEditingId(id);
+    const memberToEdit = team.find((member) => member.id === id);
+    setFormData({ ...memberToEdit });
+    setImagePreview(memberToEdit.images[0].img); // Set the image preview to the existing image URL
+    setShowTable(false); // Hide the table and show the form in edit mode
   };
 
-  useEffect(() => {
-    if (!shows) {
-      setEditMode(false);
-      setEditingId(null);
-      setFormData({});
-      setImagePreview("");
-    }
-  }, [shows]);
+  const handleAdd = () => {
+    setFormData({});
+    setEditMode(false);
+    setShowTable(false); // Switch to form view when adding new item
+  };
+
+  const handleView = () => {
+    setFormData({});
+    setEditMode(false);
+    setShowTable(true); // Switch to table view
+  };
 
   return (
-    <Container>
-      <Row>
-        <Col>
-          {!shows && !editMode && (
-            <SearchInput
+  
+
+    <Container fluid>
+    <Row>
+      <Col>
+        <Card>
+          <Card.Header>
+            <Row>
+              {showTable ? (
+                <Col className="d-flex justify-content-end align-items-center">
+                <SearchInput
               searchQuery={searchQuery}
               onSearch={handleSearch}
-              onExport={handleExport}
+      
               showExportButton={false}
             />
-          )}
-        </Col>
-      </Row>
+                  <Button
+                    variant="outline-success"
+                    onClick={handleAdd}
+                    className="ms-2 mb-3"
+                  >
+                    Add
+                  </Button>
+                </Col>
+              ) : (
+                <Col className="d-flex justify-content-end align-items-center">
+                  <Button   variant="outline-secondary" onClick={handleView}>
+                    View
+                  </Button>
+                </Col>
+              )}
+            </Row>
+          </Card.Header>
 
-      <Row>
-        <Col>
-          {!shows && !editMode ? (
-            <Table striped bordered hover responsive>
-              <thead>
-                <tr>
-                  {tableColumns.map((col) => (
-                    <th key={col.key}>{col.label}</th>
-                  ))}
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(searchQuery.trim() ? filteredData : team).map(
-                  (item, index) => (
-                    <tr key={item.id}>
-                      {tableColumns.map((col) => (
-                        <td key={col.key}>
-                          {col.key === "srNo"
-                            ? index + 1
-                            : col.render
-                            ? col.render(item[col.key], index)
-                            : item[col.key]}
-                        </td>
-                      ))}
-                      <td>
-                        <div className="d-flex">
-                          <Button
-                            className="ms-1"
-                            onClick={() => toggleEdit(item.id)}
-                          >
-                            <FaEdit />
-                          </Button>
-                          <Button
-                            className="ms-1"
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            <FaTrash />
-                          </Button>
-
-                          <Button
-                            className="ms-1"
-                            onClick={() =>
-                              handleIsActive(
-                                item.id,
-                                !eyeVisibilityById[item.id]
-                              )
-                            }
-                          >
-                            {eyeVisibilityById[item.id] ? (
-                              <FaEyeSlash />
-                            ) : (
-                              <FaEye />
-                            )}
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </Table>
-          ) : (
-            <Card className="p-4">
+          <Card.Body>
+            {loading ? ( 
+              <div className="d-flex justify-content-center align-items-center" style={{ height: '100px' }}>
+                <ThreeDots  
+                  height="80"
+                  width="80"
+                  radius="9"
+                  color="#000"
+                  ariaLabel="three-dots-loading"
+            
+                  visible={true}
+                />
+              </div>
+            ) : showTable ? (
+              <DataTable
+                columns={tableColumns(currentPage, rowsPerPage)}
+                data={filteredData.length > 0 ? filteredData : team}
+                pagination
+                responsive
+                striped
+                noDataComponent="No Data Available"
+                onChangePage={(page) => setCurrentPage(page)}
+                onChangeRowsPerPage={(rowsPerPage) =>
+                  setRowsPerPage(rowsPerPage)
+                }
+              />
+            ) : (
               <Form onSubmit={handleSubmit}>
                 <Row>
-                <Col md={6}>
+                <Col md={12}>
                     {imagePreview && (
                       <img
                         src={imagePreview}
@@ -452,7 +520,7 @@ const ProductDetails = () => {
                       onChange={handleChange}
                       initialData={formData}
                       error={errors.img}
-                      imageDimensiion="Image must be 612*408 pixels" 
+                      // imageDimensiion="Image must be 612*408 pixels" 
                     />
                   </Col>
                   <Col md={6}>
@@ -477,6 +545,7 @@ const ProductDetails = () => {
                       textarea
                       useJodit={true}
                       error={errors.application}
+                      charLimit={1000}
                     />
                   </Col>
                 </Row>
@@ -491,19 +560,12 @@ const ProductDetails = () => {
                   </div>
                 </Row>
               </Form>
-            </Card>
-          )}
-        </Col>
-      </Row>
-
-      <Row>
-        {!shows && !editMode && (
-          <Col className="mt-3">
-            <TablePagination />
-          </Col>
-        )}
-      </Row>
-    </Container>
+            )}
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
+  </Container>
   );
 };
 

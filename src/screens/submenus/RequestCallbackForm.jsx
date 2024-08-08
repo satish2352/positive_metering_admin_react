@@ -118,12 +118,12 @@ const RequestCallbackForm = () => {
           </Table>
         </Col>
       </Row>
-      <Row>
+      {/* <Row>
   <Col className="mt-3">
   <TablePagination />
 
   </Col>
-</Row>
+</Row> */}
     </Container>
   );
 };

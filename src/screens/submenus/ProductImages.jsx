@@ -1,5 +1,3 @@
-// // // // // ////sos
-
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -13,7 +11,7 @@ import {
 import DataTable from "react-data-table-component";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
-import NewResuableForm from "../../components/form/NewResuableForm";
+import NewReusableForm from "../../components/form/NewResuableForm";
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -21,13 +19,10 @@ import instance from "../../api/AxiosInstance";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import { ThreeDots } from "react-loader-spinner";
-import { Tooltip, OverlayTrigger } from "react-bootstrap";
+import { ThreeDots  } from 'react-loader-spinner'; 
+import { Tooltip, OverlayTrigger,  } from 'react-bootstrap';
 import "../../App.scss";
-import { Justify } from "react-bootstrap-icons";
-const Testimonial = () => {
-  // const {  setData, filteredData } =
-  //   useSearchExport();
+const ProductImages = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
 
@@ -48,26 +43,31 @@ const Testimonial = () => {
     </div>
   );
 
+
+
   const tableColumns = (currentPage, rowsPerPage) => [
     {
       name: <CustomHeader name="Sr. No." />,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
-      width: "80px",
-      
-
     },
     {
-      name: <CustomHeader name="Review" />,
-      cell: (row) => <span>{row.review}</span>,
-      width: "auto",
-  
+      name: <CustomHeader name="Image" />,
+      cell: (row) => (
+        <img
+          src={row.img}
+          alt="Event"
+          style={{ width: "100px", height: "auto" }}
+        />
+      ),
     },
     {
-      name: <CustomHeader name="Star" />,
-      cell: (row) => <span>{row.star}</span>,
-      width: "80px",
+      name: <CustomHeader name="Product Name" />,
+      cell: (row) => <span>{row.productName}</span>,
     },
-
+    {
+      name: <CustomHeader name="Application" />,
+      cell: (row) => <span>{row.application}</span>,
+    },
     {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
@@ -85,8 +85,11 @@ const Testimonial = () => {
             {eyeVisibilityById[row.id] ? <FaEyeSlash /> : <FaEye />}
           </Button>
         </div>
+  
       ),
     },
+
+ 
   ];
 
   useEffect(() => {
@@ -111,7 +114,7 @@ const Testimonial = () => {
     setLoading(true);
     const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
     try {
-      const response = await instance.get("testimonials/get-testimonials", {
+      const response = await instance.get("productImages/get-productImages", {
         headers: {
           Authorization: "Bearer " + accessToken,
           "Content-Type": "application/json",
@@ -125,7 +128,7 @@ const Testimonial = () => {
         "Error fetching team:",
         error.response || error.message || error
       );
-    } finally {
+    }    finally {
       setLoading(false);
     }
   };
@@ -134,20 +137,25 @@ const Testimonial = () => {
     let errors = {};
     let isValid = true;
 
-    // if (!formData.review?.trim()) {
-    //   errors.review = "Review is required";
-    //   isValid = false;
-    // }
-    if (!formData.review?.trim()) {
-      errors.review = "Review is required";
+    if (!formData.img) {
+      errors.img = "Image is required with 612x408 pixels";
       isValid = false;
-    } else if (formData.review.length > 1000) {
-      errors.review = "Review must be 1000 characters or less";
+    } else if (formData.img instanceof File && !validateImageSize(formData.img)) {
+      errors.img = "Image is not 612x408 pixels";
       isValid = false;
     }
-    const starValue = parseFloat(formData.star);
-    if (isNaN(starValue) || starValue < 0 || starValue > 5) {
-      errors.star = "Star should be a number between 0 and 5";
+    if (!formData.productName?.trim()) {
+      errors.productName = "Product Name is required";
+      isValid = false;
+    }
+
+  
+
+    if (!formData.application?.trim()) {
+      errors.application = "Product Description is required";
+      isValid = false;
+    } else if (formData.application.length > 1000) {
+      errors.application = "Product Description must be 1000 characters or less";
       isValid = false;
     }
 
@@ -155,25 +163,48 @@ const Testimonial = () => {
     return isValid;
   };
 
-  const handleChange = (name, value) => {
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    if (errors[name]) {
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-    } else if (name === "review") {
+  const validateImageSize = (file) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width === 612 && img.height === 408) {
+          resolve();
+        } else {
+          reject("Image must be 612x408 pixels");
+        }
+      };
+      img.onerror = () => reject("Error loading image");
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleChange = async (name, value) => {
+    if (name === "img" && value instanceof File) {
+      try {
+        await validateImageSize(value);
+        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+        setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
+      } catch (error) {
+        setErrors((prevErrors) => ({ ...prevErrors, img: error }));
+        setImagePreview("");
+      }
+    } else if (name === "application") {
       const charLimit = 1000; // Set your character limit here
       if (value.length > charLimit) {
         setErrors((prevErrors) => ({
           ...prevErrors,
-          review: `Character limit of ${charLimit} exceeded`,
+          application: `Character limit of ${charLimit} exceeded`,
         }));
       } else {
         setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-        setErrors((prevErrors) => ({ ...prevErrors, review: "" }));
+        setErrors((prevErrors) => ({ ...prevErrors, application: "" }));
       }
     } else {
-      setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+      setFormData({ ...formData, [name]: value });
     }
   };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm(formData)) {
@@ -186,23 +217,19 @@ const Testimonial = () => {
 
       try {
         if (editMode) {
-          await instance.put(
-            `testimonials/update-testimonials/${editingId}`,
-            data,
-            {
-              headers: {
-                Authorization: "Bearer " + accessToken,
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+          await instance.put(`productImages/update-productimage/${editingId}`, data, {
+            headers: {
+              Authorization: "Bearer " + accessToken,
+              "Content-Type": "multipart/form-data",
+            },
+          });
           toast.success("Data Updated Successfully");
           const updatedTeam = team.map((member) =>
             member.id === editingId ? formData : member
           );
           setTeam(updatedTeam);
         } else {
-          await instance.post("testimonials/create-testimonials", data, {
+          await instance.post("productImages/create-productimage", data, {
             headers: {
               Authorization: "Bearer " + accessToken,
               "Content-Type": "multipart/form-data",
@@ -218,6 +245,7 @@ const Testimonial = () => {
         setShowTable(true); // Switch back to table view after submission
       } catch (error) {
         console.error("Error handling form submission:", error);
+        toast.error(response.data.message);
       } finally {
         setLoading(false); // Set loading to false
       }
@@ -256,23 +284,20 @@ const Testimonial = () => {
                 setLoading(true);
                 const accessToken = localStorage.getItem("accessToken");
                 try {
-                  await instance.delete(
-                    `testimonials/isdelete-testimonial/${id}`,
-                    {
-                      headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                        "Content-Type": "application/json",
-                      },
-                    }
-                  );
+                  await instance.delete(`productImages/delete-productimage/${id}`, {
+                    headers: {
+                      Authorization: `Bearer ${accessToken}`,
+                      "Content-Type": "application/json",
+                    },
+                  });
                   toast.success("Data Deleted Successfully");
                   fetchTeam();
                 } catch (error) {
                   console.error("Error deleting data:", error);
                   toast.error("Error deleting data");
                 } finally {
-                  setLoading(false);
-                }
+        setLoading(false); 
+      }
                 onClose();
               }}
             >
@@ -321,7 +346,7 @@ const Testimonial = () => {
                 const accessToken = localStorage.getItem("accessToken");
                 try {
                   await instance.put(
-                    `testimonials/isactive-testimonial/${id}`,
+                    `productImages/isactive-productImages/${id}`,
                     { isVisible },
                     {
                       headers: {
@@ -342,8 +367,8 @@ const Testimonial = () => {
                   console.error("Error updating visibility:", error);
                   toast.error("Error updating visibility");
                 } finally {
-                  setLoading(false); // Set loading to false
-                }
+        setLoading(false); // Set loading to false
+      }
                 onClose();
               }}
             >
@@ -379,126 +404,137 @@ const Testimonial = () => {
   };
 
   return (
-    <Container fluid>
-      <Row>
-        <Col>
-          <Card>
-            <Card.Header>
-              <Row>
-                {showTable ? (
-                  <Col className="d-flex justify-content-end align-items-center">
-                    <SearchInput
-                      searchQuery={searchQuery}
-                      onSearch={handleSearch}
-                      showExportButton={false}
-                    />
-                    <Button
-                      variant="outline-success"
-                      onClick={handleAdd}
-                      className="ms-2 mb-3"
-                    >
-                      Add
-                    </Button>
-                  </Col>
-                ) : (
-                  <Col className="d-flex justify-content-end align-items-center">
-                    <Button variant="outline-secondary" onClick={handleView}>
-                      View
-                    </Button>
-                  </Col>
-                )}
-              </Row>
-            </Card.Header>
+  
 
-            <Card.Body>
-              {loading ? ( // Check loading state
-                <div
-                  className="d-flex justify-content-center align-items-center"
-                  style={{ height: "100px" }}
-                >
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#000"
-                    ariaLabel="three-dots-loading"
-                    visible={true}
-                  />
-                </div>
-              ) : showTable ? (
-                <DataTable
-                  columns={tableColumns(currentPage, rowsPerPage)}
-                  data={filteredData.length > 0 ? filteredData : team}
-                  pagination
-                  responsive
-                  striped
-                  noDataComponent="No Data Available"
-                  onChangePage={(page) => setCurrentPage(page)}
-                  onChangeRowsPerPage={(rowsPerPage) =>
-                    setRowsPerPage(rowsPerPage)
-                  }
-                  customStyles={{
-                    rows: {
-                      style: {
-                        alignItems: "flex-start", // Aligns text to the top-left corner
-                      },
-                    },
-                    cells: {
-                      style: {
-                        textAlign: "left", // Ensures text is aligned to the left
-                      },
-                    },
-                  }}
-                />
+    <Container fluid>
+    <Row>
+      <Col>
+        <Card>
+          <Card.Header>
+            <Row>
+              {showTable ? (
+                <Col className="d-flex justify-content-end align-items-center">
+                <SearchInput
+              searchQuery={searchQuery}
+              onSearch={handleSearch}
+      
+              showExportButton={false}
+            />
+                  <Button
+                    variant="outline-success"
+                    onClick={handleAdd}
+                    className="ms-2 mb-3"
+                  >
+                    Add
+                  </Button>
+                </Col>
               ) : (
-                <Form onSubmit={handleSubmit}>
-                  <Row>
-                    <Col md={6}>
-                      <NewResuableForm
-                        label={"Review"}
-                        placeholder={"Enter Review"}
-                        name={"review"}
-                        type={"text"}
-                        onChange={handleChange}
-                        initialData={formData}
-                        textarea
-                        error={errors.review}
-                        charLimit={1000}
-                      />
-                    </Col>
-                    <Col md={6}>
-                      <NewResuableForm
-                        label={"Star"}
-                        placeholder={"Enter Star (0-5)"}
-                        name={"star"}
-                        type={"number"}
-                        onChange={handleChange}
-                        initialData={formData}
-                        min={0}
-                        max={5}
-                        step={0.1}
-                        error={errors.star}
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <div className="mt-3 d-flex justify-content-end">
-                      <Button
-                        type="submit"
-                        variant={editMode ? "success" : "primary"}
-                      >
-                        {editMode ? "Update" : "Submit"}
-                      </Button>
-                    </div>
-                  </Row>
-                </Form>
+                <Col className="d-flex justify-content-end align-items-center">
+                  <Button   variant="outline-secondary" onClick={handleView}>
+                    View
+                  </Button>
+                </Col>
               )}
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+            </Row>
+          </Card.Header>
+
+          <Card.Body>
+            {loading ? ( // Check loading state
+              <div className="d-flex justify-content-center align-items-center" style={{ height: '100px' }}>
+                <ThreeDots  
+                  height="80"
+                  width="80"
+                  radius="9"
+                  color="#000"
+                  ariaLabel="three-dots-loading"
+            
+                  visible={true}
+                />
+              </div>
+            ) : showTable ? (
+              <DataTable
+                columns={tableColumns(currentPage, rowsPerPage)}
+                data={filteredData.length > 0 ? filteredData : team}
+                pagination
+                responsive
+                striped
+                noDataComponent="No Data Available"
+                onChangePage={(page) => setCurrentPage(page)}
+                onChangeRowsPerPage={(rowsPerPage) =>
+                  setRowsPerPage(rowsPerPage)
+                }
+              />
+            ) : (
+              <Form onSubmit={handleSubmit}>
+                <Row>
+                <Col md={12}>
+                    {imagePreview && (
+                      <img
+                        src={imagePreview}
+                        alt="Selected Preview"
+                        style={{
+                          width: "100px",
+                          height: "auto",
+                          marginBottom: "10px",
+                        }}
+                      />
+                    )}
+
+                    <NewReusableForm
+                      label={"Upload Product Image"}
+                      placeholder={"Upload Image"}
+                      name={"img"}
+                      type={"file"}
+                      onChange={handleChange}
+                      initialData={formData}
+                      error={errors.img}
+                      imageDimensiion="Image must be 612*408 pixels" 
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <NewReusableForm
+                      label="Product Name"
+                      placeholder="Enter Product Name"
+                      name="productName"
+                      type="text"
+                      onChange={handleChange}
+                      initialData={formData}
+                      error={errors.productName}
+                    />
+                  </Col>
+                  <Col md={12}>
+                    <NewReusableForm
+                      label="Product Description"
+                      placeholder="Enter Application"
+                      name="application"
+                      type="text"
+                      onChange={handleChange}
+                      initialData={formData}
+                      textarea
+                      useJodit={true}
+                      error={errors.application}
+                      charLimit={1000}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <div className="mt-3 d-flex justify-content-end">
+                    <Button
+                      type="submit"
+                      variant={editMode ? "success" : "primary"}
+                    >
+                      {editMode ? "Update" : "Submit"}
+                    </Button>
+                  </div>
+                </Row>
+              </Form>
+            )}
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
+  </Container>
   );
 };
 
-export default Testimonial;
+export default ProductImages;

@@ -1,4 +1,7 @@
-////not in use
+
+
+
+////sos final
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -8,24 +11,25 @@ import {
   Button,
   Form,
   Table,
-  Alert,
 } from "react-bootstrap";
+import DataTable from "react-data-table-component";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
 import NewResuableForm from "../../components/form/NewResuableForm";
-import ReusableTable from "../../components/table/ReusableTable";
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import TablePagination from "../../components/pagination/TablePagination";
 import instance from "../../api/AxiosInstance";
+import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
+import { ThreeDots  } from 'react-loader-spinner'; 
+import { Tooltip, OverlayTrigger,  } from 'react-bootstrap';
+import "../../App.scss";
 const OurTeam = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-  const { shows, toggleShows } = React.useContext(ShowContext);
+
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -33,27 +37,68 @@ const OurTeam = () => {
   const [formData, setFormData] = useState({});
   const [eyeVisibilityById, setEyeVisibilityById] = useState({});
   const [imagePreview, setImagePreview] = useState("");
-  const tableColumns = [
+  const [showTable, setShowTable] = useState(true); // New state for toggling form and table view
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [loading, setLoading] = useState(false);
+  const CustomHeader = ({ name }) => (
+    <div style={{ fontWeight: "bold", color: "black", fontSize: "16px" }}>
+      {name}
+    </div>
+  );
+
+
+
+  const tableColumns = (currentPage, rowsPerPage) => [
     {
-      key: "srNo",
-      label: "Sr. No.",
-      render: (value, index) => index + 1, // Adding serial number starting from 1
+      name: <CustomHeader name="Sr. No." />,
+      selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
     },
     {
-      key: "img",
-      label: "Image",
-      render: (value) => (
+      name: <CustomHeader name="Image" />,
+      cell: (row) => (
         <img
-          src={value}
-          alt="Testimonial"
+          src={row.img}
+          alt="OurTeam"
           style={{ width: "100px", height: "auto" }}
         />
       ),
     },
-    { key: "name", label: "Name" },
-    { key: "designation", label: "Designation" },
-    { key: "description", label: "Description" },
-    { key: "position_no", label: "Position No" },
+
+    {
+      name: <CustomHeader name="Designation" />,
+      cell: (row) => <span>{row.designation}</span>,
+    },
+    {
+      name: <CustomHeader name="Description" />,
+      cell: (row) => <span>{row.description}</span>,
+    },
+    {
+      name: <CustomHeader name="Position No" />,
+      cell: (row) => <span>{row.position_no}</span>,
+    },
+    {
+      name: <CustomHeader name="Actions" />,
+      cell: (row) => (
+        <div className="d-flex">
+          <Button className="ms-1" onClick={() => toggleEdit(row.id)}>
+            <FaEdit />
+          </Button>
+          <Button className="ms-1" onClick={() => handleDelete(row.id)}>
+            <FaTrash />
+          </Button>
+          <Button
+            className="ms-1"
+            onClick={() => handleIsActive(row.id, !eyeVisibilityById[row.id])}
+          >
+            {eyeVisibilityById[row.id] ? <FaEyeSlash /> : <FaEye />}
+          </Button>
+        </div>
+  
+      ),
+    },
+
+ 
   ];
 
   useEffect(() => {
@@ -75,9 +120,12 @@ const OurTeam = () => {
   }, [formData.img]);
 
   const fetchTeam = async () => {
+    setLoading(true);
+    const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
     try {
       const response = await instance.get("team/find-teammembers", {
         headers: {
+          Authorization: "Bearer " + accessToken,
           "Content-Type": "application/json",
         },
       });
@@ -89,6 +137,8 @@ const OurTeam = () => {
         "Error fetching team:",
         error.response || error.message || error
       );
+    }    finally {
+      setLoading(false);
     }
   };
 
@@ -97,12 +147,13 @@ const OurTeam = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required with 500x700 pixels";
+      errors.img = "Image is required with 443x435 pixels";
       isValid = false;
     } else if (formData.img instanceof File && !validateImageSize(formData.img)) {
-      errors.img = "Image is not 500x700 pixels";
+      errors.img = "Image is not 443x435 pixels";
       isValid = false;
     }
+
 
     if (!formData.name?.trim()) {
       errors.name = "Name is required";
@@ -126,23 +177,20 @@ const OurTeam = () => {
     return isValid;
   };
 
-
-
   const validateImageSize = (file) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        if (img.width === 500 && img.height === 700) {
+        if (img.width === 443 && img.height === 435) {
           resolve();
         } else {
-          reject("Image must be 500*700 pixels");
+          reject("Image must be 443x435 pixels");
         }
       };
       img.onerror = () => reject("Error loading image");
       img.src = URL.createObjectURL(file);
     });
   };
-
 
   const handleChange = async (name, value) => {
     if (name === "img" && value instanceof File) {
@@ -159,14 +207,12 @@ const OurTeam = () => {
     }
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm(formData)) {
+      setLoading(true);
       const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
-
       const data = new FormData();
-     
       for (const key in formData) {
         data.append(key, formData[key]);
       }
@@ -179,18 +225,12 @@ const OurTeam = () => {
               "Content-Type": "multipart/form-data",
             },
           });
-
           toast.success("Data Updated Successfully");
-
-          // Update the specific entry in the team array
           const updatedTeam = team.map((member) =>
-            member.id === editingId ? { ...member, ...formData } : member
+            member.id === editingId ? formData : member
           );
-
           setTeam(updatedTeam);
         } else {
-    
-
           await instance.post("team/create-teammember", data, {
             headers: {
               Authorization: "Bearer " + accessToken,
@@ -199,20 +239,16 @@ const OurTeam = () => {
           });
           toast.success("Data Submitted Successfully");
         }
-
         fetchTeam();
 
-        toggleShows();
-
         setEditMode(false);
-
         setFormData({});
-
         setImagePreview("");
+        setShowTable(true); // Switch back to table view after submission
       } catch (error) {
         console.error("Error handling form submission:", error);
-
-        toast.error(error.response.data.message);
+      } finally {
+        setLoading(false); // Set loading to false
       }
     }
   };
@@ -246,6 +282,7 @@ const OurTeam = () => {
               style={{ marginRight: "10px" }}
               className="btn btn-primary"
               onClick={async () => {
+                setLoading(true);
                 const accessToken = localStorage.getItem("accessToken");
                 try {
                   await instance.delete(`team/isdelete-teammember/${id}`, {
@@ -259,7 +296,9 @@ const OurTeam = () => {
                 } catch (error) {
                   console.error("Error deleting data:", error);
                   toast.error("Error deleting data");
-                }
+                } finally {
+        setLoading(false); 
+      }
                 onClose();
               }}
             >
@@ -304,6 +343,7 @@ const OurTeam = () => {
               style={{ marginRight: "10px" }}
               className="btn btn-primary"
               onClick={async () => {
+                setLoading(true);
                 const accessToken = localStorage.getItem("accessToken");
                 try {
                   await instance.put(
@@ -321,14 +361,15 @@ const OurTeam = () => {
                   );
                   setEyeVisibilityById((prev) => ({
                     ...prev,
-
                     [id]: isVisible,
                   }));
                   fetchTeam();
                 } catch (error) {
                   console.error("Error updating visibility:", error);
                   toast.error("Error updating visibility");
-                }
+                } finally {
+        setLoading(false); // Set loading to false
+      }
                 onClose();
               }}
             >
@@ -343,105 +384,91 @@ const OurTeam = () => {
     });
   };
 
-  const toggleEdit = (leaderId) => {
-    const memberToEdit = team.find((item) => item.id === leaderId);
-    if (memberToEdit) {
-      setEditingId(leaderId);
-      setEditMode(true);
-      toggleShows();
-      setFormData(memberToEdit);
-    }
+  const toggleEdit = (id) => {
+    const selectedMember = team.find((member) => member.id === id);
+    setEditingId(id);
+    setFormData(selectedMember);
+    setEditMode(true);
+    setShowTable(false); // Switch to form view when editing
   };
 
-  useEffect(() => {
-    if (!shows) {
-      setEditMode(false);
-      setEditingId(null);
-      setFormData({});
-      setImagePreview("");
-    }
-  }, [shows]);
+  const handleAdd = () => {
+    setFormData({});
+    setEditMode(false);
+    setShowTable(false); // Switch to form view when adding new item
+  };
 
+  const handleView = () => {
+    setFormData({});
+    setEditMode(false);
+    setShowTable(true); // Switch to table view
+  };
 
   return (
-    <Container>
-      <Row>
-        {!shows && !editMode && (
-          <SearchInput
+  
+
+    <Container fluid>
+    <Row>
+      <Col>
+        <Card>
+          <Card.Header>
+            <Row>
+              {showTable ? (
+                <Col className="d-flex justify-content-end align-items-center">
+                <SearchInput
             searchQuery={searchQuery}
             onSearch={handleSearch}
-            onExport={handleExport}
+            
             showExportButton={false}
           />
-        )}
-      </Row>
+                  <Button
+                    variant="outline-success"
+                    onClick={handleAdd}
+                    className="ms-2 mb-3"
+                  >
+                    Add
+                  </Button>
+                </Col>
+              ) : (
+                <Col className="d-flex justify-content-end align-items-center">
+                  <Button   variant="outline-secondary" onClick={handleView}>
+                    View
+                  </Button>
+                </Col>
+              )}
+            </Row>
+          </Card.Header>
 
-      <Row>
-        <Col>
-          {!shows && !editMode ? (
-            <Table striped bordered hover responsive>
-              <thead>
-                <tr>
-                  {tableColumns.map((col) => (
-                    <th key={col.key}>{col.label}</th>
-                  ))}
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(searchQuery.trim() ? filteredData : team).map(
-                  (item, index) => (
-                    <tr key={item.id}>
-                      {tableColumns.map((col) => (
-                        <td key={col.key}>
-                          {col.key === "srNo"
-                            ? index + 1
-                            : col.render
-                            ? col.render(item[col.key], index)
-                            : item[col.key]}
-                        </td>
-                      ))}
-                      <td>
-                        <div className="d-flex">
-                          <Button
-                            className="ms-1"
-                            onClick={() => toggleEdit(item.id)}
-                          >
-                            <FaEdit />
-                          </Button>
-                          <Button
-                            className="ms-1"
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            <FaTrash />
-                          </Button>
-                          <Button
-                            className="ms-1"
-                            onClick={() =>
-                              handleIsActive(
-                                item.id,
-                                !eyeVisibilityById[item.id]
-                              )
-                            }
-                          >
-                            {eyeVisibilityById[item.id] ? (
-                              <FaEyeSlash />
-                            ) : (
-                              <FaEye />
-                            )}
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </Table>
-          ) : (
-            <Card className="p-4">
+          <Card.Body>
+            {loading ? ( // Check loading state
+              <div className="d-flex justify-content-center align-items-center" style={{ height: '100px' }}>
+                <ThreeDots  
+                  height="80"
+                  width="80"
+                  radius="9"
+                  color="#000"
+                  ariaLabel="three-dots-loading"
+            
+                  visible={true}
+                />
+              </div>
+            ) : showTable ? (
+              <DataTable
+                columns={tableColumns(currentPage, rowsPerPage)}
+                data={filteredData.length > 0 ? filteredData : team}
+                pagination
+                responsive
+                striped
+                noDataComponent="No Data Available"
+                onChangePage={(page) => setCurrentPage(page)}
+                onChangeRowsPerPage={(rowsPerPage) =>
+                  setRowsPerPage(rowsPerPage)
+                }
+              />
+            ) : (
               <Form onSubmit={handleSubmit}>
                 <Row>
-                  <Col md={6}>
+                <Col md={12}>
                     {imagePreview && (
                       <img
                         src={imagePreview}
@@ -454,22 +481,17 @@ const OurTeam = () => {
                       />
                     )}
                     <NewResuableForm
-                      label={"Upload Team Image"}
-                      placeholder={""}
+                      label={"Upload Blog Image"}
+                      placeholder={"Upload Image"}
                       name={"img"}
                       type={"file"}
-                      onChange={(name, value) => {
-                        const file = value;
-                        if (file) {
-                          handleChange(name, file);
-                        }
-                      }}
+                      onChange={handleChange}
                       initialData={formData}
                       error={errors.img}
-                      imageDimensiion="Image must be 500*700 pixels" 
+                      imageDimensiion="Image must be 443*435 pixels" 
                     />
-                  </Col>
-                  <Col md={6}>
+                    </Col>
+                    <Col md={6}>
                     <NewResuableForm
                       label={"Name"}
                       placeholder={"Enter Name"}
@@ -526,19 +548,12 @@ const OurTeam = () => {
                   </div>
                 </Row>
               </Form>
-            </Card>
-          )}
-        </Col>
-      </Row>
-
-      <Row>
-        {!shows && !editMode && (
-          <Col className="mt-3">
-            <TablePagination />
-          </Col>
-        )}
-      </Row>
-    </Container>
+            )}
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
+  </Container>
   );
 };
 

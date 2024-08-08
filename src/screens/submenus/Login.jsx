@@ -1,6 +1,6 @@
 
 
-////style a1 image and row not in row
+// ////style a1 image and row not in row
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Card, Image } from "react-bootstrap";
 import instance from "../../api/AxiosInstance";
@@ -9,13 +9,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaLock } from 'react-icons/fa';
 import logo from "../../assets/images/logo.png";
-
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-
+  
+  const [loading, setLoading] = useState(false);
   const validateForm = () => {
     let errors = {};
     let isValid = true;
@@ -141,6 +141,8 @@ const Login = () => {
 };
 
 export default Login;
+
+
 
 
 

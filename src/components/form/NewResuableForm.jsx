@@ -155,6 +155,248 @@
 
 ////sos final
 
+// import React, { useState, useEffect } from "react";
+// import { Form } from "react-bootstrap";
+// import JoditEditor from "jodit-react";
+
+// const NewReusableForm = ({
+//   label,
+//   name,
+//   placeholder,
+//   type,
+//   textarea,
+//   useJodit,
+//   onChange,
+//   initialData,
+//   error,
+//   imageDimensiion 
+// }) => {
+//   const [value, setValue] = useState(initialData[name] || "");
+
+//   useEffect(() => {
+//     setValue(initialData[name] || "");
+//   }, [initialData, name]);
+
+//   const handleChange = (e) => {
+//     const { value, files } = e.target;
+//     setValue(type === "file" ? files[0] : value);
+//     onChange(name, type === "file" ? files[0] : value);
+//   };
+
+//   const handleEditorChange = (newContent) => {
+//     setValue(newContent);
+//     onChange(name, newContent);
+//   };
+
+//   return (
+//     <Form.Group>
+//       <Form.Label>{label}</Form.Label>
+    
+//       {imageDimensiion && (
+//           <span className="form-text text-danger ms-2">
+//             ({imageDimensiion})
+//           </span>
+//         )}
+//       {type === "file" ? (
+//         <>
+//           <Form.Control
+//             type={type}
+//             accept="image/*,.pdf,.doc,.docx"
+//             onChange={handleChange}
+//             isInvalid={!!error} // shows error if any
+//           />
+//           {error && <div className="invalid-feedback d-block">{error}</div>}
+//         </>
+//       ) : useJodit ? (
+//         <>
+//           <JoditEditor
+//             value={value}
+//             onChange={handleEditorChange}
+//           />
+//           {error && <div className="invalid-feedback d-block">{error}</div>}
+//         </>
+//       ) : textarea ? (
+//         <>
+//           <Form.Control
+//             as="textarea"
+//             placeholder={placeholder}
+//             value={value}
+//             onChange={handleChange}
+//             isInvalid={!!error} // shows error if any
+//           />
+//           {error && <Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>}
+//         </>
+//       ) : (
+//         <>
+//           <Form.Control
+//             type={type}
+//             placeholder={placeholder}
+//             value={value}
+//             onChange={handleChange}
+//             isInvalid={!!error} // shows error if any
+//           />
+//           {error && <Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>}
+//         </>
+//       )}
+//     </Form.Group>
+//   );
+// };
+
+// export default NewReusableForm;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////v2
+// import React, { useState, useEffect } from "react";
+// import { Form } from "react-bootstrap";
+// import JoditEditor from "jodit-react";
+
+// const NewReusableForm = ({
+//   label,
+//   name,
+//   placeholder,
+//   type,
+//   textarea,
+//   useJodit,
+//   onChange,
+//   initialData,
+//   error,
+//   imageDimensiion,
+//   charLimit,
+// }) => {
+//   const [value, setValue] = useState(initialData[name] || "");
+//   const [charError, setCharError] = useState("");
+
+//   useEffect(() => {
+//     setValue(initialData[name] || "");
+//   }, [initialData, name]);
+
+//   const handleChange = (e) => {
+//     const { value, files } = e.target;
+//     const newValue = type === "file" ? files[0] : value;
+
+//     if (charLimit && newValue.length > charLimit) {
+//       setCharError(`Character limit of ${charLimit} exceeded`);
+//     } else {
+//       setCharError("");
+//       setValue(newValue);
+//       onChange(name, newValue);
+//     }
+//   };
+
+//   const handleEditorChange = (newContent) => {
+//     if (charLimit && newContent.length > charLimit) {
+//       setCharError(`Character limit of ${charLimit} exceeded`);
+//     } else {
+//       setCharError("");
+//       setValue(newContent);
+//       onChange(name, newContent);
+//     }
+//   };
+
+//   return (
+//     <Form.Group>
+//       <Form.Label>{label}</Form.Label>
+//       {imageDimensiion && (
+//         <span className="form-text text-danger ms-2">
+//           ({imageDimensiion})
+//         </span>
+//       )}
+//       {charLimit && (
+//         <span className="form-text text-danger ms-2">
+//           (Max {charLimit} characters)
+//         </span>
+//       )}
+//       {type === "file" ? (
+//         <>
+//           <Form.Control
+//             type={type}
+//             accept="image/*,.pdf,.doc,.docx"
+//             onChange={handleChange}
+//             isInvalid={!!error || !!charError} // shows error if any
+//           />
+//           {(error || charError) && (
+//             <div className="invalid-feedback d-block">
+//               {error || charError}
+//             </div>
+//           )}
+//         </>
+//       ) : useJodit ? (
+//         <>
+//           <JoditEditor
+//             value={value}
+//             onChange={handleEditorChange}
+//           />
+//           {(error || charError) && (
+//             <div className="invalid-feedback d-block">
+//               {error || charError}
+//             </div>
+//           )}
+//         </>
+//       ) : textarea ? (
+//         <>
+//           <Form.Control
+//             as="textarea"
+//             placeholder={placeholder}
+//             value={value}
+//             onChange={handleChange}
+//             isInvalid={!!error || !!charError} // shows error if any
+//           />
+//           <div className="text-muted">
+//             {value.length}/{charLimit}
+//           </div>
+//           {(error || charError) && (
+//             <Form.Control.Feedback type="invalid">
+//               {error || charError}
+//             </Form.Control.Feedback>
+//           )}
+//         </>
+//       ) : (
+//         <>
+//           <Form.Control
+//             type={type}
+//             placeholder={placeholder}
+//             value={value}
+//             onChange={handleChange}
+//             isInvalid={!!error || !!charError} // shows error if any
+//           />
+//           <div className="text-muted">
+//             {value.length}/{charLimit}
+//           </div>
+//           {(error || charError) && (
+//             <Form.Control.Feedback type="invalid">
+//               {error || charError}
+//             </Form.Control.Feedback>
+//           )}
+//         </>
+//       )}
+//     </Form.Group>
+//   );
+// };
+
+// export default NewReusableForm;
+
+
+
+
+
+
+
+
+////
 import React, { useState, useEffect } from "react";
 import { Form } from "react-bootstrap";
 import JoditEditor from "jodit-react";
@@ -169,9 +411,12 @@ const NewReusableForm = ({
   onChange,
   initialData,
   error,
-  imageDimensiion 
+  imageDimensiion,
+  charLimit,
+  onSubmit,
 }) => {
   const [value, setValue] = useState(initialData[name] || "");
+  const [charError, setCharError] = useState("");
 
   useEffect(() => {
     setValue(initialData[name] || "");
@@ -179,33 +424,53 @@ const NewReusableForm = ({
 
   const handleChange = (e) => {
     const { value, files } = e.target;
-    setValue(type === "file" ? files[0] : value);
-    onChange(name, type === "file" ? files[0] : value);
+    const newValue = type === "file" ? files[0] : value;
+
+    if (charLimit && newValue.length > charLimit) {
+      setCharError(`Character limit of ${charLimit} exceeded`);
+    } else {
+      setCharError("");
+      setValue(newValue);
+      onChange(name, newValue);
+    }
   };
 
   const handleEditorChange = (newContent) => {
-    setValue(newContent);
-    onChange(name, newContent);
+    if (charLimit && newContent.length > charLimit) {
+      setCharError(`Character limit of ${charLimit} exceeded`);
+    } else {
+      setCharError("");
+      setValue(newContent);
+      onChange(name, newContent);
+    }
   };
 
   return (
     <Form.Group>
       <Form.Label>{label}</Form.Label>
-    
       {imageDimensiion && (
-          <span className="form-text text-danger ms-2">
-            ({imageDimensiion})
-          </span>
-        )}
+        <span className="form-text text-danger ms-2">
+          ({imageDimensiion})
+        </span>
+      )}
+      {charLimit && (
+        <span className="form-text text-danger ms-2">
+          (Max {charLimit} characters)
+        </span>
+      )}
       {type === "file" ? (
         <>
           <Form.Control
             type={type}
             accept="image/*,.pdf,.doc,.docx"
             onChange={handleChange}
-            isInvalid={!!error} // shows error if any
+            isInvalid={!!error || !!charError}
           />
-          {error && <div className="invalid-feedback d-block">{error}</div>}
+          {(error || charError) && (
+            <div className="invalid-feedback d-block">
+              {error || charError}
+            </div>
+          )}
         </>
       ) : useJodit ? (
         <>
@@ -213,7 +478,16 @@ const NewReusableForm = ({
             value={value}
             onChange={handleEditorChange}
           />
-          {error && <div className="invalid-feedback d-block">{error}</div>}
+          {(error || charError) && (
+            <div className="invalid-feedback d-block">
+              {error || charError}
+            </div>
+          )}
+          {charLimit && (
+            <div className="text-muted">
+              {value.length}/{charLimit}
+            </div>
+          )}
         </>
       ) : textarea ? (
         <>
@@ -222,9 +496,18 @@ const NewReusableForm = ({
             placeholder={placeholder}
             value={value}
             onChange={handleChange}
-            isInvalid={!!error} // shows error if any
+            isInvalid={!!error || !!charError}
           />
-          {error && <Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>}
+          {charLimit && (
+            <div className="text-muted">
+              {value.length}/{charLimit}
+            </div>
+          )}
+          {(error || charError) && (
+            <Form.Control.Feedback type="invalid">
+              {error || charError}
+            </Form.Control.Feedback>
+          )}
         </>
       ) : (
         <>
@@ -233,9 +516,18 @@ const NewReusableForm = ({
             placeholder={placeholder}
             value={value}
             onChange={handleChange}
-            isInvalid={!!error} // shows error if any
+            isInvalid={!!error || !!charError}
           />
-          {error && <Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>}
+          {charLimit && (
+            <div className="text-muted">
+              {value.length}/{charLimit}
+            </div>
+          )}
+          {(error || charError) && (
+            <Form.Control.Feedback type="invalid">
+              {error || charError}
+            </Form.Control.Feedback>
+          )}
         </>
       )}
     </Form.Group>
@@ -243,3 +535,5 @@ const NewReusableForm = ({
 };
 
 export default NewReusableForm;
+
+

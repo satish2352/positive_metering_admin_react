@@ -45,6 +45,7 @@ import { Sidebar } from "./components";
 import ProtectedRoutes from "./api/ProtectedRoutes";
 import ApplicationData from "./screens/submenus/ApplicationData";
 import Events from "./screens/submenus/Events";
+import ProductImages from "./screens/submenus/ProductImages";
 
 function App() {
   return (
@@ -180,6 +181,10 @@ function App() {
                     <Route
             path="/applicationdata"
             element={<ProtectedRoutes Component={ApplicationData} />}
+          />
+                           <Route
+            path="/productimages"
+            element={<ProtectedRoutes Component={ProductImages} />}
           />
           <Route
             path="/logout"

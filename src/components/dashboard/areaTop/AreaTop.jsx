@@ -1,14 +1,4 @@
-
-
-
-
-
-
-
-
-
-
-// // ////sir code
+// // // ////sir code
 import { useContext, useEffect, useRef, useState } from "react";
 import { SidebarContext } from "../../../context/SidebarContext";
 import { TitleContext } from "../../../context/TitleContext";
@@ -20,7 +10,8 @@ import { addDays } from "date-fns";
 
 import "./AreaTop.scss";
 
-const AreaTop = () => {
+const AreaTop = ({ buttonValue, tableView }) => {
+  
   const { openSidebar, activeMenuName } = useContext(SidebarContext);
   const [headerName, setHeader] = useState("");
   const { title, setTitle } = useContext(TitleContext);
@@ -29,13 +20,13 @@ const AreaTop = () => {
   const dateRangeRef = useRef(null);
   const location = useLocation();
 
-
   const handleClickOutside = (event) => {
     if (dateRangeRef.current && !dateRangeRef.current.contains(event.target)) {
       setShowDatePicker(false);
     }
   };
 
+  
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -43,11 +34,10 @@ const AreaTop = () => {
     };
   }, []);
 
+
   useEffect(() => {
     setTitle(activeMenuName);
   }, [activeMenuName, setTitle]);
-
-
 
   const handleButtonClick = () => {
     toggleShows();
@@ -62,80 +52,80 @@ const AreaTop = () => {
     "/getintouch",
     "/subscribe",
     "/headercontact",
+    "/testimonial",
+    "/headercontact",
+    "/homeslider",
+    "/carousal",
+     "/infrastructure",
+     "/ourteam",
+"/productname",
+"/productdetails",
+"/technicaldata",
+"/optionsdata",
+ "/materialdata",
+ "/blogdetails",
+ "/applicationdata",
+ "/uploadcv",
+ "/subscribe",
+ "/getintouch",
+ "/office",
+ "/contactsalesperson",
+ "/events",
+ "/news",
   ];
   const isHiddenPath = hiddenPaths.includes(location.pathname);
-  // let headerName = (window.location.pathname).replace(/^\/+/, '');
+
   useEffect(() => {
     if (window.location.pathname == "/testimonial") {
       setHeader("Testimonial");
-    } 
-    else if (window.location.pathname == "/headercontact") {
+    } else if (window.location.pathname == "/headercontact") {
       setHeader("Header Contact");
-    }
-    else if (window.location.pathname == "/homeslider") {
+    } else if (window.location.pathname == "/homeslider") {
       setHeader("Image Slider");
-    }
-    else if (window.location.pathname == "/carousal") {
-      setHeader("Carousal");
-    }
-    else if (window.location.pathname == "/infrastructure") {
+    } else if (window.location.pathname == "/carousal") {
+      setHeader("Home Sliding Image");
+    } else if (window.location.pathname == "/infrastructure") {
       setHeader("Infrastructure");
-    }
-
-    else if (window.location.pathname == "/ourteam") {
+    } else if (window.location.pathname == "/ourteam") {
       setHeader("Our Team");
-    }
-    else if (window.location.pathname == "/productname") {
+    } else if (window.location.pathname == "/productname") {
       setHeader("Product Name");
-    }
-    else if (window.location.pathname == "/productdetails") {
+    } else if (window.location.pathname == "/productdetails") {
       setHeader("Product Details");
-    }
-    else if (window.location.pathname == "/technicaldata") {
+    } else if (window.location.pathname == "/technicaldata") {
       setHeader("Technical Data");
-    }
-    else if (window.location.pathname == "/optionsdata") {
+    } else if (window.location.pathname == "/optionsdata") {
       setHeader("Options Data");
-    }
-    else if (window.location.pathname == "/materialdata") {
+    } else if (window.location.pathname == "/materialdata") {
       setHeader("Material Data");
-    }
-    else if (window.location.pathname == "/blogdetails") {
+    } else if (window.location.pathname == "/blogdetails") {
       setHeader("Blog Details");
-    }
-    else if (window.location.pathname == "/news") {
+    } else if (window.location.pathname == "/news") {
       setHeader("News");
-    }
-    else if (window.location.pathname == "/events") {
+    } else if (window.location.pathname == "/events") {
       setHeader("Events");
-    }
-    else if (window.location.pathname == "/contactsalesperson") {
+    } else if (window.location.pathname == "/contactsalesperson") {
       setHeader("Contact Sales Person");
-    }
-    else if (window.location.pathname == "/office") {
+    } else if (window.location.pathname == "/office") {
       setHeader("Our Offices");
-    }
-    else if (window.location.pathname == "/carousalform") {
+    } else if (window.location.pathname == "/carousalform") {
       setHeader("User Data");
-    }
-    else if (window.location.pathname == "/requestcallbackform") {
+    } else if (window.location.pathname == "/requestcallbackform") {
       setHeader("Request Callback Form");
-    }
-    else if (window.location.pathname == "/office") {
+    } else if (window.location.pathname == "/office") {
       setHeader("Our Offices");
-    }
-    else if (window.location.pathname == "/getintouch") {
+    } else if (window.location.pathname == "/getintouch") {
       setHeader("Get In Touch");
-    }
-    else if (window.location.pathname == "/subscribe") {
+    } else if (window.location.pathname == "/subscribe") {
       setHeader("Subscribe");
-    }
-    else if (window.location.pathname == "/uploadcv") {
+    } else if (window.location.pathname == "/uploadcv") {
       setHeader("Cv List");
-    }
-    else if (window.location.pathname == "/applicationdata") {
+    } else if (window.location.pathname == "/applicationdata") {
       setHeader("Application Data");
-    }
+    }else if (window.location.pathname == "/productimages") {
+    setHeader("Product Images");
+  }
+    
   }, [window.location.pathname]);
   return (
     <section className="content-area-top bg-white p-3 mb-3">
@@ -161,6 +151,9 @@ const AreaTop = () => {
 };
 
 export default AreaTop;
+
+
+
 
 
 
