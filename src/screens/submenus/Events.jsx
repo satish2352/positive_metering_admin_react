@@ -457,6 +457,7 @@ const Events = () => {
                 onChangeRowsPerPage={(rowsPerPage) =>
                   setRowsPerPage(rowsPerPage)
                 }
+                
               />
             ) : (
               <Form onSubmit={handleSubmit}>

@@ -53,21 +53,7 @@ const ProductDetails = () => {
       name: <CustomHeader name="Sr. No." />,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
     },
-    {
-      name: <CustomHeader name="Image" />,
-      cell: (row) => 
-        (
-        <img
-          src={row.images[0].img}
-          alt="ProductDetails"
-          style={{ width: "100px", height: "auto" }}
-        />
-      ),
-    },
-
-
-
-  
+   
     {
       name: <CustomHeader name="Product Name" />,
       cell: (row) => <span>{row.productName}</span>,
@@ -106,19 +92,7 @@ const ProductDetails = () => {
 
 
 
-  // useEffect(() => {
-  //   if (formData.img && formData.img instanceof File) {
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       setImagePreview(reader.result);
-  //     };
-  //     reader.readAsDataURL(formData.img);
-  //   } else if (formData.img && typeof formData.img === "string") {
-  //     setImagePreview(formData.img);
-  //   } else {
-  //     setImagePreview("");
-  //   }
-  // }, [formData.img]);
+
 
   const fetchTeam = async () => {
     setLoading(true);
@@ -147,15 +121,7 @@ const ProductDetails = () => {
     let errors = {};
     let isValid = true;
 
-    if (!formData.img) {
-      // errors.img = "Image is required with 612x408 pixels";
-      errors.img = "Image is required ";
-      isValid = false;
-    } 
-    // else if (formData.img instanceof File && !validateImageSize(formData.img)) {
-    //   errors.img = "Image is not 612x408 pixels";
-    //   isValid = false;
-    // }
+
     if (!formData.productName?.trim()) {
       errors.productName = "Product Name is required";
       isValid = false;
@@ -174,47 +140,6 @@ const ProductDetails = () => {
     setErrors(errors);
     return isValid;
   };
-
-  // const validateImageSize = (file) => {
-  //   return new Promise((resolve, reject) => {
-  //     const img = new Image();
-  //     img.onload = () => {
-  //       if (img.width === 612 && img.height === 408) {
-  //         resolve();
-  //       } else {
-  //         reject("Image must be 612x408 pixels");
-  //       }
-  //     };
-  //     img.onerror = () => reject("Error loading image");
-  //     img.src = URL.createObjectURL(file);
-  //   });
-  // };
-
-  // const handleChange = async (name, value) => {
-  //   if (name === "img" && value instanceof File) {
-  //     try {
-  //       await validateImageSize(value);
-  //       setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-  //       setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
-  //     } catch (error) {
-  //       setErrors((prevErrors) => ({ ...prevErrors, img: error }));
-  //       setImagePreview("");
-  //     }
-  //   } else if (name === "application") {
-  //     const charLimit = 1000; // Set your character limit here
-  //     if (value.length > charLimit) {
-  //       setErrors((prevErrors) => ({
-  //         ...prevErrors,
-  //         application: `Character limit of ${charLimit} exceeded`,
-  //       }));
-  //     } else {
-  //       setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-  //       setErrors((prevErrors) => ({ ...prevErrors, application: "" }));
-  //     }
-  //   } else {
-  //     setFormData({ ...formData, [name]: value });
-  //   }
-  // };
 
 
 
@@ -250,7 +175,7 @@ const ProductDetails = () => {
           await instance.put(`productdetails/update-productdetails/${editingId}`, data, {
             headers: {
               Authorization: "Bearer " + accessToken,
-              "Content-Type": "multipart/form-data",
+              "Content-Type": "application/json",
             },
           });
           toast.success("Data Updated Successfully");
@@ -262,7 +187,7 @@ const ProductDetails = () => {
           await instance.post("productdetails/create-productdetails", data, {
             headers: {
               Authorization: "Bearer " + accessToken,
-              "Content-Type": "multipart/form-data",
+              "Content-Type": "application/json",
             },
           });
           toast.success("Data Submitted Successfully");
@@ -415,14 +340,12 @@ const ProductDetails = () => {
 
 
   const toggleEdit = (id) => {
-    setEditMode(true);
+    const selectedMember = team.find((member) => member.id === id);
     setEditingId(id);
-    const memberToEdit = team.find((member) => member.id === id);
-    setFormData({ ...memberToEdit });
-    setImagePreview(memberToEdit.images[0].img); // Set the image preview to the existing image URL
-    setShowTable(false); // Hide the table and show the form in edit mode
+    setFormData(selectedMember);
+    setEditMode(true);
+    setShowTable(false); 
   };
-
   const handleAdd = () => {
     setFormData({});
     setEditMode(false);
@@ -495,34 +418,23 @@ const ProductDetails = () => {
                 onChangeRowsPerPage={(rowsPerPage) =>
                   setRowsPerPage(rowsPerPage)
                 }
+                customStyles={{
+                    rows: {
+                      style: {
+                        alignItems: "flex-start", // Aligns text to the top-left corner
+                      },
+                    },
+                    cells: {
+                      style: {
+                        textAlign: "left", // Ensures text is aligned to the left
+                      },
+                    },
+                  }}
               />
             ) : (
               <Form onSubmit={handleSubmit}>
                 <Row>
-                <Col md={12}>
-                    {imagePreview && (
-                      <img
-                        src={imagePreview}
-                        alt="Selected Preview"
-                        style={{
-                          width: "100px",
-                          height: "auto",
-                          marginBottom: "10px",
-                        }}
-                      />
-                    )}
-
-                    <NewReusableForm
-                      label={"Upload Product Image"}
-                      placeholder={"Upload Image"}
-                      name={"img"}
-                      type={"file"}
-                      onChange={handleChange}
-                      initialData={formData}
-                      error={errors.img}
-                      // imageDimensiion="Image must be 612*408 pixels" 
-                    />
-                  </Col>
+     
                   <Col md={6}>
                     <NewReusableForm
                       label="Product Name"

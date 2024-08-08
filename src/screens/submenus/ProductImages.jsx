@@ -19,8 +19,8 @@ import instance from "../../api/AxiosInstance";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import { ThreeDots  } from 'react-loader-spinner'; 
-import { Tooltip, OverlayTrigger,  } from 'react-bootstrap';
+import { ThreeDots } from "react-loader-spinner";
+import { Tooltip, OverlayTrigger } from "react-bootstrap";
 import "../../App.scss";
 const ProductImages = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
@@ -32,18 +32,17 @@ const ProductImages = () => {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({});
   const [eyeVisibilityById, setEyeVisibilityById] = useState({});
-  const [imagePreview, setImagePreview] = useState("");
+  const [imagePreviews, setimagePreviews] = useState("");
   const [showTable, setShowTable] = useState(true); // New state for toggling form and table view
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState([]); // New state for product names
   const CustomHeader = ({ name }) => (
     <div style={{ fontWeight: "bold", color: "black", fontSize: "16px" }}>
       {name}
     </div>
   );
-
-
 
   const tableColumns = (currentPage, rowsPerPage) => [
     {
@@ -55,19 +54,38 @@ const ProductImages = () => {
       cell: (row) => (
         <img
           src={row.img}
-          alt="Event"
+          alt="ProductImages"
           style={{ width: "100px", height: "auto" }}
         />
       ),
     },
+
+    // {
+    //   name: <CustomHeader name="Images" />,
+    //   cell: (row) =>
+    //     Array.isArray(row.img) ? (
+    //       row.img.map((imageSrc, index) => (
+    //         <img
+    //           key={index}
+    //           src={imageSrc}
+    //           alt="ProductImages"
+    //           style={{ width: "100px", height: "auto", marginRight: "5px" }}
+    //         />
+    //       ))
+    //     ) : (
+    //       <img
+    //         src={row.img} // Assuming row.img is a single image URL if it's not an array
+    //         alt="ProductImage"
+    //         style={{ width: "100px", height: "auto" }}
+    //       />
+    //     ),
+    // },
+
     {
       name: <CustomHeader name="Product Name" />,
       cell: (row) => <span>{row.productName}</span>,
     },
-    {
-      name: <CustomHeader name="Application" />,
-      cell: (row) => <span>{row.application}</span>,
-    },
+
     {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
@@ -78,43 +96,65 @@ const ProductImages = () => {
           <Button className="ms-1" onClick={() => handleDelete(row.id)}>
             <FaTrash />
           </Button>
-          <Button
-            className="ms-1"
-            onClick={() => handleIsActive(row.id, !eyeVisibilityById[row.id])}
-          >
-            {eyeVisibilityById[row.id] ? <FaEyeSlash /> : <FaEye />}
-          </Button>
+
         </div>
-  
       ),
     },
-
- 
   ];
 
   useEffect(() => {
     fetchTeam();
+    fetchProducts();
+
   }, []);
 
   useEffect(() => {
     if (formData.img && formData.img instanceof File) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result);
+        setimagePreviews(reader.result);
       };
       reader.readAsDataURL(formData.img);
     } else if (formData.img && typeof formData.img === "string") {
-      setImagePreview(formData.img);
+
+      setimagePreviews(formData.img);
     } else {
-      setImagePreview("");
+      setimagePreviews("");
     }
   }, [formData.img]);
+
+  // useEffect(() => {
+  //   if (formData.img) {
+  //     // If formData.img is an array
+  //     if (Array.isArray(formData.img)) {
+  //       const previews = formData.img.map((file) => {
+  //         if (file instanceof File) {
+  //           return URL.createObjectURL(file);
+  //         } else if (typeof file === "string") {
+  //           return file;
+  //         }
+  //         return "";
+  //       });
+  //       setimagePreviews(previews);
+  //     }
+
+  //     else if (typeof formData.img === "string") {
+  //       setimagePreviews([formData.img]);
+  //     }
+
+  //     else {
+  //       setimagePreviews([]);
+  //     }
+  //   } else {
+  //     setimagePreviews([]);
+  //   }
+  // }, [formData.img]);
 
   const fetchTeam = async () => {
     setLoading(true);
     const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
     try {
-      const response = await instance.get("productImages/get-productImages", {
+      const response = await instance.get("productImages/get-productimages", {
         headers: {
           Authorization: "Bearer " + accessToken,
           "Content-Type": "application/json",
@@ -128,8 +168,23 @@ const ProductImages = () => {
         "Error fetching team:",
         error.response || error.message || error
       );
-    }    finally {
+    } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchProducts = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    try {
+      const response = await instance.get("productdetails/get-productnames", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      setProducts(response.data.responseData);
+    } catch (error) {
+      console.error("Error fetching products:", error);
     }
   };
 
@@ -138,24 +193,17 @@ const ProductImages = () => {
     let isValid = true;
 
     if (!formData.img) {
-      errors.img = "Image is required with 612x408 pixels";
+      errors.img = "Image is required with 500x500 pixels";
       isValid = false;
-    } else if (formData.img instanceof File && !validateImageSize(formData.img)) {
-      errors.img = "Image is not 612x408 pixels";
+    } else if (
+      formData.img instanceof File &&
+      !validateImageSize(formData.img)
+    ) {
+      errors.img = "Image is not 500x500 pixels";
       isValid = false;
     }
     if (!formData.productName?.trim()) {
       errors.productName = "Product Name is required";
-      isValid = false;
-    }
-
-  
-
-    if (!formData.application?.trim()) {
-      errors.application = "Product Description is required";
-      isValid = false;
-    } else if (formData.application.length > 1000) {
-      errors.application = "Product Description must be 1000 characters or less";
       isValid = false;
     }
 
@@ -167,10 +215,10 @@ const ProductImages = () => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        if (img.width === 612 && img.height === 408) {
+        if (img.width === 500 && img.height === 500) {
           resolve();
         } else {
-          reject("Image must be 612x408 pixels");
+          reject("Image must be 500x500 pixels");
         }
       };
       img.onerror = () => reject("Error loading image");
@@ -186,24 +234,30 @@ const ProductImages = () => {
         setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
       } catch (error) {
         setErrors((prevErrors) => ({ ...prevErrors, img: error }));
-        setImagePreview("");
-      }
-    } else if (name === "application") {
-      const charLimit = 1000; // Set your character limit here
-      if (value.length > charLimit) {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          application: `Character limit of ${charLimit} exceeded`,
-        }));
-      } else {
-        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-        setErrors((prevErrors) => ({ ...prevErrors, application: "" }));
+        setimagePreviews("");
       }
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
-
+  // const handleChange = async (name, value) => {
+  //   if (name === "img" && value instanceof File) {
+  //     try {
+  //       await validateImageSize(value);
+  //       setFormData((prevFormData) => ({
+  //         ...prevFormData,
+  //         img: [...(prevFormData.img || []), value],
+  //       }));
+  //     } catch (error) {
+  //       setErrors((prevErrors) => ({ ...prevErrors, img: error }));
+  //     }
+  //   } else {
+  //     setFormData((prevFormData) => ({
+  //       ...prevFormData,
+  //       [name]: value,
+  //     }));
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -217,12 +271,16 @@ const ProductImages = () => {
 
       try {
         if (editMode) {
-          await instance.put(`productImages/update-productimage/${editingId}`, data, {
-            headers: {
-              Authorization: "Bearer " + accessToken,
-              "Content-Type": "multipart/form-data",
-            },
-          });
+          await instance.put(
+            `productImages/update-productimage/${editingId}`,
+            data,
+            {
+              headers: {
+                Authorization: "Bearer " + accessToken,
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
           toast.success("Data Updated Successfully");
           const updatedTeam = team.map((member) =>
             member.id === editingId ? formData : member
@@ -241,7 +299,7 @@ const ProductImages = () => {
 
         setEditMode(false);
         setFormData({});
-        setImagePreview("");
+        setimagePreviews("");
         setShowTable(true); // Switch back to table view after submission
       } catch (error) {
         console.error("Error handling form submission:", error);
@@ -284,20 +342,23 @@ const ProductImages = () => {
                 setLoading(true);
                 const accessToken = localStorage.getItem("accessToken");
                 try {
-                  await instance.delete(`productImages/delete-productimage/${id}`, {
-                    headers: {
-                      Authorization: `Bearer ${accessToken}`,
-                      "Content-Type": "application/json",
-                    },
-                  });
+                  await instance.delete(
+                    `productImages/delete-productimage/${id}`,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        "Content-Type": "application/json",
+                      },
+                    }
+                  );
                   toast.success("Data Deleted Successfully");
                   fetchTeam();
                 } catch (error) {
                   console.error("Error deleting data:", error);
                   toast.error("Error deleting data");
                 } finally {
-        setLoading(false); 
-      }
+                  setLoading(false);
+                }
                 onClose();
               }}
             >
@@ -367,8 +428,8 @@ const ProductImages = () => {
                   console.error("Error updating visibility:", error);
                   toast.error("Error updating visibility");
                 } finally {
-        setLoading(false); // Set loading to false
-      }
+                  setLoading(false); // Set loading to false
+                }
                 onClose();
               }}
             >
@@ -404,136 +465,137 @@ const ProductImages = () => {
   };
 
   return (
-  
-
     <Container fluid>
-    <Row>
-      <Col>
-        <Card>
-          <Card.Header>
-            <Row>
-              {showTable ? (
-                <Col className="d-flex justify-content-end align-items-center">
-                <SearchInput
-              searchQuery={searchQuery}
-              onSearch={handleSearch}
-      
-              showExportButton={false}
-            />
-                  <Button
-                    variant="outline-success"
-                    onClick={handleAdd}
-                    className="ms-2 mb-3"
-                  >
-                    Add
-                  </Button>
-                </Col>
-              ) : (
-                <Col className="d-flex justify-content-end align-items-center">
-                  <Button   variant="outline-secondary" onClick={handleView}>
-                    View
-                  </Button>
-                </Col>
-              )}
-            </Row>
-          </Card.Header>
-
-          <Card.Body>
-            {loading ? ( // Check loading state
-              <div className="d-flex justify-content-center align-items-center" style={{ height: '100px' }}>
-                <ThreeDots  
-                  height="80"
-                  width="80"
-                  radius="9"
-                  color="#000"
-                  ariaLabel="three-dots-loading"
-            
-                  visible={true}
-                />
-              </div>
-            ) : showTable ? (
-              <DataTable
-                columns={tableColumns(currentPage, rowsPerPage)}
-                data={filteredData.length > 0 ? filteredData : team}
-                pagination
-                responsive
-                striped
-                noDataComponent="No Data Available"
-                onChangePage={(page) => setCurrentPage(page)}
-                onChangeRowsPerPage={(rowsPerPage) =>
-                  setRowsPerPage(rowsPerPage)
-                }
-              />
-            ) : (
-              <Form onSubmit={handleSubmit}>
-                <Row>
-                <Col md={12}>
-                    {imagePreview && (
-                      <img
-                        src={imagePreview}
-                        alt="Selected Preview"
-                        style={{
-                          width: "100px",
-                          height: "auto",
-                          marginBottom: "10px",
-                        }}
-                      />
-                    )}
-
-                    <NewReusableForm
-                      label={"Upload Product Image"}
-                      placeholder={"Upload Image"}
-                      name={"img"}
-                      type={"file"}
-                      onChange={handleChange}
-                      initialData={formData}
-                      error={errors.img}
-                      imageDimensiion="Image must be 612*408 pixels" 
+      <Row>
+        <Col>
+          <Card>
+            <Card.Header>
+              <Row>
+                {showTable ? (
+                  <Col className="d-flex justify-content-end align-items-center">
+                    <SearchInput
+                      searchQuery={searchQuery}
+                      onSearch={handleSearch}
+                      showExportButton={false}
                     />
-                  </Col>
-                  <Col md={6}>
-                    <NewReusableForm
-                      label="Product Name"
-                      placeholder="Enter Product Name"
-                      name="productName"
-                      type="text"
-                      onChange={handleChange}
-                      initialData={formData}
-                      error={errors.productName}
-                    />
-                  </Col>
-                  <Col md={12}>
-                    <NewReusableForm
-                      label="Product Description"
-                      placeholder="Enter Application"
-                      name="application"
-                      type="text"
-                      onChange={handleChange}
-                      initialData={formData}
-                      textarea
-                      useJodit={true}
-                      error={errors.application}
-                      charLimit={1000}
-                    />
-                  </Col>
-                </Row>
-                <Row>
-                  <div className="mt-3 d-flex justify-content-end">
                     <Button
-                      type="submit"
-                      variant={editMode ? "success" : "primary"}
+                      variant="outline-success"
+                      onClick={handleAdd}
+                      className="ms-2 mb-3"
                     >
-                      {editMode ? "Update" : "Submit"}
+                      Add
                     </Button>
-                  </div>
-                </Row>
-              </Form>
-            )}
-          </Card.Body>
-        </Card>
-      </Col>
-    </Row>
-  </Container>
+                  </Col>
+                ) : (
+                  <Col className="d-flex justify-content-end align-items-center">
+                    <Button variant="outline-secondary" onClick={handleView}>
+                      View
+                    </Button>
+                  </Col>
+                )}
+              </Row>
+            </Card.Header>
+
+            <Card.Body>
+              {loading ? ( // Check loading state
+                <div
+                  className="d-flex justify-content-center align-items-center"
+                  style={{ height: "100px" }}
+                >
+                  <ThreeDots
+                    height="80"
+                    width="80"
+                    radius="9"
+                    color="#000"
+                    ariaLabel="three-dots-loading"
+                    visible={true}
+                  />
+                </div>
+              ) : showTable ? (
+                <DataTable
+                  columns={tableColumns(currentPage, rowsPerPage)}
+                  data={filteredData.length > 0 ? filteredData : team}
+                  pagination
+                  responsive
+                  striped
+                  noDataComponent="No Data Available"
+                  onChangePage={(page) => setCurrentPage(page)}
+                  onChangeRowsPerPage={(rowsPerPage) =>
+                    setRowsPerPage(rowsPerPage)
+                  }
+                />
+              ) : (
+                <Form onSubmit={handleSubmit}>
+                  <Row>
+                   
+                    <Col md={6}>
+                      <Form.Group controlId="productName">
+                        <Form.Label>Product Name</Form.Label>
+                        <Form.Control
+                          as="select"
+                          value={formData.productName || ""}
+                          onChange={(e) =>
+                            handleChange("productName", e.target.value)
+                          }
+                          isInvalid={!!errors.productName}
+                        >
+                          <option value="">Select Product Name</option>
+                          {products.map((product) => (
+                            <option
+                              key={product.id}
+                              value={product.productName}
+                            >
+                              {product.productName}
+                            </option>
+                          ))}
+                        </Form.Control>
+                        <Form.Control.Feedback type="invalid">
+                          {errors.productName}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                    </Col>
+                    <Col md={12}>
+                      {imagePreviews && (
+                        <img
+                          src={imagePreviews}
+                          alt="Selected Preview"
+                          style={{
+                            width: "100px",
+                            height: "auto",
+                            marginBottom: "10px",
+                          }}
+                        />
+                      )}
+
+                      <NewReusableForm
+                        label={"Upload Product Image"}
+                        placeholder={"Upload Image"}
+                        name={"img"}
+                        type={"file"}
+                        onChange={handleChange}
+                        initialData={formData}
+                        error={errors.img}
+                        imageDimensiion="Image must be 500*500 pixels"
+                      />
+                    </Col>
+                  </Row>
+                  <Row>
+                    <div className="mt-3 d-flex justify-content-end">
+                      <Button
+                        type="submit"
+                        variant={editMode ? "success" : "primary"}
+                      >
+                        {editMode ? "Update" : "Submit"}
+                      </Button>
+                    </div>
+                  </Row>
+                </Form>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

@@ -597,6 +597,7 @@ const ContactSalesPerson = () => {
     {
       name: <CustomHeader name="Sr. No." />,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
+      width:"150px"
     },
     {
       name: <CustomHeader name="Image" />,
@@ -1026,6 +1027,18 @@ const ContactSalesPerson = () => {
                 onChangeRowsPerPage={(rowsPerPage) =>
                   setRowsPerPage(rowsPerPage)
                 }
+                customStyles={{
+                    rows: {
+                      style: {
+                        alignItems: "flex-start", // Aligns text to the top-left corner
+                      },
+                    },
+                    cells: {
+                      style: {
+                        textAlign: "left", // Ensures text is aligned to the left
+                      },
+                    },
+                  }}
               />
             ) : (
               <Form onSubmit={handleSubmit}>
@@ -1073,7 +1086,7 @@ const ContactSalesPerson = () => {
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
-                      label="person_name"
+                      label="Person Name"
                       placeholder="Enter person name"
                       name="person_name"
                       type="text"
@@ -1086,8 +1099,8 @@ const ContactSalesPerson = () => {
                   </Col>
                   <Col md={6}>
                     <NewResuableForm
-                      label="Phone"
-                      placeholder="Enter Phone"
+                      label="Phone No"
+                      placeholder="Enter Phone No"
                       type="number"
                       name="phone"
                       onChange={handleChange}
@@ -1099,7 +1112,7 @@ const ContactSalesPerson = () => {
                   <Col md={6}>
                     <NewResuableForm
                       label="Email"
-                      placeholder="Enter Email"
+                      placeholder="Enter Email address"
                       type="email"
                       name="email"
                       onChange={handleChange}

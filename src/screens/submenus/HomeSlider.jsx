@@ -320,15 +320,15 @@
 //       ),
 //     });
 //   };
-//   const toggleEdit = (leaderId) => {
-//     const memberToEdit = team.find((item) => item.id === leaderId);
-//     if (memberToEdit) {
-//       setEditingId(leaderId);
-//       setEditMode(true);
-//       toggleShows(); 
-//       setFormData(memberToEdit);
-//     }
-//   };
+  const toggleEdit = (leaderId) => {
+    const memberToEdit = team.find((item) => item.id === leaderId);
+    if (memberToEdit) {
+      setEditingId(leaderId);
+      setEditMode(true);
+      toggleShows(); 
+      setFormData(memberToEdit);
+    }
+  };
 
 
 

@@ -557,15 +557,15 @@ const ApplicationData = () => {
           <Button className="ms-1" onClick={() => toggleEdit(row.id)}>
             <FaEdit />
           </Button>
-          {/* <Button className="ms-1" onClick={() => handleDelete(row.id)}>
+          <Button className="ms-1" onClick={() => handleDelete(row.id)}>
             <FaTrash />
           </Button>
-          <Button
+          {/* <Button
             className="ms-1"
             onClick={() => handleIsActive(row.id, !eyeVisibilityById[row.id])}
           >
             {eyeVisibilityById[row.id] ? <FaEyeSlash /> : <FaEye />}
-          </Button> */}
+          </Button>  */}
         </div>
   
       ),
@@ -666,7 +666,7 @@ const ApplicationData = () => {
           await instance.put(`applicationData/update-applicationData/${editingId}`, data, {
             headers: {
               Authorization: "Bearer " + accessToken,
-              "Content-Type": "multipart/form-data",
+              "Content-Type": "application/json",
             },
           });
           toast.success("Data Updated Successfully");
@@ -678,7 +678,7 @@ const ApplicationData = () => {
           await instance.post("applicationData/create-applicationData", data, {
             headers: {
               Authorization: "Bearer " + accessToken,
-              "Content-Type": "multipart/form-data",
+              "Content-Type": "application/json",
             },
           });
           toast.success("Data Submitted Successfully");
@@ -908,6 +908,18 @@ const ApplicationData = () => {
                 onChangeRowsPerPage={(rowsPerPage) =>
                   setRowsPerPage(rowsPerPage)
                 }
+                customStyles={{
+                    rows: {
+                      style: {
+                        alignItems: "flex-start", // Aligns text to the top-left corner
+                      },
+                    },
+                    cells: {
+                      style: {
+                        textAlign: "left", // Ensures text is aligned to the left
+                      },
+                    },
+                  }}
               />
             ) : (
               <Form onSubmit={handleSubmit}>

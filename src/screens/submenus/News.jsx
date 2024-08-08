@@ -971,6 +971,18 @@ const Events = () => {
                 onChangeRowsPerPage={(rowsPerPage) =>
                   setRowsPerPage(rowsPerPage)
                 }
+                customStyles={{
+                    rows: {
+                      style: {
+                        alignItems: "flex-start", // Aligns text to the top-left corner
+                      },
+                    },
+                    cells: {
+                      style: {
+                        textAlign: "left", // Ensures text is aligned to the left
+                      },
+                    },
+                  }}
               />
             ) : (
               <Form onSubmit={handleSubmit}>
