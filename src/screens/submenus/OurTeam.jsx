@@ -54,16 +54,7 @@ const OurTeam = () => {
       name: <CustomHeader name="Sr. No." />,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
     },
-    {
-      name: <CustomHeader name="Image" />,
-      cell: (row) => (
-        <img
-          src={row.img}
-          alt="OurTeam"
-          style={{ width: "100px", height: "auto" }}
-        />
-      ),
-    },
+
 
     {
       name: <CustomHeader name="Designation" />,
@@ -76,6 +67,16 @@ const OurTeam = () => {
     {
       name: <CustomHeader name="Position No" />,
       cell: (row) => <span>{row.position_no}</span>,
+    },
+    {
+      name: <CustomHeader name="Image" />,
+      cell: (row) => (
+        <img
+          src={row.img}
+          alt="OurTeam"
+          style={{ width: "100px", height: "auto" }}
+        />
+      ),
     },
     {
       name: <CustomHeader name="Actions" />,

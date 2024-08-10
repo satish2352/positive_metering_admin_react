@@ -599,16 +599,7 @@ const ContactSalesPerson = () => {
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
       width:"150px"
     },
-    {
-      name: <CustomHeader name="Image" />,
-      cell: (row) => (
-        <img
-          src={row.img}
-          alt="ContactSalesPerson"
-          style={{ width: "100px", height: "auto" }}
-        />
-      ),
-    },
+  
     {
       name: <CustomHeader name="Title" />,
       cell: (row) => <span>{row.title}</span>,
@@ -624,6 +615,16 @@ const ContactSalesPerson = () => {
     {
       name: <CustomHeader name="Email" />,
       cell: (row) => <span>{row.email}</span>,
+    },
+    {
+      name: <CustomHeader name="Image" />,
+      cell: (row) => (
+        <img
+          src={row.img}
+          alt="ContactSalesPerson"
+          style={{ width: "100px", height: "auto" }}
+        />
+      ),
     },
     {
       name: <CustomHeader name="Actions" />,
