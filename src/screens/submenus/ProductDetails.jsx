@@ -132,10 +132,8 @@ const ProductDetails = () => {
     if (!formData.application?.trim()) {
       errors.application = "Product Description is required";
       isValid = false;
-    } else if (formData.application.length > 1000) {
-      errors.application = "Product Description must be 1000 characters or less";
-      isValid = false;
-    }
+    } 
+  
 
     setErrors(errors);
     return isValid;
@@ -143,21 +141,26 @@ const ProductDetails = () => {
 
 
 
+  // const handleChange = (name, value) => {
+  //   if (name === "application") {
+  //     const charLimit = 1000; // Set your character limit here
+  //     if (value.length > charLimit) {
+  //       setErrors((prevErrors) => ({
+  //         ...prevErrors,
+  //         application: `Character limit of ${charLimit} exceeded`,
+  //       }));
+  //     } else {
+  //       setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+  //       setErrors((prevErrors) => ({ ...prevErrors, application: "" }));
+  //     }
+  //   } else {
+  //     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+  //   }
+  // };
+
+
   const handleChange = (name, value) => {
-    if (name === "application") {
-      const charLimit = 1000; // Set your character limit here
-      if (value.length > charLimit) {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          application: `Character limit of ${charLimit} exceeded`,
-        }));
-      } else {
-        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-        setErrors((prevErrors) => ({ ...prevErrors, application: "" }));
-      }
-    } else {
-      setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    }
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -239,7 +242,7 @@ const ProductDetails = () => {
                 setLoading(true);
                 const accessToken = localStorage.getItem("accessToken");
                 try {
-                  await instance.delete(`productdetails/isdelete-productdetails/${id}`, {
+                  await instance.delete(`productAggregate/delete-products/${id}`, {
                     headers: {
                       Authorization: `Bearer ${accessToken}`,
                       "Content-Type": "application/json",
@@ -457,7 +460,7 @@ const ProductDetails = () => {
                       textarea
                       useJodit={true}
                       error={errors.application}
-                      charLimit={1000}
+                      // charLimit={1000}
                     />
                   </Col>
                 </Row>

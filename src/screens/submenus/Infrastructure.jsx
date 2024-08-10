@@ -716,10 +716,11 @@ const Infrastructure = () => {
     if (!formData.desc?.trim()) {
       errors.desc = "Description is required";
       isValid = false;
-    } else if (formData.desc.length > 1000) {
-      errors.desc = "Description must be 1000 characters or less";
-      isValid = false;
-    }
+    } 
+    // else if (formData.desc.length > 1000) {
+    //   errors.desc = "Description must be 1000 characters or less";
+    //   isValid = false;
+    // }
 
     setErrors(errors);
     return isValid;
@@ -752,19 +753,9 @@ const Infrastructure = () => {
         setErrors((prevErrors) => ({ ...prevErrors, img: error }));
         setImagePreview("");
       }
-    } else if (name === "desc") {
-      const charLimit = 1000; // Set your character limit here
-      if (value.length > charLimit) {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          desc: `Character limit of ${charLimit} exceeded`,
-        }));
-      } else {
-        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-        setErrors((prevErrors) => ({ ...prevErrors, desc: "" }));
-      }
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
     }
   };
 
@@ -1088,7 +1079,7 @@ const Infrastructure = () => {
                       initialData={formData}
                       textarea
                       error={errors.desc}
-                      charLimit={1000}
+                      // charLimit={1000}
                     />
                   </Col>
                 </Row>

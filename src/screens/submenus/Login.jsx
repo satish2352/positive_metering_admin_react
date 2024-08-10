@@ -1,6 +1,4 @@
 
-
-// ////style a1 image and row not in row
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Card, Image } from "react-bootstrap";
 import instance from "../../api/AxiosInstance";
@@ -9,13 +7,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaLock } from 'react-icons/fa';
 import logo from "../../assets/images/logo.png";
+import { ThreeDots } from 'react-loader-spinner';
+
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  
   const [loading, setLoading] = useState(false);
+
   const validateForm = () => {
     let errors = {};
     let isValid = true;
@@ -41,6 +41,7 @@ const Login = () => {
     e.preventDefault();
 
     if (validateForm()) {
+      setLoading(true);
       try {
         const response = await instance.post(
           `/auth/login`,
@@ -64,6 +65,8 @@ const Login = () => {
       } catch (error) {
         console.error("Error handling form submission:", error);
         toast.error("Error in Submit");
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -71,7 +74,7 @@ const Login = () => {
   return (
     <Container className="d-flex flex-column align-items-center justify-content-center min-vh-100 bg-light">
       <Row className="w-100 justify-content-center">
-        <Col xs={12} md={8} lg={6}>
+        <Col xs={4} md={4} lg={4}>
           <Card className="shadow-lg border-0 rounded-3">
             <Card.Body className="p-5 bg-white">
               <Row className="align-items-center mb-4">
@@ -82,56 +85,71 @@ const Login = () => {
                   <h3 className="text-center text-primary font-weight-bold">POSITIVE METERING PUMPS PVT LTD</h3>
                 </Col>
               </Row>
-              <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="formBasicEmail" className="mb-4">
-                  <Form.Label className="d-flex align-items-center">
-                    <FaUser className="me-2 text-secondary" />
-                    Email address
-                  </Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Enter email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="bg-light border-0 shadow-sm rounded-pill px-3"
-                  />
-                  {errors.email && (
-                    <span className="text-danger">{errors.email}</span>
-                  )}
-                </Form.Group>
 
-                <Form.Group controlId="formBasicPassword" className="mb-4">
-                  <Form.Label className="d-flex align-items-center">
-                    <FaLock className="me-2 text-secondary" />
-                    Password
-                  </Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="bg-light border-0 shadow-sm rounded-pill px-3"
+              {loading ? (
+                <div className="d-flex justify-content-center align-items-center">
+                  <ThreeDots
+                    height="80"
+                    width="80"
+                    radius="9"
+                    color="#007bff"
+                    ariaLabel="three-dots-loading"
+                    visible={true}
                   />
-                  {errors.password && (
-                    <span className="text-danger">{errors.password}</span>
-                  )}
-                </Form.Group>
+                </div>
+              ) : (
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group controlId="formBasicEmail" className="mb-4">
+                    <Form.Label className="d-flex align-items-center">
+                      <FaUser className="me-2 text-secondary" />
+                      Email address
+                    </Form.Label>
+                    <Form.Control
+                      type="email"
+                      placeholder="Enter email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="bg-light border-0 shadow-sm rounded-pill px-3"
+                    />
+                    {errors.email && (
+                      <span className="text-danger">{errors.email}</span>
+                    )}
+                  </Form.Group>
 
-                <Row className="justify-content-center">
-                  <Col xs="auto">
-                    <Button
-                      variant="primary"
-                      type="submit"
-                      className="mt-4 py-2 px-5 rounded-pill shadow-lg"
-                      style={{ backgroundColor: "#007bff", border: "none" }}
-                    >
-                      Login
-                    </Button>
-                  </Col>
-                </Row>
-              </Form>
+                  <Form.Group controlId="formBasicPassword" className="mb-4">
+                    <Form.Label className="d-flex align-items-center">
+                      <FaLock className="me-2 text-secondary" />
+                      Password
+                    </Form.Label>
+                    <Form.Control
+                      type="password"
+                      placeholder="Password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="bg-light border-0 shadow-sm rounded-pill px-3"
+                    />
+                    {errors.password && (
+                      <span className="text-danger">{errors.password}</span>
+                    )}
+                  </Form.Group>
+
+                  <Row className="justify-content-center">
+                    <Col xs="auto">
+                      <Button
+                        variant="primary"
+                        type="submit"
+                        className="mt-4 py-2 px-5 rounded-pill shadow-lg"
+                        style={{ backgroundColor: "#007bff", border: "none" }}
+                        disabled={loading}
+                      >
+                        Login
+                      </Button>
+                    </Col>
+                  </Row>
+                </Form>
+              )}
             </Card.Body>
           </Card>
         </Col>
@@ -141,8 +159,3 @@ const Login = () => {
 };
 
 export default Login;
-
-
-
-
-

@@ -134,10 +134,7 @@ const Testimonial = () => {
     let errors = {};
     let isValid = true;
 
-    // if (!formData.review?.trim()) {
-    //   errors.review = "Review is required";
-    //   isValid = false;
-    // }
+
     if (!formData.review?.trim()) {
       errors.review = "Review is required";
       isValid = false;
