@@ -630,18 +630,23 @@ const ContactSalesPerson = () => {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
         <div className="d-flex">
-          <Button className="ms-1" onClick={() => toggleEdit(row.id)}>
+          <Button className="ms-1"  onClick={() => toggleEdit(row.id)}>
             <FaEdit />
           </Button>
-          <Button className="ms-1" onClick={() => handleDelete(row.id)}>
+          <Button className="ms-1" style={{backgroundColor:"red",color:"white",borderColor:"red"}} onClick={() => handleDelete(row.id)}>
             <FaTrash />
           </Button>
           <Button
-            className="ms-1"
-            onClick={() => handleIsActive(row.id, !eyeVisibilityById[row.id])}
-          >
-            {eyeVisibilityById[row.id] ? <FaEyeSlash /> : <FaEye />}
-          </Button>
+  className="ms-1"
+  style={{
+    backgroundColor: eyeVisibilityById[row.id] ? 'red' : 'green',
+    borderColor: eyeVisibilityById[row.id] ? 'red' : 'green',
+    color: 'white', // This ensures the icon color contrasts well with the background
+  }}
+  onClick={() => handleIsActive(row.id, !eyeVisibilityById[row.id])}
+>
+  {eyeVisibilityById[row.id] ? <FaEyeSlash /> : <FaEye />}
+</Button>
         </div>
   
       ),

@@ -56,7 +56,7 @@ const HeaderContact = () => {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
         <div className="d-flex">
-          <Button className="ms-1" onClick={() => toggleEdit(row.id)}>
+          <Button className="ms-1"  onClick={() => toggleEdit(row.id)}>
             <FaEdit />
           </Button>
         </div>

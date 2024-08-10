@@ -541,7 +541,7 @@ const OptionsData = () => {
           <Button className="ms-1" onClick={() => toggleEdit(row.id)}>
             <FaEdit />
           </Button>
-          <Button className="ms-1" onClick={() => handleDelete(row.id)}>
+          <Button className="ms-1" style={{backgroundColor:"red",color:"white",borderColor:"red"}} onClick={() => handleDelete(row.id)}>
             <FaTrash />
           </Button>
           {/* <Button
