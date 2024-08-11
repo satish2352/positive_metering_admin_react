@@ -9,6 +9,7 @@ import {
   Card,
   Button,
   Form,
+  Tooltip, OverlayTrigger,  
 } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import { useSearchExport } from "../../context/SearchExportContext";
@@ -56,9 +57,15 @@ const HeaderContact = () => {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
         <div className="d-flex">
+        <OverlayTrigger
+           placement="top"
+           overlay={<Tooltip id="edit-tooltip">Edit</Tooltip>}
+        >
+        
           <Button className="ms-1"  onClick={() => toggleEdit(row.id)}>
             <FaEdit />
           </Button>
+          </OverlayTrigger>
         </div>
       ),
     },

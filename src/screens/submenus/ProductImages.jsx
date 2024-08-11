@@ -90,23 +90,45 @@ const ProductImages = () => {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
         <div className="d-flex">
+        <OverlayTrigger
+             placement="top"
+             overlay={<Tooltip id="edit-tooltip">Edit</Tooltip>}
+        >
           <Button className="ms-1" onClick={() => toggleEdit(row.id)}>
             <FaEdit />
           </Button>
+          </OverlayTrigger>
+
+          <OverlayTrigger
+               placement="top"
+               overlay={<Tooltip id="delete-tooltip">Delete</Tooltip>}
+          >
           <Button className="ms-1" style={{backgroundColor:"red",color:"white",borderColor:"red"}} onClick={() => handleDelete(row.id)}>
             <FaTrash />
           </Button>
+          </OverlayTrigger>
+        
 
         </div>
       ),
     },
   ];
 
+
+
   useEffect(() => {
     fetchTeam();
     fetchProducts();
-
+    // Retrieve and set visibility state from localStorage
+    const storedVisibility = JSON.parse(localStorage.getItem('eyeVisibilityById')) || {};
+    setEyeVisibilityById(storedVisibility);
   }, []);
+
+  useEffect(() => {
+    // Store visibility state in localStorage whenever it changes
+    localStorage.setItem('eyeVisibilityById', JSON.stringify(eyeVisibilityById));
+  }, [eyeVisibilityById]);
+  
 
   useEffect(() => {
     if (formData.img && formData.img instanceof File) {

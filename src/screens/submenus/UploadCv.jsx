@@ -1,11 +1,5 @@
-
-
-
-
-
-
 import React, { useState, useEffect, useContext } from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button  , Tooltip, OverlayTrigger,} from "react-bootstrap";
 import { FaDownload, FaTrash } from "react-icons/fa";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
@@ -61,7 +55,6 @@ const UploadCv = () => {
     const dataToExport = searchQuery.trim() ? filteredData : team;
     handleExport(dataToExport, tableColumns, "CvList");
   };
-
 
   const handleDelete = async (id) => {
     confirmAlert({
@@ -168,12 +161,17 @@ const UploadCv = () => {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
         <div className="d-flex">
-          <Button className="ms-1" style={{backgroundColor:"red",color:"white",borderColor:"red"}} onClick={() => handleDelete(row.id)}>
+          <OverlayTrigger
+           placement="top"
+           overlay={<Tooltip id="delete-tooltip">Delete</Tooltip>}
+        >
+        <Button className="ms-1" style={{backgroundColor:"red",color:"white",borderColor:"red"}} onClick={() => handleDelete(row.id)}>
             <FaTrash />
           </Button>
+        </OverlayTrigger>
         </div>
       ),
-      key: "actions"
+      key: "actions",
     },
   ];
 
@@ -231,3 +229,7 @@ const UploadCv = () => {
 };
 
 export default UploadCv;
+
+
+
+

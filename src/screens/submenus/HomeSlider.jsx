@@ -33,6 +33,7 @@ import {
   Button,
   Form,
   Table,
+  Tooltip, OverlayTrigger,  
 } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import { useSearchExport } from "../../context/SearchExportContext";
@@ -46,7 +47,7 @@ import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { ThreeDots  } from 'react-loader-spinner'; 
-import { Tooltip, OverlayTrigger,  } from 'react-bootstrap';
+
 import "../../App.scss";
 const HomeSlider = () => {
   const {  setData, filteredData } =
@@ -90,20 +91,43 @@ const HomeSlider = () => {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
         <div className="d-flex">
-          <Button className="ms-1" onClick={() => toggleEdit(row.id)}>
-            <FaEdit />
-          </Button>
-          <Button className="ms-1" onClick={() => handleDelete(row.id)}>
-            <FaTrash />
-          </Button>
-          <Button
-            className="ms-1"
-            onClick={() => handleIsActive(row.id, !eyeVisibilityById[row.id])}
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip id="edit-tooltip">Edit</Tooltip>}
           >
-            {eyeVisibilityById[row.id] ? <FaEyeSlash /> : <FaEye />}
-          </Button>
+            <Button className="ms-1" onClick={() => toggleEdit(row.id)}>
+              <FaEdit />
+            </Button>
+          </OverlayTrigger>
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip id="delete-tooltip">Delete</Tooltip>}
+          >
+            <Button
+              className="ms-1"
+              style={{ backgroundColor: "red", color: "white", borderColor: "red" }}
+              onClick={() => handleDelete(row.id)}
+            >
+              <FaTrash />
+            </Button>
+          </OverlayTrigger>
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip id="visibility-tooltip">{eyeVisibilityById[row.id] ? 'Hide' : 'Show'}</Tooltip>}
+          >
+            <Button
+              className="ms-1"
+              style={{
+                backgroundColor: eyeVisibilityById[row.id] ? 'red' : 'green',
+                borderColor: eyeVisibilityById[row.id] ? 'red' : 'green',
+                color: 'white',
+              }}
+              onClick={() => handleIsActive(row.id, !eyeVisibilityById[row.id])}
+            >
+              {eyeVisibilityById[row.id] ? <FaEyeSlash /> : <FaEye />}
+            </Button>
+          </OverlayTrigger>
         </div>
-  
       ),
     },
 
@@ -112,7 +136,16 @@ const HomeSlider = () => {
 
   useEffect(() => {
     fetchTeam();
+    // Retrieve and set visibility state from localStorage
+    const storedVisibility = JSON.parse(localStorage.getItem('eyeVisibilityById')) || {};
+    setEyeVisibilityById(storedVisibility);
   }, []);
+
+  useEffect(() => {
+    // Store visibility state in localStorage whenever it changes
+    localStorage.setItem('eyeVisibilityById', JSON.stringify(eyeVisibilityById));
+  }, [eyeVisibilityById]);
+  
 
   useEffect(() => {
     if (formData.img && formData.img instanceof File) {

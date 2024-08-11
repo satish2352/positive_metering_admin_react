@@ -6,7 +6,7 @@
 
 
 import React, { useState, useEffect, useContext } from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button,  Tooltip, OverlayTrigger,} from "react-bootstrap";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
 import SearchInput from "../../components/search/SearchInput";
@@ -150,9 +150,14 @@ const Subscribe = () => {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
         <div className="d-flex">
-          <Button className="ms-1" style={{backgroundColor:"red",color:"white",borderColor:"red"}} onClick={() => handleDelete(row.id)}>
+          <OverlayTrigger
+           placement="top"
+           overlay={<Tooltip id="delete-tooltip">Delete</Tooltip>}
+        >
+        <Button className="ms-1" style={{backgroundColor:"red",color:"white",borderColor:"red"}} onClick={() => handleDelete(row.id)}>
             <FaTrash />
           </Button>
+        </OverlayTrigger>
         </div>
       ),
     },

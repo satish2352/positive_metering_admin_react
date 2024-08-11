@@ -72,15 +72,26 @@ const ApplicationData = () => {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
         <div className="d-flex">
+        <OverlayTrigger
+             placement="top"
+             overlay={<Tooltip id="edit-tooltip">Edit</Tooltip>}
+        >
           <Button className="ms-1" onClick={() => toggleEdit(row.id)}>
             <FaEdit />
           </Button>
+          </OverlayTrigger>
+
+          <OverlayTrigger
+               placement="top"
+               overlay={<Tooltip id="delete-tooltip">Delete</Tooltip>}
+          >
           <Button className="ms-1" style={{backgroundColor:"red",color:"white",borderColor:"red"}} onClick={() => handleDelete(row.id)}>
             <FaTrash />
           </Button>
-      
+          </OverlayTrigger>
+        
+
         </div>
-  
       ),
     },
 
