@@ -57,16 +57,7 @@ const Office = () => {
       name: <CustomHeader name="Sr. No." />,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
     },
-    {
-      name: <CustomHeader name="Image" />,
-      cell: (row) => (
-        <img
-          src={row.img}
-          alt="Event"
-          style={{ width: "100px", height: "auto" }}
-        />
-      ),
-    },
+
     {
       name: <CustomHeader name="Title" />,
       cell: (row) => <span>{row.title}</span>,
@@ -83,31 +74,16 @@ const Office = () => {
       name: <CustomHeader name="Email" />,
       cell: (row) => <span>{row.email}</span>,
     },
-//     {
-//       name: <CustomHeader name="Actions" />,
-//       cell: (row) => (
-//         <div className="d-flex">
-//           <Button className="ms-1"  onClick={() => toggleEdit(row.id)}>
-//             <FaEdit />
-//           </Button>
-//           <Button className="ms-1" style={{backgroundColor:"red",color:"white",borderColor:"red"}} onClick={() => handleDelete(row.id)}>
-//             <FaTrash />
-//           </Button>
-//           <Button
-//   className="ms-1"
-//   style={{
-//     backgroundColor: eyeVisibilityById[row.id] ? 'red' : 'green',
-//     borderColor: eyeVisibilityById[row.id] ? 'red' : 'green',
-//     color: 'white', // This ensures the icon color contrasts well with the background
-//   }}
-//   onClick={() => handleIsActive(row.id, !eyeVisibilityById[row.id])}
-// >
-//   {eyeVisibilityById[row.id] ? <FaEyeSlash /> : <FaEye />}
-// </Button>
-//         </div>
-  
-//       ),
-//     },
+    {
+      name: <CustomHeader name="Image" />,
+      cell: (row) => (
+        <img
+          src={row.img}
+          alt="Event"
+          style={{ width: "100px", height: "auto" }}
+        />
+      ),
+    },
 {
   name: <CustomHeader name="Actions" />,
   cell: (row) => (

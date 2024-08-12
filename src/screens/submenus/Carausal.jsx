@@ -59,6 +59,11 @@ const Carousal = () => {
       name: <CustomHeader name="Sr. No." />,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
     },
+
+    {
+      name: <CustomHeader name="View" />,
+      cell: (row) => <span>{row.view}</span>,
+    },
     {
       name: <CustomHeader name="Image" />,
       cell: (row) => (
@@ -68,10 +73,6 @@ const Carousal = () => {
           style={{ width: "100px", height: "auto" }}
         />
       ),
-    },
-    {
-      name: <CustomHeader name="View" />,
-      cell: (row) => <span>{row.view}</span>,
     },
     {
       name: <CustomHeader name="Actions" />,

@@ -57,17 +57,7 @@ const BlogDetails = () => {
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
       width: "80px",
     },
-    {
-      name: <CustomHeader name="Image" />,
-      cell: (row) => (
-        <img
-          src={row.img}
-          alt="BlogDetails"
-          style={{ width: "100px", height: "auto" }}
-        />
-      ),
-      width: "150px",
-    },
+
     {
       name: <CustomHeader name="Title" />,
       cell: (row) => <span>{row.title}</span>,
@@ -81,6 +71,17 @@ const BlogDetails = () => {
       name: <CustomHeader name="Long Description" />,
       cell: (row) => <span>{row.longDesc}</span>,
       width: "auto",
+    },
+    {
+      name: <CustomHeader name="Image" />,
+      cell: (row) => (
+        <img
+          src={row.img}
+          alt="BlogDetails"
+          style={{ width: "100px", height: "auto" }}
+        />
+      ),
+      width: "150px",
     },
     {
       name: <CustomHeader name="Actions" />,

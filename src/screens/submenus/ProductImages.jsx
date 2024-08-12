@@ -49,6 +49,12 @@ const ProductImages = () => {
       name: <CustomHeader name="Sr. No." />,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
     },
+
+
+    {
+      name: <CustomHeader name="Product Name" />,
+      cell: (row) => <span>{row.productName}</span>,
+    },
     {
       name: <CustomHeader name="Image" />,
       cell: (row) => (
@@ -59,33 +65,6 @@ const ProductImages = () => {
         />
       ),
     },
-
-    // {
-    //   name: <CustomHeader name="Images" />,
-    //   cell: (row) =>
-    //     Array.isArray(row.img) ? (
-    //       row.img.map((imageSrc, index) => (
-    //         <img
-    //           key={index}
-    //           src={imageSrc}
-    //           alt="ProductImages"
-    //           style={{ width: "100px", height: "auto", marginRight: "5px" }}
-    //         />
-    //       ))
-    //     ) : (
-    //       <img
-    //         src={row.img} // Assuming row.img is a single image URL if it's not an array
-    //         alt="ProductImage"
-    //         style={{ width: "100px", height: "auto" }}
-    //       />
-    //     ),
-    // },
-
-    {
-      name: <CustomHeader name="Product Name" />,
-      cell: (row) => <span>{row.productName}</span>,
-    },
-
     {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (

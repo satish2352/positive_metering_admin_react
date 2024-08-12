@@ -56,6 +56,15 @@ const Infrastructure = () => {
       name: <CustomHeader name="Sr. No." />,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
     },
+
+    {
+      name: <CustomHeader name="Title" />,
+      cell: (row) => <span>{row.title}</span>,
+    },
+    {
+      name: <CustomHeader name="Description" />,
+      cell: (row) => <span>{row.desc}</span>,
+    },
     {
       name: <CustomHeader name="Image" />,
       cell: (row) => (
@@ -65,14 +74,6 @@ const Infrastructure = () => {
           style={{ width: "100px", height: "auto" }}
         />
       ),
-    },
-    {
-      name: <CustomHeader name="Title" />,
-      cell: (row) => <span>{row.title}</span>,
-    },
-    {
-      name: <CustomHeader name="Description" />,
-      cell: (row) => <span>{row.desc}</span>,
     },
     {
       name: <CustomHeader name="Actions" />,

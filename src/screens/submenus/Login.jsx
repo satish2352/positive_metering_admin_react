@@ -1,11 +1,14 @@
 
+
+////sos final
+
 import React, { useState } from "react";
-import { Form, Button, Container, Row, Col, Card, Image } from "react-bootstrap";
+import { Form, Button, Container, Row, Col, Card, Image, InputGroup } from "react-bootstrap";
 import instance from "../../api/AxiosInstance";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
-import { FaUser, FaLock } from 'react-icons/fa';
+import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import logo from "../../assets/images/logo.png";
 import { ThreeDots } from 'react-loader-spinner';
 
@@ -13,6 +16,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -44,7 +48,7 @@ const Login = () => {
       setLoading(true);
       try {
         const response = await instance.post(
-          `/auth/login`,
+          "/auth/login",
           { email, password },
           {
             headers: {
@@ -74,12 +78,12 @@ const Login = () => {
   return (
     <Container className="d-flex flex-column align-items-center justify-content-center min-vh-100 bg-light">
       <Row className="w-100 justify-content-center">
-        <Col xs={4} md={4} lg={4}>
+        <Col xs={12} sm={10} md={8} lg={6} xl={4}>
           <Card className="shadow-lg border-0 rounded-3">
-            <Card.Body className="p-5 bg-white">
+            <Card.Body className="p-4 p-md-5 bg-white">
               <Row className="align-items-center mb-4">
                 <Col xs={12} className="text-center mb-3">
-                  <Image src={logo} alt="Logo" fluid style={{ maxWidth: "100px" }} />
+                  <Image src={logo} alt="Logo" fluid style={{ maxWidth: "80px", width: "100%" }} />
                 </Col>
                 <Col xs={12}>
                   <h3 className="text-center text-primary font-weight-bold">POSITIVE METERING PUMPS PVT LTD</h3>
@@ -122,14 +126,22 @@ const Login = () => {
                       <FaLock className="me-2 text-secondary" />
                       Password
                     </Form.Label>
-                    <Form.Control
-                      type="password"
-                      placeholder="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="bg-light border-0 shadow-sm rounded-pill px-3"
-                    />
+                    <InputGroup className="bg-light border-0 shadow-sm rounded-pill">
+                      <Form.Control
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="border-0 px-3 rounded-pill"
+                      />
+                      <InputGroup.Text
+                        className="bg-light border-0 rounded-pill"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </InputGroup.Text>
+                    </InputGroup>
                     {errors.password && (
                       <span className="text-danger">{errors.password}</span>
                     )}
