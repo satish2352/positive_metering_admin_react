@@ -53,21 +53,37 @@ const Testimonial = () => {
       name: <CustomHeader name="Sr. No." />,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
       width: "80px",
-      
+
+
+    },
+    {
+      name: <CustomHeader name="Name" />,
+      cell: (row) => <span>{row.name}</span>,
+      width: "auto",
+
+    },
+    {
+      name: <CustomHeader name="Company Name" />,
+      cell: (row) => <span>{row.company_Name}</span>,
+      width: "auto",
 
     },
     {
       name: <CustomHeader name="Review" />,
       cell: (row) => <span>{row.review}</span>,
       width: "auto",
-  
     },
     {
       name: <CustomHeader name="Star" />,
       cell: (row) => <span>{row.star}</span>,
       width: "80px",
     },
+    {
+      name: <CustomHeader name="Experience" />,
+      cell: (row) => <span>{row.experience}</span>,
+      width: "auto",
 
+    },
     {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
@@ -124,7 +140,6 @@ const Testimonial = () => {
     // Store visibility state in localStorage whenever it changes
     localStorage.setItem('eyeVisibilityById', JSON.stringify(eyeVisibilityById));
   }, [eyeVisibilityById]);
-  
 
   useEffect(() => {
     if (formData.img && formData.img instanceof File) {
@@ -175,6 +190,18 @@ const Testimonial = () => {
       errors.review = "Review must be 1000 characters or less";
       isValid = false;
     }
+    if (!formData.name?.trim()) {
+      errors.name = "Name is required";
+      isValid = false;
+    }
+    if (!formData.company_Name?.trim()) {
+      errors.name = "Company name is required";
+      isValid = false;
+    }
+    if (!formData.experience) {
+      errors.name = "Experience is required";
+      isValid = false;
+    }
     const starValue = parseFloat(formData.star);
     if (isNaN(starValue) || starValue < 0 || starValue > 5) {
       errors.star = "Star should be a number between 0 and 5";
@@ -222,7 +249,7 @@ const Testimonial = () => {
             {
               headers: {
                 Authorization: "Bearer " + accessToken,
-                "Content-Type": "multipart/form-data",
+                "Content-Type": "application/json",
               },
             }
           );
@@ -235,7 +262,7 @@ const Testimonial = () => {
           await instance.post("testimonials/create-testimonials", data, {
             headers: {
               Authorization: "Bearer " + accessToken,
-              "Content-Type": "multipart/form-data",
+              "Content-Type": "application/json",
             },
           });
           toast.success("Data Submitted Successfully");
@@ -485,15 +512,28 @@ const Testimonial = () => {
                   <Row>
                     <Col md={6}>
                       <NewResuableForm
-                        label={"Review"}
-                        placeholder={"Enter Review"}
-                        name={"review"}
+                        label={"Name"}
+                        placeholder={"Enter Name"}
+                        name={"name"}
                         type={"text"}
                         onChange={handleChange}
                         initialData={formData}
                         textarea
-                        error={errors.review}
-                        charLimit={1000}
+                        error={errors.name}
+                        charLimit={100}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <NewResuableForm
+                        label={"Company Name"}
+                        placeholder={"Enter Company Name"}
+                        name={"company_Name"}
+                        type={"text"}
+                        onChange={handleChange}
+                        initialData={formData}
+                        textarea
+                        error={errors.company_Name}
+                        charLimit={100}
                       />
                     </Col>
                     <Col md={6}>
@@ -508,6 +548,30 @@ const Testimonial = () => {
                         max={5}
                         step={0.1}
                         error={errors.star}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <NewResuableForm
+                        label={"Experience"}
+                        placeholder={"Enter Experience"}
+                        name={"experience"}
+                        type={"number"}
+                        onChange={handleChange}
+                        initialData={formData}
+                        error={errors.experience}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <NewResuableForm
+                        label={"Review"}
+                        placeholder={"Enter Review"}
+                        name={"review"}
+                        type={"text"}
+                        onChange={handleChange}
+                        initialData={formData}
+                        textarea
+                        error={errors.review}
+                        charLimit={1000}
                       />
                     </Col>
                   </Row>
