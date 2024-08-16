@@ -53,20 +53,16 @@ const Testimonial = () => {
       name: <CustomHeader name="Sr. No." />,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
       width: "80px",
-
-
     },
     {
       name: <CustomHeader name="Name" />,
       cell: (row) => <span>{row.name}</span>,
       width: "auto",
-
     },
     {
       name: <CustomHeader name="Company Name" />,
       cell: (row) => <span>{row.company_Name}</span>,
       width: "auto",
-
     },
     {
       name: <CustomHeader name="Review" />,
@@ -81,6 +77,12 @@ const Testimonial = () => {
     {
       name: <CustomHeader name="Experience" />,
       cell: (row) => <span>{row.experience}</span>,
+      width: "auto",
+
+    },
+    {
+      name: <CustomHeader name="Image" />,
+      cell: (row) => <span>{row.img}</span>,
       width: "auto",
 
     },
@@ -249,7 +251,7 @@ const Testimonial = () => {
             {
               headers: {
                 Authorization: "Bearer " + accessToken,
-                "Content-Type": "application/json",
+                "Content-Type": "multipart/form-data",
               },
             }
           );
@@ -262,7 +264,7 @@ const Testimonial = () => {
           await instance.post("testimonials/create-testimonials", data, {
             headers: {
               Authorization: "Bearer " + accessToken,
-              "Content-Type": "application/json",
+              "Content-Type": "multipart/form-data",
             },
           });
           toast.success("Data Submitted Successfully");
