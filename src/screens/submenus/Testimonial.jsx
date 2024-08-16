@@ -1,4 +1,3 @@
-// // // // // ////sos
 
 import React, { useState, useEffect } from "react";
 import {
@@ -8,11 +7,9 @@ import {
   Card,
   Button,
   Form,
-  Table,
 } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import { useSearchExport } from "../../context/SearchExportContext";
-import { ShowContext } from "../../context/ShowContext";
 import NewResuableForm from "../../components/form/NewResuableForm";
 import SearchInput from "../../components/search/SearchInput";
 import { toast } from "react-toastify";
@@ -21,17 +18,13 @@ import instance from "../../api/AxiosInstance";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import { ThreeDots } from "react-loader-spinner";
-import { Tooltip, OverlayTrigger } from "react-bootstrap";
+import { ThreeDots  } from 'react-loader-spinner'; 
+import { Tooltip, OverlayTrigger,  } from 'react-bootstrap';
 import "../../App.scss";
-import { Justify } from "react-bootstrap-icons";
 const Testimonial = () => {
-  // const {  setData, filteredData } =
-  //   useSearchExport();
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
     useSearchExport();
-
-  const [team, setTeam] = useState([]);
+  const [testimonial, setTestimonial] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -52,39 +45,37 @@ const Testimonial = () => {
     {
       name: <CustomHeader name="Sr. No." />,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
-      width: "80px",
     },
+
     {
       name: <CustomHeader name="Name" />,
       cell: (row) => <span>{row.name}</span>,
-      width: "auto",
     },
     {
       name: <CustomHeader name="Company Name" />,
       cell: (row) => <span>{row.company_Name}</span>,
-      width: "auto",
     },
     {
       name: <CustomHeader name="Review" />,
       cell: (row) => <span>{row.review}</span>,
-      width: "auto",
     },
     {
       name: <CustomHeader name="Star" />,
       cell: (row) => <span>{row.star}</span>,
-      width: "80px",
     },
     {
       name: <CustomHeader name="Experience" />,
       cell: (row) => <span>{row.experience}</span>,
-      width: "auto",
-
     },
     {
       name: <CustomHeader name="Image" />,
-      cell: (row) => <span>{row.img}</span>,
-      width: "auto",
-
+      cell: (row) => (
+        <img
+          src={row.img}
+          alt="tedtimonials"
+          style={{ width: "100px", height: "auto" }}
+        />
+      ),
     },
     {
       name: <CustomHeader name="Actions" />,
@@ -129,6 +120,8 @@ const Testimonial = () => {
         </div>
       ),
     },
+
+ 
   ];
 
   useEffect(() => {
@@ -142,6 +135,7 @@ const Testimonial = () => {
     // Store visibility state in localStorage whenever it changes
     localStorage.setItem('eyeVisibilityById', JSON.stringify(eyeVisibilityById));
   }, [eyeVisibilityById]);
+  
 
   useEffect(() => {
     if (formData.img && formData.img instanceof File) {
@@ -168,71 +162,100 @@ const Testimonial = () => {
         },
       });
       const reversedData = response.data.responseData.reverse();
-      setTeam(reversedData);
+      setTestimonial(reversedData);
       setData(reversedData);
     } catch (error) {
       console.error(
         "Error fetching team:",
         error.response || error.message || error
       );
-    } finally {
+    }    finally {
       setLoading(false);
     }
   };
 
   const validateForm = (formData) => {
+    
     let errors = {};
     let isValid = true;
 
-
-    if (!formData.review?.trim()) {
-      errors.review = "Review is required";
+    if (!formData.img) {
+      errors.img = "Image is not 400x400 pixels";
       isValid = false;
-    } else if (formData.review.length > 1000) {
-      errors.review = "Review must be 1000 characters or less";
+    
+    } else if (
+      formData.img instanceof File &&
+      !validateImageSize(formData.img)
+    ) {
+      errors.img = "Image is required with 400x400 pixels";
       isValid = false;
     }
     if (!formData.name?.trim()) {
       errors.name = "Name is required";
       isValid = false;
     }
+
     if (!formData.company_Name?.trim()) {
-      errors.name = "Company name is required";
+      errors.desc = "Company Name is required";
       isValid = false;
-    }
+    } 
+    if (!formData.review?.trim()) {
+      errors.desc = "Review is required";
+      isValid = false;
+    } 
     if (!formData.experience) {
-      errors.name = "Experience is required";
+      errors.desc = "Experience is required";
       isValid = false;
-    }
-    const starValue = parseFloat(formData.star);
-    if (isNaN(starValue) || starValue < 0 || starValue > 5) {
-      errors.star = "Star should be a number between 0 and 5";
+    } 
+    if (!formData.star) {
+      errors.desc = "Star is required";
       isValid = false;
-    }
+    } 
+    // else if (formData.desc.length > 1000) {
+    //   errors.desc = "Description must be 1000 characters or less";
+    //   isValid = false;
+    // }
 
     setErrors(errors);
     return isValid;
   };
 
-  const handleChange = (name, value) => {
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    if (errors[name]) {
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-    } else if (name === "review") {
-      const charLimit = 1000; // Set your character limit here
-      if (value.length > charLimit) {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          review: `Character limit of ${charLimit} exceeded`,
-        }));
-      } else {
+  const validateImageSize = (file) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width === 400 && img.height === 400) {
+          resolve();
+        } else {
+          reject("Image is required with 400x400 pixels");
+        }
+      };
+      img.onerror = () => reject("Error loading image");
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  
+
+  const handleChange = async (name, value) => {
+    if (name === "img" && value instanceof File) {
+      try {
+        await validateImageSize(value);
         setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-        setErrors((prevErrors) => ({ ...prevErrors, review: "" }));
+        setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
+      } catch (error) {
+        setErrors((prevErrors) => ({ ...prevErrors, img: error }));
+        setImagePreview("");
       }
     } else {
       setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
     }
   };
+
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm(formData)) {
@@ -245,21 +268,17 @@ const Testimonial = () => {
 
       try {
         if (editMode) {
-          await instance.put(
-            `testimonials/update-testimonials/${editingId}`,
-            data,
-            {
-              headers: {
-                Authorization: "Bearer " + accessToken,
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+          await instance.put(`testimonials/update-testimonials/${editingId}`, data, {
+            headers: {
+              Authorization: "Bearer " + accessToken,
+              "Content-Type": "multipart/form-data",
+            },
+          });
           toast.success("Data Updated Successfully");
-          const updatedTeam = team.map((member) =>
+          const updatedTeam = testimonial.map((member) =>
             member.id === editingId ? formData : member
           );
-          setTeam(updatedTeam);
+          setTestimonial(updatedTeam);
         } else {
           await instance.post("testimonials/create-testimonials", data, {
             headers: {
@@ -315,23 +334,20 @@ const Testimonial = () => {
                 setLoading(true);
                 const accessToken = localStorage.getItem("accessToken");
                 try {
-                  await instance.delete(
-                    `testimonials/isdelete-testimonial/${id}`,
-                    {
-                      headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                        "Content-Type": "application/json",
-                      },
-                    }
-                  );
+                  await instance.delete(`testimonials/isdelete-testimonial/${id}`, {
+                    headers: {
+                      Authorization: `Bearer ${accessToken}`,
+                      "Content-Type": "application/json",
+                    },
+                  });
                   toast.success("Data Deleted Successfully");
                   fetchTeam();
                 } catch (error) {
                   console.error("Error deleting data:", error);
                   toast.error("Error deleting data");
                 } finally {
-                  setLoading(false);
-                }
+        setLoading(false); 
+      }
                 onClose();
               }}
             >
@@ -401,8 +417,8 @@ const Testimonial = () => {
                   console.error("Error updating visibility:", error);
                   toast.error("Error updating visibility");
                 } finally {
-                  setLoading(false); // Set loading to false
-                }
+        setLoading(false); // Set loading to false
+      }
                 onClose();
               }}
             >
@@ -418,7 +434,7 @@ const Testimonial = () => {
   };
 
   const toggleEdit = (id) => {
-    const selectedMember = team.find((member) => member.id === id);
+    const selectedMember = testimonial.find((member) => member.id === id);
     setEditingId(id);
     setFormData(selectedMember);
     setEditMode(true);
@@ -438,65 +454,66 @@ const Testimonial = () => {
   };
 
   return (
-    <Container fluid>
-      <Row>
-        <Col>
-          <Card>
-            <Card.Header>
-              <Row>
-                {showTable ? (
-                  <Col className="d-flex justify-content-end align-items-center">
-                    <SearchInput
-                      searchQuery={searchQuery}
-                      onSearch={handleSearch}
-                      showExportButton={false}
-                    />
-                    <Button
-                      variant="outline-success"
-                      onClick={handleAdd}
-                      className="ms-2 mb-3"
-                    >
-                      Add
-                    </Button>
-                  </Col>
-                ) : (
-                  <Col className="d-flex justify-content-end align-items-center">
-                    <Button variant="outline-secondary" onClick={handleView}>
-                      View
-                    </Button>
-                  </Col>
-                )}
-              </Row>
-            </Card.Header>
+  
 
-            <Card.Body>
-              {loading ? ( // Check loading state
-                <div
-                  className="d-flex justify-content-center align-items-center"
-                  style={{ height: "100px" }}
-                >
-                  <ThreeDots
-                    height="80"
-                    width="80"
-                    radius="9"
-                    color="#000"
-                    ariaLabel="three-dots-loading"
-                    visible={true}
-                  />
-                </div>
-              ) : showTable ? (
-                <DataTable
-                  columns={tableColumns(currentPage, rowsPerPage)}
-                  data={filteredData.length > 0 ? filteredData : team}
-                  pagination
-                  responsive
-                  striped
-                  noDataComponent="No Data Available"
-                  onChangePage={(page) => setCurrentPage(page)}
-                  onChangeRowsPerPage={(rowsPerPage) =>
-                    setRowsPerPage(rowsPerPage)
-                  }
-                  customStyles={{
+    <Container fluid>
+    <Row>
+      <Col>
+        <Card>
+          <Card.Header>
+            <Row>
+              {showTable ? (
+                <Col className="d-flex justify-content-end align-items-center">
+                <SearchInput
+              searchQuery={searchQuery}
+              onSearch={handleSearch}
+              onExport={handleExport}
+              showExportButton={false}
+            />
+                  <Button
+                    variant="outline-success"
+                    onClick={handleAdd}
+                    className="ms-2 mb-3"
+                  >
+                    Add
+                  </Button>
+                </Col>
+              ) : (
+                <Col className="d-flex justify-content-end align-items-center">
+                  <Button   variant="outline-secondary" onClick={handleView}>
+                    View
+                  </Button>
+                </Col>
+              )}
+            </Row>
+          </Card.Header>
+
+          <Card.Body>
+            {loading ? ( // Check loading state
+              <div className="d-flex justify-content-center align-items-center" style={{ height: '100px' }}>
+                <ThreeDots  
+                  height="80"
+                  width="80"
+                  radius="9"
+                  color="#000"
+                  ariaLabel="three-dots-loading"
+            
+                  visible={true}
+                />
+              </div>
+            ) : showTable ? (
+              <DataTable
+                columns={tableColumns(currentPage, rowsPerPage)}
+                data={filteredData.length > 0 ? filteredData : testimonial}
+                pagination
+                responsive
+                striped
+                noDataComponent="No Data Available"
+                onChangePage={(page) => setCurrentPage(page)}
+                onChangeRowsPerPage={(rowsPerPage) =>
+                  setRowsPerPage(rowsPerPage)
+                }
+                customStyles={{
                     rows: {
                       style: {
                         alignItems: "flex-start", // Aligns text to the top-left corner
@@ -508,92 +525,108 @@ const Testimonial = () => {
                       },
                     },
                   }}
-                />
-              ) : (
-                <Form onSubmit={handleSubmit}>
-                  <Row>
-                    <Col md={6}>
-                      <NewResuableForm
-                        label={"Name"}
-                        placeholder={"Enter Name"}
-                        name={"name"}
-                        type={"text"}
-                        onChange={handleChange}
-                        initialData={formData}
-                        textarea
-                        error={errors.name}
-                        charLimit={100}
+              />
+            ) : (
+              <Form onSubmit={handleSubmit}>
+                <Row>
+                  <Col md={12}>
+                    {imagePreview && (
+                      <img
+                        src={imagePreview}
+                        alt="Selected Preview"
+                        style={{
+                          width: "100px",
+                          height: "auto",
+                          marginBottom: "10px",
+                        }}
                       />
-                    </Col>
-                    <Col md={6}>
-                      <NewResuableForm
-                        label={"Company Name"}
-                        placeholder={"Enter Company Name"}
-                        name={"company_Name"}
-                        type={"text"}
-                        onChange={handleChange}
-                        initialData={formData}
-                        textarea
-                        error={errors.company_Name}
-                        charLimit={100}
-                      />
-                    </Col>
-                    <Col md={6}>
-                      <NewResuableForm
-                        label={"Star"}
-                        placeholder={"Enter Star (0-5)"}
-                        name={"star"}
-                        type={"number"}
-                        onChange={handleChange}
-                        initialData={formData}
-                        min={0}
-                        max={5}
-                        step={0.1}
-                        error={errors.star}
-                      />
-                    </Col>
-                    <Col md={6}>
-                      <NewResuableForm
-                        label={"Experience"}
-                        placeholder={"Enter Experience"}
-                        name={"experience"}
-                        type={"number"}
-                        onChange={handleChange}
-                        initialData={formData}
-                        error={errors.experience}
-                      />
-                    </Col>
-                    <Col md={6}>
-                      <NewResuableForm
-                        label={"Review"}
-                        placeholder={"Enter Review"}
-                        name={"review"}
-                        type={"text"}
-                        onChange={handleChange}
-                        initialData={formData}
-                        textarea
-                        error={errors.review}
-                        charLimit={1000}
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <div className="mt-3 d-flex justify-content-end">
-                      <Button
-                        type="submit"
-                        variant={editMode ? "success" : "primary"}
-                      >
-                        {editMode ? "Update" : "Submit"}
-                      </Button>
-                    </div>
-                  </Row>
-                </Form>
-              )}
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+                    )}
+                    <NewResuableForm
+                      label={"Upload Testimonials Image"}
+                      placeholder={"Upload Image"}
+                      name={"img"}
+                      type={"file"}
+                      onChange={handleChange}
+                      initialData={formData}
+                      error={errors.img}
+                      imageDimensiion="Image must be 400x400 pixels"
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <NewResuableForm
+                      label="Name"
+                      placeholder="Enter Name"
+                      name="name"
+                      type="text"
+                      onChange={handleChange}
+                      initialData={formData}
+                      error={errors.name}
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <NewResuableForm
+                      label="Company Name"
+                      placeholder="Enter Company Name"
+                      name="company_Name"
+                      type="text"
+                      onChange={handleChange}
+                      initialData={formData}
+                      error={errors.company_Name}
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <NewResuableForm
+                      label="Experience"
+                      placeholder="Enter Experience"
+                      name="experience"
+                      type="text"
+                      onChange={handleChange}
+                      initialData={formData}
+                      error={errors.experience}
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <NewResuableForm
+                      label="Star"
+                      placeholder="Enter Star"
+                      name="star"
+                      type="text"
+                      onChange={handleChange}
+                      initialData={formData}
+                      error={errors.star}
+                    />
+                  </Col>
+                  <Col md={12}>
+                    <NewResuableForm
+                      label="Review"
+                      placeholder="Enter Review"
+                      name="review"
+                      type="text"
+                      onChange={handleChange}
+                      initialData={formData}
+                      textarea
+                      error={errors.review}
+                      charLimit={1000}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <div className="mt-3 d-flex justify-content-end">
+                    <Button
+                      type="submit"
+                      variant={editMode ? "success" : "primary"}
+                    >
+                      {editMode ? "Update" : "Submit"}
+                    </Button>
+                  </div>
+                </Row>
+              </Form>
+            )}
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
+  </Container>
   );
 };
 
