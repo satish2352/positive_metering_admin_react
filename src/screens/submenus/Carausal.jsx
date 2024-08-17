@@ -1,8 +1,4 @@
 
-
-
-
-
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -172,20 +168,24 @@ const Carousal = () => {
   };
 
   const validateForm = (formData) => {
+    console.log("formData", formData);
+    
     let errors = {};
     let isValid = true;
   
  
-    if (!formData.img) {
-      errors.img = "Image is required with 2548*1018 for Desktop and 1307*1018 pixels for mobile";
-      isValid = false;
-    } else if (
-      formData.img instanceof File &&
-      !validateImageSize(formData.img)
-    ) {
+  // Check if formData.img is a File object
+  if (!formData.img || !(formData.img instanceof File)) {
+    errors.img = "Image is required with 2548*1018 for Desktop and 1307*1018 pixels for mobile";
+    isValid = false;
+  } else {
+    // Validate image size
+    const isSizeValid = validateImageSize(formData.img);
+    if (!isSizeValid) {
       errors.img = "Image is not 2548*1018 for Desktop and 1307*1018 pixels for mobile";
       isValid = false;
     }
+  }
     if (!formData.view) {
       errors.view = "View selection is required";
       isValid = false;
@@ -197,17 +197,24 @@ const Carousal = () => {
 
  
   const validateImageSize = (file, view) => {
+    
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        const dimensions = {
-          Desktop: { width: 2548, height: 1018, message: "Uploaded image is not 2548*1018 pixels for Desktop view." },
-          Mobile: { width: 1307, height: 1018, message: "Uploaded image is not 1307*1018 pixels for Mobile view." }
-        };
+        // const dimensions = {
+        //   Desktop: { width: 2548, height: 1018, message: "Uploaded image is not 2548*1018 pixels for Desktop view." },
+        //   Mobile: { width: 1307, height: 1018, message: "Uploaded image is not 1307*1018 pixels for Mobile view." }
+        // };
         
-        const { width, height, message } = dimensions[view] || {};
+    // Validate the view parameter
+    // if (!dimensions[view]) {
+    //   reject("Invalid view type specified.");
+    //   return;
+    // }
+
+    // const { width, height, message } = dimensions[view];
         
-        if (img.width === width && img.height === height) {
+        if ((img.width === 2548 || img.width === 1307) && img.height === 1018) {
           resolve();
         } else {
           reject(message);
@@ -221,15 +228,11 @@ const Carousal = () => {
 
 
   const handleChange = async (name, value) => {
+    console.log("File received:", value); // Log the file
     if (name === "img" && value instanceof File) {
       try {
         await validateImageSize(value, formData.view);
         setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-        if (errors[name]) {
-          setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-        }
-        setFormData({ ...formData, [name]: value });
-        setErrors((prevErrors) => ({ ...prevErrors, img: "" }));
       } catch (error) {
         setErrors((prevErrors) => ({ ...prevErrors, img: error }));
         setImagePreview("");
@@ -241,6 +244,8 @@ const Carousal = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("formData____________", formData);
+    
     if (validateForm(formData)) {
       setLoading(true);
       const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
