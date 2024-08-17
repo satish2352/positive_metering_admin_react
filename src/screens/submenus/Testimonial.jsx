@@ -18,8 +18,8 @@ import instance from "../../api/AxiosInstance";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import { ThreeDots  } from 'react-loader-spinner'; 
-import { Tooltip, OverlayTrigger,  } from 'react-bootstrap';
+import { ThreeDots } from 'react-loader-spinner';
+import { Tooltip, OverlayTrigger, } from 'react-bootstrap';
 import "../../App.scss";
 const Testimonial = () => {
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
@@ -53,7 +53,7 @@ const Testimonial = () => {
     },
     {
       name: <CustomHeader name="Company Name" />,
-      cell: (row) => <span>{row.company_Name}</span>,
+      cell: (row) => <span>{row.company_Name ? row.company_Name : "NA"}</span>,
     },
     {
       name: <CustomHeader name="Review" />,
@@ -69,12 +69,14 @@ const Testimonial = () => {
     },
     {
       name: <CustomHeader name="Image" />,
-      cell: (row) => (
+      cell: (row) => row.img ? (
         <img
           src={row.img}
-          alt="tedtimonials"
+          alt="Uploaded"
           style={{ width: "100px", height: "auto" }}
         />
+      ) : (
+        <span>NA</span>
       ),
     },
     {
@@ -121,7 +123,7 @@ const Testimonial = () => {
       ),
     },
 
- 
+
   ];
 
   useEffect(() => {
@@ -135,7 +137,7 @@ const Testimonial = () => {
     // Store visibility state in localStorage whenever it changes
     localStorage.setItem('eyeVisibilityById', JSON.stringify(eyeVisibilityById));
   }, [eyeVisibilityById]);
-  
+
 
   useEffect(() => {
     if (formData.img && formData.img instanceof File) {
@@ -169,48 +171,36 @@ const Testimonial = () => {
         "Error fetching team:",
         error.response || error.message || error
       );
-    }    finally {
+    } finally {
       setLoading(false);
     }
   };
 
   const validateForm = (formData) => {
-    
+
     let errors = {};
     let isValid = true;
 
-    if (!formData.img) {
-      errors.img = "Image is not 400x400 pixels";
-      isValid = false;
-    
-    } else if (
-      formData.img instanceof File &&
-      !validateImageSize(formData.img)
-    ) {
-      errors.img = "Image is required with 400x400 pixels";
+    if (formData.img && formData.img instanceof File && !validateImageSize(formData.img)) {
+      errors.img = "Image must be 400x400 pixels";
       isValid = false;
     }
     if (!formData.name?.trim()) {
       errors.name = "Name is required";
       isValid = false;
     }
-
-    if (!formData.company_Name?.trim()) {
-      errors.desc = "Company Name is required";
-      isValid = false;
-    } 
     if (!formData.review?.trim()) {
       errors.desc = "Review is required";
       isValid = false;
-    } 
+    }
     if (!formData.experience) {
       errors.desc = "Experience is required";
       isValid = false;
-    } 
+    }
     if (!formData.star) {
       errors.desc = "Star is required";
       isValid = false;
-    } 
+    }
     // else if (formData.desc.length > 1000) {
     //   errors.desc = "Description must be 1000 characters or less";
     //   isValid = false;
@@ -235,7 +225,7 @@ const Testimonial = () => {
     });
   };
 
-  
+
 
   const handleChange = async (name, value) => {
     if (name === "img" && value instanceof File) {
@@ -346,8 +336,8 @@ const Testimonial = () => {
                   console.error("Error deleting data:", error);
                   toast.error("Error deleting data");
                 } finally {
-        setLoading(false); 
-      }
+                  setLoading(false);
+                }
                 onClose();
               }}
             >
@@ -417,8 +407,8 @@ const Testimonial = () => {
                   console.error("Error updating visibility:", error);
                   toast.error("Error updating visibility");
                 } finally {
-        setLoading(false); // Set loading to false
-      }
+                  setLoading(false); // Set loading to false
+                }
                 onClose();
               }}
             >
@@ -454,66 +444,66 @@ const Testimonial = () => {
   };
 
   return (
-  
+
 
     <Container fluid>
-    <Row>
-      <Col>
-        <Card>
-          <Card.Header>
-            <Row>
-              {showTable ? (
-                <Col className="d-flex justify-content-end align-items-center">
-                <SearchInput
-              searchQuery={searchQuery}
-              onSearch={handleSearch}
-              onExport={handleExport}
-              showExportButton={false}
-            />
-                  <Button
-                    variant="outline-success"
-                    onClick={handleAdd}
-                    className="ms-2 mb-3"
-                  >
-                    Add
-                  </Button>
-                </Col>
-              ) : (
-                <Col className="d-flex justify-content-end align-items-center">
-                  <Button   variant="outline-secondary" onClick={handleView}>
-                    View
-                  </Button>
-                </Col>
-              )}
-            </Row>
-          </Card.Header>
+      <Row>
+        <Col>
+          <Card>
+            <Card.Header>
+              <Row>
+                {showTable ? (
+                  <Col className="d-flex justify-content-end align-items-center">
+                    <SearchInput
+                      searchQuery={searchQuery}
+                      onSearch={handleSearch}
+                      onExport={handleExport}
+                      showExportButton={false}
+                    />
+                    <Button
+                      variant="outline-success"
+                      onClick={handleAdd}
+                      className="ms-2 mb-3"
+                    >
+                      Add
+                    </Button>
+                  </Col>
+                ) : (
+                  <Col className="d-flex justify-content-end align-items-center">
+                    <Button variant="outline-secondary" onClick={handleView}>
+                      View
+                    </Button>
+                  </Col>
+                )}
+              </Row>
+            </Card.Header>
 
-          <Card.Body>
-            {loading ? ( // Check loading state
-              <div className="d-flex justify-content-center align-items-center" style={{ height: '100px' }}>
-                <ThreeDots  
-                  height="80"
-                  width="80"
-                  radius="9"
-                  color="#000"
-                  ariaLabel="three-dots-loading"
-            
-                  visible={true}
-                />
-              </div>
-            ) : showTable ? (
-              <DataTable
-                columns={tableColumns(currentPage, rowsPerPage)}
-                data={filteredData.length > 0 ? filteredData : testimonial}
-                pagination
-                responsive
-                striped
-                noDataComponent="No Data Available"
-                onChangePage={(page) => setCurrentPage(page)}
-                onChangeRowsPerPage={(rowsPerPage) =>
-                  setRowsPerPage(rowsPerPage)
-                }
-                customStyles={{
+            <Card.Body>
+              {loading ? ( // Check loading state
+                <div className="d-flex justify-content-center align-items-center" style={{ height: '100px' }}>
+                  <ThreeDots
+                    height="80"
+                    width="80"
+                    radius="9"
+                    color="#000"
+                    ariaLabel="three-dots-loading"
+
+                    visible={true}
+                  />
+                </div>
+              ) : showTable ? (
+                <DataTable
+                  columns={tableColumns(currentPage, rowsPerPage)}
+                  data={filteredData.length > 0 ? filteredData : testimonial}
+                  pagination
+                  responsive
+                  striped
+                  noDataComponent="No Data Available"
+                  onChangePage={(page) => setCurrentPage(page)}
+                  onChangeRowsPerPage={(rowsPerPage) =>
+                    setRowsPerPage(rowsPerPage)
+                  }
+                  customStyles={{
                     rows: {
                       style: {
                         alignItems: "flex-start", // Aligns text to the top-left corner
@@ -525,108 +515,108 @@ const Testimonial = () => {
                       },
                     },
                   }}
-              />
-            ) : (
-              <Form onSubmit={handleSubmit}>
-                <Row>
-                  <Col md={12}>
-                    {imagePreview && (
-                      <img
-                        src={imagePreview}
-                        alt="Selected Preview"
-                        style={{
-                          width: "100px",
-                          height: "auto",
-                          marginBottom: "10px",
-                        }}
+                />
+              ) : (
+                <Form onSubmit={handleSubmit}>
+                  <Row>
+                    <Col md={12}>
+                      {imagePreview && (
+                        <img
+                          src={imagePreview}
+                          alt="Selected Preview"
+                          style={{
+                            width: "100px",
+                            height: "auto",
+                            marginBottom: "10px",
+                          }}
+                        />
+                      )}
+                      <NewResuableForm
+                        label={"Upload Testimonials Image"}
+                        placeholder={"Upload Image"}
+                        name={"img"}
+                        type={"file"}
+                        onChange={handleChange}
+                        initialData={formData}
+                        error={errors.img}
+                        imageDimensiion="Image must be 400x400 pixels"
                       />
-                    )}
-                    <NewResuableForm
-                      label={"Upload Testimonials Image"}
-                      placeholder={"Upload Image"}
-                      name={"img"}
-                      type={"file"}
-                      onChange={handleChange}
-                      initialData={formData}
-                      error={errors.img}
-                      imageDimensiion="Image must be 400x400 pixels"
-                    />
-                  </Col>
-                  <Col md={6}>
-                    <NewResuableForm
-                      label="Name"
-                      placeholder="Enter Name"
-                      name="name"
-                      type="text"
-                      onChange={handleChange}
-                      initialData={formData}
-                      error={errors.name}
-                    />
-                  </Col>
-                  <Col md={6}>
-                    <NewResuableForm
-                      label="Company Name"
-                      placeholder="Enter Company Name"
-                      name="company_Name"
-                      type="text"
-                      onChange={handleChange}
-                      initialData={formData}
-                      error={errors.company_Name}
-                    />
-                  </Col>
-                  <Col md={6}>
-                    <NewResuableForm
-                      label="Experience"
-                      placeholder="Enter Experience"
-                      name="experience"
-                      type="text"
-                      onChange={handleChange}
-                      initialData={formData}
-                      error={errors.experience}
-                    />
-                  </Col>
-                  <Col md={6}>
-                    <NewResuableForm
-                      label="Star"
-                      placeholder="Enter Star"
-                      name="star"
-                      type="text"
-                      onChange={handleChange}
-                      initialData={formData}
-                      error={errors.star}
-                    />
-                  </Col>
-                  <Col md={12}>
-                    <NewResuableForm
-                      label="Review"
-                      placeholder="Enter Review"
-                      name="review"
-                      type="text"
-                      onChange={handleChange}
-                      initialData={formData}
-                      textarea
-                      error={errors.review}
-                      charLimit={1000}
-                    />
-                  </Col>
-                </Row>
-                <Row>
-                  <div className="mt-3 d-flex justify-content-end">
-                    <Button
-                      type="submit"
-                      variant={editMode ? "success" : "primary"}
-                    >
-                      {editMode ? "Update" : "Submit"}
-                    </Button>
-                  </div>
-                </Row>
-              </Form>
-            )}
-          </Card.Body>
-        </Card>
-      </Col>
-    </Row>
-  </Container>
+                    </Col>
+                    <Col md={6}>
+                      <NewResuableForm
+                        label="Name"
+                        placeholder="Enter Name"
+                        name="name"
+                        type="text"
+                        onChange={handleChange}
+                        initialData={formData}
+                        error={errors.name}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <NewResuableForm
+                        label="Company Name"
+                        placeholder="Enter Company Name"
+                        name="company_Name"
+                        type="text"
+                        onChange={handleChange}
+                        initialData={formData}
+                        error={errors.company_Name}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <NewResuableForm
+                        label="Experience"
+                        placeholder="Enter Experience"
+                        name="experience"
+                        type="text"
+                        onChange={handleChange}
+                        initialData={formData}
+                        error={errors.experience}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <NewResuableForm
+                        label="Star"
+                        placeholder="Enter Star"
+                        name="star"
+                        type="text"
+                        onChange={handleChange}
+                        initialData={formData}
+                        error={errors.star}
+                      />
+                    </Col>
+                    <Col md={12}>
+                      <NewResuableForm
+                        label="Review"
+                        placeholder="Enter Review"
+                        name="review"
+                        type="text"
+                        onChange={handleChange}
+                        initialData={formData}
+                        textarea
+                        error={errors.review}
+                        charLimit={1000}
+                      />
+                    </Col>
+                  </Row>
+                  <Row>
+                    <div className="mt-3 d-flex justify-content-end">
+                      <Button
+                        type="submit"
+                        variant={editMode ? "success" : "primary"}
+                      >
+                        {editMode ? "Update" : "Submit"}
+                      </Button>
+                    </div>
+                  </Row>
+                </Form>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
