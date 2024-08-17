@@ -246,16 +246,74 @@ const Testimonial = () => {
 
 
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   console.log("formData", formData);
+    
+  //   if (validateForm(formData)) {
+  //     setLoading(true);
+  //     const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
+  //     const data = new FormData();
+      
+  //     for (const key in formData) {
+  //       data.append(key, formData[key]);
+  //     }
+      
+  //     try {
+  //       if (editMode) {
+  //         await instance.put(`testimonials/update-testimonials/${editingId}`, data, {
+  //           headers: {
+  //             Authorization: "Bearer " + accessToken,
+  //             "Content-Type": "multipart/form-data",
+  //           },
+  //         });
+  //         toast.success("Data Updated Successfully");
+  //         const updatedTeam = testimonial.map((member) =>
+  //           member.id === editingId ? formData : member
+  //         );
+  //         setTestimonial(updatedTeam);
+  //       } else {
+  //         await instance.post("testimonials/create-testimonials", data, {
+  //           headers: {
+  //             Authorization: "Bearer " + accessToken,
+  //             "Content-Type": "multipart/form-data",
+  //           },
+  //         });
+  //         toast.success("Data Submitted Successfully");
+  //       }
+  //       fetchTeam();
+
+  //       setEditMode(false);
+  //       setFormData({});
+  //       setImagePreview("");
+  //       setShowTable(true); // Switch back to table view after submission
+  //     } catch (error) {
+  //       console.error("Error handling form submission:", error);
+  //     } finally {
+  //       setLoading(false); // Set loading to false
+  //     }
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("formData", formData);
+  
     if (validateForm(formData)) {
       setLoading(true);
       const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
       const data = new FormData();
-      for (const key in formData) {
-        data.append(key, formData[key]);
+      
+      // Replace null values with empty strings
+      const adjustedFormData = {
+        ...formData,
+        company_name: formData.company_name || "",
+        img: formData.img || ""
+      };
+  
+      for (const key in adjustedFormData) {
+        data.append(key, adjustedFormData[key]);
       }
-
+  
       try {
         if (editMode) {
           await instance.put(`testimonials/update-testimonials/${editingId}`, data, {
@@ -266,7 +324,7 @@ const Testimonial = () => {
           });
           toast.success("Data Updated Successfully");
           const updatedTeam = testimonial.map((member) =>
-            member.id === editingId ? formData : member
+            member.id === editingId ? adjustedFormData : member
           );
           setTestimonial(updatedTeam);
         } else {
@@ -279,7 +337,7 @@ const Testimonial = () => {
           toast.success("Data Submitted Successfully");
         }
         fetchTeam();
-
+  
         setEditMode(false);
         setFormData({});
         setImagePreview("");
@@ -291,7 +349,7 @@ const Testimonial = () => {
       }
     }
   };
-
+  
   const handleDelete = async (id) => {
     confirmAlert({
       title: "Confirm to delete",
