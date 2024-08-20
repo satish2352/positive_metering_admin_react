@@ -36,6 +36,7 @@ const Events = () => {
   const [formData, setFormData] = useState({});
   const [eyeVisibilityById, setEyeVisibilityById] = useState({});
   const [imagePreview, setImagePreview] = useState("");
+  const [pdfPreview, setPdfPreview] = useState("");
   const [showTable, setShowTable] = useState(true); // New state for toggling form and table view
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -46,7 +47,8 @@ const Events = () => {
     </div>
   );
 
-
+  console.log("eyeVisibilityById[row.id]", eyeVisibilityById);
+  
 
   const tableColumns = (currentPage, rowsPerPage) => [
     {
@@ -74,6 +76,18 @@ const Events = () => {
           alt="News"
           style={{ width: "100px", height: "auto" }}
         />
+      ),
+    },
+    {
+      name: <CustomHeader name="PDF" />,
+      cell: (row) => (
+        row.pdf ? (
+          <a style={{textDecoration:"none"}} href={row.pdf} target="_blank" rel="noopener noreferrer">
+            View PDF
+          </a>
+        ) : (
+          "NA"
+        )
       ),
     },
     {
@@ -219,6 +233,13 @@ const Events = () => {
         setErrors((prevErrors) => ({ ...prevErrors, img: error }));
         setImagePreview("");
       }
+    } else if (name === "pdf" && value instanceof File) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPdfPreview(reader.result);
+      };
+      reader.readAsDataURL(value);
+      setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -484,7 +505,7 @@ const Events = () => {
                 customStyles={{
                     rows: {
                       style: {
-                        alignItems: "flex-start", // Aligns text to the top-left corner
+                        alignItems: "flex-center", // Aligns text to the top-left corner
                       },
                     },
                     cells: {
@@ -517,6 +538,24 @@ const Events = () => {
                     />
          
                   </Col>
+                  <Col md={12}>
+      {/* {pdfPreview && (
+        <embed
+          src={pdfPreview}
+          type="application/pdf"
+          style={{ width: "100%", height: "400px" }}
+        />
+      )} */}
+      <NewResuableForm
+        label={"Upload PDF"}
+        placeholder={"Upload PDF (optional)"}
+        name={"pdf"}
+        type={"file"}
+        onChange={handleChange}
+        initialData={formData}
+        error={errors.pdf}
+      />
+    </Col>
                   <Col md={6}>
                     <NewResuableForm
                       label={"Title"}
@@ -579,6 +618,3 @@ const Events = () => {
 };
 
 export default Events;
-
-
-
