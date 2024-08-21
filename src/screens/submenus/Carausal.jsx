@@ -63,7 +63,7 @@ const Carousal = () => {
     {
       name: <CustomHeader name="Media" />,
       cell: (row) => {
-        const fileExtension = row.img.split('.').pop().toLowerCase();
+        const fileExtension = row?.img?.split('.')?.pop()?.toLowerCase();
 
         const isVideo = ['mp4', 'avi', 'mov', 'wmv'].includes(fileExtension);
 
