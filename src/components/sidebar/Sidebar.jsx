@@ -41,7 +41,7 @@ const SidebarMenu = [
         icon: <RiContactsBookLine style={{ color: "red" }} size={24} />,
       },
       {
-        subMenus: "Home Sliding Image",
+        subMenus: "Home Sliding Media",
         url: "/carousal",
         icon: <RiFileListLine style={{ color: "red" }} size={24} />,
       },

@@ -84,7 +84,7 @@ const AreaTop = ({ buttonValue, tableView }) => {
     } else if (window.location.pathname == "/homeslider") {
       setHeader("Image Slider");
     } else if (window.location.pathname == "/carousal") {
-      setHeader("Home Sliding Image");
+      setHeader("Home Sliding Media");
     } else if (window.location.pathname == "/infrastructure") {
       setHeader("Infrastructure");
     } else if (window.location.pathname == "/ourteam") {

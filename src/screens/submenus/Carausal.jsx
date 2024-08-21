@@ -71,6 +71,8 @@ const Carousal = () => {
           isVideo ? (
             <video
               src={row.img}
+              autoPlay  // Add autoPlay attribute for autoplay
+              controls
               style={{ width: "100px", height: "auto" }}
             />
           ) : (
@@ -158,7 +160,7 @@ const Carousal = () => {
       setImagePreview("");
     }
   }, [formData.img]);
-  
+
 
   const fetchTeam = async () => {
     setLoading(true);
@@ -199,7 +201,7 @@ const Carousal = () => {
         // Validate image size
         const isSizeValid = validateImageSize(formData.img);
         if (!isSizeValid) {
-          errors.img = "Image must be 2548*1018 for Desktop and 1307*1018 pixels for mobile";
+          errors.img = "Media size must be 2548*1018 for Desktop and 1307*1018 pixels for mobile";
           isValid = false;
         }
       }
@@ -208,7 +210,7 @@ const Carousal = () => {
       if (formData.img && formData.img instanceof File) {
         const isSizeValid = validateImageSize(formData.img);
         if (!isSizeValid) {
-          errors.img = "Image must be 2548*1018 for Desktop and 1307*1018 pixels for mobile";
+          errors.img = "Media size must be 2548*1018 for Desktop and 1307*1018 pixels for mobile";
           isValid = false;
         }
       }
@@ -236,7 +238,7 @@ const Carousal = () => {
         if ((img.width === 2548 || img.width === 1307) && img.height === 1018) {
           resolve();
         } else {
-          reject("Image is not 2548x1018 for Desktop or 1307x1018 for Mobile view.");
+          reject("Media size: 2548x1018 for Desktop view, 1307x1018 for Mobile view. Videos must be less than 10 mb");
         }
       };
       img.onerror = () => reject("Error loading image");
@@ -248,15 +250,15 @@ const Carousal = () => {
     if (!imagePreview) {
       return <div>No preview available</div>;
     }
-  
+
     try {
       if (imagePreview.startsWith('data:')) {
         const mimeType = imagePreview.split(',')[0].split(':')[1].split(';')[0];
         const isVideo = mimeType.startsWith('video/');
         const isImage = mimeType.startsWith('image/');
-  
+
         if (isVideo) {
-          return <video src={imagePreview} style={{ width: "100px", height: "auto", marginBottom: "10px" }} controls />;
+          return <video autoPlay controls src={imagePreview} style={{ width: "100px", height: "auto", marginBottom: "10px" }} />;
         } else if (isImage) {
           return <img src={imagePreview} alt="Selected Preview" style={{ width: "100px", height: "auto", marginBottom: "10px" }} />;
         } else {
@@ -265,9 +267,9 @@ const Carousal = () => {
       } else {
         const isVideo = imagePreview.endsWith('.mp4') || imagePreview.endsWith('.webm') || imagePreview.endsWith('.avi');
         const isImage = imagePreview.endsWith('.png') || imagePreview.endsWith('.jpg') || imagePreview.endsWith('.jpeg');
-  
+
         if (isVideo) {
-          return <video src={imagePreview} style={{ width: "100px", height: "auto", marginBottom: "10px" }} controls />;
+          return <video src={imagePreview} autoPlay controls style={{ width: "100px", height: "auto", marginBottom: "10px" }} />;
         } else if (isImage) {
           return <img src={imagePreview} alt="Selected Preview" style={{ width: "100px", height: "auto", marginBottom: "10px" }} />;
         } else {
@@ -284,10 +286,10 @@ const Carousal = () => {
     if (name === "img" && value instanceof File) {
       try {
         const fileType = value.type.split("/")[0];
-  
+
         if (fileType === "image" || fileType === "video") {
           setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-  
+
           // Update preview if the file is an image or video
           const reader = new FileReader();
           reader.onloadend = () => {
@@ -306,7 +308,7 @@ const Carousal = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (validateForm(formData)) {
       setLoading(true);
       const accessToken = localStorage.getItem("accessToken");
@@ -315,10 +317,10 @@ const Carousal = () => {
         data.append(key, formData[key]);
       }
       console.log("data", data);
-  
+
       try {
         if (editMode) {
-          
+
           await instance.put(`homeslider/update-homeslider/${editingId}`, data, {
             headers: {
               Authorization: "Bearer " + accessToken,
@@ -340,7 +342,7 @@ const Carousal = () => {
           toast.success("Data Submitted Successfully");
         }
         fetchTeam();
-  
+
         setEditMode(false);
         setFormData({});
         setImagePreview("");
@@ -488,7 +490,7 @@ const Carousal = () => {
     const selectedMember = team.find((member) => member.id === id);
     setEditingId(id);
     console.log("selectedMember", selectedMember);
-    
+
     setFormData({
       ...selectedMember,
       img: selectedMember.img // Ensure the URL or file is set correctly
@@ -583,7 +585,7 @@ const Carousal = () => {
                         }}
                         initialData={formData}
                         error={errors.img}
-                        imageDimensiion="Image size: 2548x1018 for Desktop view, 1307x1018 for Mobile view. Videos are also supported."
+                        imageDimensiion="Media size: 2548x1018 for Desktop view, 1307x1018 for Mobile view. Videos must be less than 10 mb"
                       />
                     </Col>
                     <Col md={4}>
