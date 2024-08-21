@@ -110,7 +110,7 @@ const AreaTop = ({ buttonValue, tableView }) => {
     } else if (window.location.pathname == "/office") {
       setHeader("Our Offices");
     } else if (window.location.pathname == "/carousalform") {
-      setHeader("User Data");
+      setHeader("User Data List");
     } else if (window.location.pathname == "/requestcallbackform") {
       setHeader("Request Callback Form");
     } else if (window.location.pathname == "/office") {
@@ -118,7 +118,7 @@ const AreaTop = ({ buttonValue, tableView }) => {
     } else if (window.location.pathname == "/getintouch") {
       setHeader("Get In Touch");
     } else if (window.location.pathname == "/subscribe") {
-      setHeader("Subscribe");
+      setHeader("Subscriber List");
     } else if (window.location.pathname == "/uploadcv") {
       setHeader("Cv List");
     } else if (window.location.pathname == "/applicationdata") {

@@ -158,6 +158,11 @@ const UploadCv = () => {
       key: "cv",
     },
     {
+      name: <CustomHeader name="Date" />,
+      selector: (row) => (row.createdAt)?.slice(0,10),
+      key: "message",
+    },
+    {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
         <div className="d-flex">

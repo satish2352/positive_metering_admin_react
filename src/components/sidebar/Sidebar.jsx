@@ -163,7 +163,7 @@ const SidebarMenu = [
     mainIcon: <MdOutlinePermContactCalendar size={24} />,
     subMenu: [
       {
-        subMenus: "User Data",
+        subMenus: "User Data List",
         url: "/carousalform",
         icon: <RiFileListLine style={{ color: "red" }} size={24} />,
       },
@@ -173,7 +173,7 @@ const SidebarMenu = [
         icon: <FiUploadCloud style={{ color: "red" }} size={24} />,
       },
       {
-        subMenus: "Subscribe",
+        subMenus: "Subscriber List",
         url: "/subscribe",
         icon: <MdAccountBox style={{ color: "red" }} size={24} />,
       },
