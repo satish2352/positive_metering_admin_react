@@ -326,7 +326,7 @@ const NewReusableForm = ({
         <>
           <Form.Control
             type={type}
-            accept="image/*,.pdf,.doc,.docx"
+            accept="image/*,.pdf,.doc,.docx, video/*"
             onChange={handleChange}
             isInvalid={!!error || !!charError}
           />

@@ -8,10 +8,10 @@ import {
   Button,
   Form,
   Table,
-  Tooltip, OverlayTrigger,  
+  Tooltip, OverlayTrigger,
 } from "react-bootstrap";
 import DataTable from "react-data-table-component";
-import { useSearchExport  } from "../../context/SearchExportContext";
+import { useSearchExport } from "../../context/SearchExportContext";
 
 import NewResuableForm from "../../components/form/NewResuableForm";
 import SearchInput from "../../components/search/SearchInput";
@@ -21,7 +21,7 @@ import instance from "../../api/AxiosInstance";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import { ThreeDots  } from 'react-loader-spinner'; 
+import { ThreeDots } from 'react-loader-spinner';
 
 import "../../App.scss";
 import { Label } from "recharts";
@@ -29,7 +29,7 @@ const Carousal = () => {
   // const {  setData, filteredData } =
   //   useSearchExport();
   const { searchQuery, handleSearch, handleExport, setData, filteredData } =
-  useSearchExport();
+    useSearchExport();
   const [team, setTeam] = useState([]);
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -41,7 +41,7 @@ const Carousal = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
-  
+
   const CustomHeader = ({ name }) => (
     <div style={{ fontWeight: "bold", color: "black", fontSize: "16px" }}>
       {name}
@@ -61,14 +61,27 @@ const Carousal = () => {
       cell: (row) => <span>{row.view}</span>,
     },
     {
-      name: <CustomHeader name="Image" />,
-      cell: (row) => (
-        <img
-          src={row.img}
-          alt="Event"
-          style={{ width: "100px", height: "auto" }}
-        />
-      ),
+      name: <CustomHeader name="Media" />,
+      cell: (row) => {
+        const fileExtension = row.img.split('.').pop().toLowerCase();
+
+        const isVideo = ['mp4', 'avi', 'mov', 'wmv'].includes(fileExtension);
+
+        return (
+          isVideo ? (
+            <video
+              src={row.img}
+              style={{ width: "100px", height: "auto" }}
+            />
+          ) : (
+            <img
+              src={row.img}
+              alt="Event"
+              style={{ width: "100px", height: "auto" }}
+            />
+          )
+        );
+      },
     },
     {
       name: <CustomHeader name="Actions" />,
@@ -114,7 +127,7 @@ const Carousal = () => {
       ),
     },
 
- 
+
   ];
 
   useEffect(() => {
@@ -128,21 +141,24 @@ const Carousal = () => {
     // Store visibility state in localStorage whenever it changes
     localStorage.setItem('eyeVisibilityById', JSON.stringify(eyeVisibilityById));
   }, [eyeVisibilityById]);
-  
+
 
   useEffect(() => {
-    if (formData.img && formData.img instanceof File) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(formData.img);
-    } else if (formData.img && typeof formData.img === "string") {
-      setImagePreview(formData.img);
+    if (formData.img) {
+      if (formData.img instanceof File) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result);
+        };
+        reader.readAsDataURL(formData.img);
+      } else if (typeof formData.img === "string") {
+        setImagePreview(formData.img);
+      }
     } else {
       setImagePreview("");
     }
   }, [formData.img]);
+  
 
   const fetchTeam = async () => {
     setLoading(true);
@@ -162,79 +178,125 @@ const Carousal = () => {
         "Error fetching team:",
         error.response || error.message || error
       );
-    }    finally {
+    } finally {
       setLoading(false);
     }
   };
 
   const validateForm = (formData) => {
     console.log("formData", formData);
-    
+
     let errors = {};
     let isValid = true;
-  
- 
-  // Check if formData.img is a File object
-  if (!formData.img || !(formData.img instanceof File)) {
-    errors.img = "Image is required with 2548*1018 for Desktop and 1307*1018 pixels for mobile";
-    isValid = false;
-  } else {
-    // Validate image size
-    const isSizeValid = validateImageSize(formData.img);
-    if (!isSizeValid) {
-      errors.img = "Image is not 2548*1018 for Desktop and 1307*1018 pixels for mobile";
-      isValid = false;
+
+
+    // Check if formData.img is a File object
+    if (!editMode) { // Only check for the image if not in edit mode
+      if (!formData.img || !(formData.img instanceof File)) {
+        errors.img = "Image is required with 2548*1018 for Desktop and 1307*1018 pixels for mobile";
+        isValid = false;
+      } else {
+        // Validate image size
+        const isSizeValid = validateImageSize(formData.img);
+        if (!isSizeValid) {
+          errors.img = "Image must be 2548*1018 for Desktop and 1307*1018 pixels for mobile";
+          isValid = false;
+        }
+      }
+    } else {
+      // In edit mode, if an image is provided, validate its size
+      if (formData.img && formData.img instanceof File) {
+        const isSizeValid = validateImageSize(formData.img);
+        if (!isSizeValid) {
+          errors.img = "Image must be 2548*1018 for Desktop and 1307*1018 pixels for mobile";
+          isValid = false;
+        }
+      }
     }
-  }
     if (!formData.view) {
       errors.view = "View selection is required";
       isValid = false;
     }
-  
+
     setErrors(errors);
     return isValid;
   };
 
- 
+
   const validateImageSize = (file, view) => {
-    
     return new Promise((resolve, reject) => {
+      if (!file.type.startsWith("image/")) {
+        // Skip validation for non-image files
+        resolve();
+        return;
+      }
+
       const img = new Image();
       img.onload = () => {
-        // const dimensions = {
-        //   Desktop: { width: 2548, height: 1018, message: "Uploaded image is not 2548*1018 pixels for Desktop view." },
-        //   Mobile: { width: 1307, height: 1018, message: "Uploaded image is not 1307*1018 pixels for Mobile view." }
-        // };
-        
-    // Validate the view parameter
-    // if (!dimensions[view]) {
-    //   reject("Invalid view type specified.");
-    //   return;
-    // }
-
-    // const { width, height, message } = dimensions[view];
-        
         if ((img.width === 2548 || img.width === 1307) && img.height === 1018) {
           resolve();
         } else {
-          reject(message);
+          reject("Image is not 2548x1018 for Desktop or 1307x1018 for Mobile view.");
         }
       };
       img.onerror = () => reject("Error loading image");
       img.src = URL.createObjectURL(file);
     });
   };
-  
 
+  const renderPreview = () => {
+    if (!imagePreview) {
+      return <div>No preview available</div>;
+    }
+  
+    try {
+      if (imagePreview.startsWith('data:')) {
+        const mimeType = imagePreview.split(',')[0].split(':')[1].split(';')[0];
+        const isVideo = mimeType.startsWith('video/');
+        const isImage = mimeType.startsWith('image/');
+  
+        if (isVideo) {
+          return <video src={imagePreview} style={{ width: "100px", height: "auto", marginBottom: "10px" }} controls />;
+        } else if (isImage) {
+          return <img src={imagePreview} alt="Selected Preview" style={{ width: "100px", height: "auto", marginBottom: "10px" }} />;
+        } else {
+          return <div>Unsupported file type</div>;
+        }
+      } else {
+        const isVideo = imagePreview.endsWith('.mp4') || imagePreview.endsWith('.webm') || imagePreview.endsWith('.avi');
+        const isImage = imagePreview.endsWith('.png') || imagePreview.endsWith('.jpg') || imagePreview.endsWith('.jpeg');
+  
+        if (isVideo) {
+          return <video src={imagePreview} style={{ width: "100px", height: "auto", marginBottom: "10px" }} controls />;
+        } else if (isImage) {
+          return <img src={imagePreview} alt="Selected Preview" style={{ width: "100px", height: "auto", marginBottom: "10px" }} />;
+        } else {
+          return <div>Unsupported file type</div>;
+        }
+      }
+    } catch (error) {
+      console.error("Error rendering preview:", error);
+      return <div>Error rendering preview</div>;
+    }
+  };
 
   const handleChange = async (name, value) => {
-    console.log("File received:", value); // Log the file
     if (name === "img" && value instanceof File) {
       try {
-        await validateImageSize(value, formData.view);
-        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+        const fileType = value.type.split("/")[0];
+  
+        if (fileType === "image" || fileType === "video") {
+          setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+  
+          // Update preview if the file is an image or video
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setImagePreview(reader.result);
+          };
+          reader.readAsDataURL(value);
+        }
       } catch (error) {
-        setErrors((prevErrors) => ({ ...prevErrors, img: error }));
+        setErrors((prevErrors) => ({ ...prevErrors, img: "Error processing file" }));
         setImagePreview("");
       }
     } else {
@@ -244,18 +306,19 @@ const Carousal = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("formData____________", formData);
-    
+  
     if (validateForm(formData)) {
       setLoading(true);
-      const accessToken = localStorage.getItem("accessToken"); // Retrieve access token
+      const accessToken = localStorage.getItem("accessToken");
       const data = new FormData();
       for (const key in formData) {
         data.append(key, formData[key]);
       }
-
+      console.log("data", data);
+  
       try {
         if (editMode) {
+          
           await instance.put(`homeslider/update-homeslider/${editingId}`, data, {
             headers: {
               Authorization: "Bearer " + accessToken,
@@ -277,15 +340,15 @@ const Carousal = () => {
           toast.success("Data Submitted Successfully");
         }
         fetchTeam();
-
+  
         setEditMode(false);
         setFormData({});
         setImagePreview("");
-        setShowTable(true); // Switch back to table view after submission
+        setShowTable(true);
       } catch (error) {
         console.error("Error handling form submission:", error);
       } finally {
-        setLoading(false); // Set loading to false
+        setLoading(false);
       }
     }
   };
@@ -334,8 +397,8 @@ const Carousal = () => {
                   console.error("Error deleting data:", error);
                   toast.error("Error deleting data");
                 } finally {
-        setLoading(false); 
-      }
+                  setLoading(false);
+                }
                 onClose();
               }}
             >
@@ -405,8 +468,8 @@ const Carousal = () => {
                   console.error("Error updating visibility:", error);
                   toast.error("Error updating visibility");
                 } finally {
-        setLoading(false); // Set loading to false
-      }
+                  setLoading(false); // Set loading to false
+                }
                 onClose();
               }}
             >
@@ -424,9 +487,14 @@ const Carousal = () => {
   const toggleEdit = (id) => {
     const selectedMember = team.find((member) => member.id === id);
     setEditingId(id);
-    setFormData(selectedMember);
+    console.log("selectedMember", selectedMember);
+    
+    setFormData({
+      ...selectedMember,
+      img: selectedMember.img // Ensure the URL or file is set correctly
+    });
     setEditMode(true);
-    setShowTable(false); // Switch to form view when editing
+    setShowTable(false);
   };
 
   const handleAdd = () => {
@@ -442,130 +510,120 @@ const Carousal = () => {
   };
 
   return (
-  
+
 
     <Container fluid>
-    <Row>
-      <Col>
-        <Card>
-          <Card.Header>
-            <Row>
-              {showTable ? (
-                <Col className="d-flex justify-content-end align-items-center">
-    
-                  <Button
-                    variant="outline-success"
-                    onClick={handleAdd}
-                    className="ms-2 mb-3"
-                  >
-                    Add
-                  </Button>
-                </Col>
-              ) : (
-                <Col className="d-flex justify-content-end align-items-center">
-                  <Button   variant="outline-secondary" onClick={handleView}>
-                    View
-                  </Button>
-                </Col>
-              )}
-            </Row>
-          </Card.Header>
+      <Row>
+        <Col>
+          <Card>
+            <Card.Header>
+              <Row>
+                {showTable ? (
+                  <Col className="d-flex justify-content-end align-items-center">
 
-          <Card.Body>
-            {loading ? ( // Check loading state
-              <div className="d-flex justify-content-center align-items-center" style={{ height: '100px' }}>
-                <ThreeDots  
-                  height="80"
-                  width="80"
-                  radius="9"
-                  color="#000"
-                  ariaLabel="three-dots-loading"
-            
-                  visible={true}
-                />
-              </div>
-            ) : showTable ? (
-              <DataTable
-                columns={tableColumns(currentPage, rowsPerPage)}
-                data={filteredData.length > 0 ? filteredData : team}
-                pagination
-                responsive
-                striped
-                noDataComponent="No Data Available"
-                onChangePage={(page) => setCurrentPage(page)}
-                onChangeRowsPerPage={(rowsPerPage) =>
-                  setRowsPerPage(rowsPerPage)
-                }
-              />
-            ) : (
-              <Form onSubmit={handleSubmit}>
-                <Row>
-                  <Col md={12}>
-                    {imagePreview && (
-                      <img
-                        src={imagePreview}
-                        alt="Selected Preview"
-                        style={{
-                          width: "100px",
-                          height: "auto",
-                          marginBottom: "10px",
-                        }}
-                      />
-                    )}
-                    <NewResuableForm
-                      label={"Upload Home Sliding Image"}
-                      placeholder={"Upload Image"}
-                      name={"img"}
-                      type={"file"}
-                      onChange={(name, value) => {
-                        const file = value;
-                        if (file) {
-                          handleChange(name, file);
-                        }
-                      }}
-                      initialData={formData}
-                      error={errors.img}
-                      imageDimensiion="Image size: 2548x1018 for Desktop view, 1307x1018 for Mobile view."
-                    />
-                  </Col>
-                  <Col md={4}>
-                    <Form.Group controlId="formView">
-                      <Form.Label>View</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="view"
-                        value={formData.view || ""}
-                        onChange={(e) =>
-                          handleChange(e.target.name, e.target.value)
-                        }
-                      >
-                        <option value="">Select View</option>
-                        <option value="Mobile">Mobile</option>
-                        <option value="Desktop">Desktop</option>
-                      </Form.Control>
-                      {errors.view && (
-                        <p className="text-danger">{errors.view}</p>
-                      )}
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <Row>
-                  <div className="mt-3 d-flex justify-content-end">
                     <Button
-                      type="submit"
-                      variant={editMode ? "success" : "primary"}
+                      variant="outline-success"
+                      onClick={handleAdd}
+                      className="ms-2 mb-3"
                     >
-                      {editMode ? "Update" : "Submit"}
+                      Add
                     </Button>
-                  </div>
-                </Row>
-              </Form>
-            )}
-          </Card.Body>
-        </Card>
-      </Col>
-    </Row>
-  </Container>
+                  </Col>
+                ) : (
+                  <Col className="d-flex justify-content-end align-items-center">
+                    <Button variant="outline-secondary" onClick={handleView}>
+                      View
+                    </Button>
+                  </Col>
+                )}
+              </Row>
+            </Card.Header>
+
+            <Card.Body>
+              {loading ? ( // Check loading state
+                <div className="d-flex justify-content-center align-items-center" style={{ height: '100px' }}>
+                  <ThreeDots
+                    height="80"
+                    width="80"
+                    radius="9"
+                    color="#000"
+                    ariaLabel="three-dots-loading"
+
+                    visible={true}
+                  />
+                </div>
+              ) : showTable ? (
+                <DataTable
+                  columns={tableColumns(currentPage, rowsPerPage)}
+                  data={filteredData.length > 0 ? filteredData : team}
+                  pagination
+                  responsive
+                  striped
+                  noDataComponent="No Data Available"
+                  onChangePage={(page) => setCurrentPage(page)}
+                  onChangeRowsPerPage={(rowsPerPage) =>
+                    setRowsPerPage(rowsPerPage)
+                  }
+                />
+              ) : (
+                <Form onSubmit={handleSubmit}>
+                  <Row>
+                    <Col md={12}>
+                      {renderPreview()}
+                      <NewResuableForm
+                        label={"Upload Home Sliding Media"}
+                        placeholder={"Upload Media"}
+                        name={"img"}
+                        type={"file"}
+                        onChange={(name, value) => {
+                          const file = value;
+                          if (file) {
+                            handleChange(name, file);
+                          }
+                        }}
+                        initialData={formData}
+                        error={errors.img}
+                        imageDimensiion="Image size: 2548x1018 for Desktop view, 1307x1018 for Mobile view. Videos are also supported."
+                      />
+                    </Col>
+                    <Col md={4}>
+                      <Form.Group controlId="formView">
+                        <Form.Label>View</Form.Label>
+                        <Form.Control
+                          as="select"
+                          name="view"
+                          value={formData.view || ""}
+                          onChange={(e) =>
+                            handleChange(e.target.name, e.target.value)
+                          }
+                        >
+                          <option value="">Select View</option>
+                          <option value="Mobile">Mobile</option>
+                          <option value="Desktop">Desktop</option>
+                        </Form.Control>
+                        {errors.view && (
+                          <p className="text-danger">{errors.view}</p>
+                        )}
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <div className="mt-3 d-flex justify-content-end">
+                      <Button
+                        type="submit"
+                        variant={editMode ? "success" : "primary"}
+                      >
+                        {editMode ? "Update" : "Submit"}
+                      </Button>
+                    </div>
+                  </Row>
+                </Form>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
