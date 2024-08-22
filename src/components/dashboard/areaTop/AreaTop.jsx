@@ -94,9 +94,9 @@ const AreaTop = ({ buttonValue, tableView }) => {
     } else if (window.location.pathname == "/productdetails") {
       setHeader("Product Details");
     } else if (window.location.pathname == "/technicaldata") {
-      setHeader("Technical Data");
+      setHeader("Models");
     } else if (window.location.pathname == "/optionsdata") {
-      setHeader("Options Data");
+      setHeader("Accessories & Optional");
     } else if (window.location.pathname == "/materialdata") {
       setHeader("Material Data");
     } else if (window.location.pathname == "/blogdetails") {

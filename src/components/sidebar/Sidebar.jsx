@@ -90,12 +90,12 @@ const SidebarMenu = [
         icon: <IoIosOptions style={{ color: "red" }} size={24} />,
       },
       {
-        subMenus: "Technical Data",
+        subMenus: "Models",
         url: "/technicaldata",
         icon: <FiFileText style={{ color: "red" }} size={24} />,
       },
       {
-        subMenus: "Options Data",
+        subMenus: "Accessories & Optional",
         url: "/optionsdata",
         icon: <IoIosOptions style={{ color: "red" }} size={24} />,
       },
