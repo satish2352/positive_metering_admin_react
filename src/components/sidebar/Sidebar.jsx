@@ -99,11 +99,11 @@ const SidebarMenu = [
         url: "/optionsdata",
         icon: <IoIosOptions style={{ color: "red" }} size={24} />,
       },
-      {
-        subMenus: "Material Data",
-        url: "/materialdata",
-        icon: <RiFileListLine style={{ color: "red" }} size={24} />,
-      },
+      // {
+      //   subMenus: "Material Data",
+      //   url: "/materialdata",
+      //   icon: <RiFileListLine style={{ color: "red" }} size={24} />,
+      // },
       {
         subMenus: "Application Data",
         url: "/applicationdata",
