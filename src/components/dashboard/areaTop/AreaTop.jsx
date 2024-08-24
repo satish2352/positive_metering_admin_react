@@ -72,7 +72,8 @@ const AreaTop = ({ buttonValue, tableView }) => {
  "/contactsalesperson",
  "/events",
  "/news",
- "/productimages"
+ "/productimages",
+ "/social-contact"
   ];
   const isHiddenPath = hiddenPaths.includes(location.pathname);
 
@@ -154,10 +155,3 @@ const AreaTop = ({ buttonValue, tableView }) => {
 };
 
 export default AreaTop;
-
-
-
-
-
-
-
