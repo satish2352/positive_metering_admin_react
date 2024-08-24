@@ -89,6 +89,8 @@ const AreaTop = ({ buttonValue, tableView }) => {
       setHeader("Infrastructure");
     } else if (window.location.pathname == "/ourteam") {
       setHeader("Our Team");
+    } else if (window.location.pathname == "/social-contact") {
+      setHeader("Social Contacts");
     } else if (window.location.pathname == "/productname") {
       setHeader("Product Name");
     } else if (window.location.pathname == "/productdetails") {

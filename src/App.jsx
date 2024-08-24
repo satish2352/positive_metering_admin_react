@@ -46,6 +46,7 @@ import ProtectedRoutes from "./api/ProtectedRoutes";
 import ApplicationData from "./screens/submenus/ApplicationData";
 import Events from "./screens/submenus/Events";
 import ProductImages from "./screens/submenus/ProductImages";
+import SocialContact from "./screens/submenus/SocialContact";
 
 function App() {
   return (
@@ -97,6 +98,10 @@ function App() {
           <Route
             path="/headercontact"
             element={<ProtectedRoutes Component={HeaderContact} />}
+          />
+          <Route
+            path="/social-contact"
+            element={<ProtectedRoutes Component={SocialContact} />}
           />
           <Route
             path="/heroform"

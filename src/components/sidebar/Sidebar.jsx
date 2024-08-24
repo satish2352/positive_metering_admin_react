@@ -41,6 +41,11 @@ const SidebarMenu = [
         icon: <RiContactsBookLine style={{ color: "red" }} size={24} />,
       },
       {
+        subMenus: "Social Contacts",
+        url: "/social-contact",
+        icon: <RiContactsBookLine style={{ color: "red" }} size={24} />,
+      },
+      {
         subMenus: "Home Sliding Media",
         url: "/carousal",
         icon: <RiFileListLine style={{ color: "red" }} size={24} />,
@@ -175,7 +180,7 @@ const SidebarMenu = [
       {
         subMenus: "Subscriber List",
         url: "/subscribe",
-        icon: <MdAccountBox style={{ color: "red" }} size={24} />,
+        icon: <RiContactsBookLine style={{ color: "red" }} size={24} />,
       },
     ],
   },
