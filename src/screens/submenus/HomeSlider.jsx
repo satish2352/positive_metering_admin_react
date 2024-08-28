@@ -53,6 +53,10 @@ const HomeSlider = () => {
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
     },
     {
+      name: <CustomHeader name="Title" />,
+      cell: (row) => <span>{row.title}</span>,
+    },
+    {
       name: <CustomHeader name="Image" />,
       cell: (row) => (
         <img
@@ -162,7 +166,10 @@ const HomeSlider = () => {
   const validateForm = (formData) => {
     let errors = {};
     let isValid = true;
-
+    if (!formData.title?.trim()) {
+      errors.title = "Title is required";
+      isValid = false;
+    }
     if (!formData.img) {
       errors.img = "Image is required with 338x220 pixels";
       isValid = false;
@@ -484,6 +491,17 @@ const HomeSlider = () => {
                       initialData={formData}
                       error={errors.img}
                       imageDimensiion="Image must be 338x220 pixels"
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <NewResuableForm
+                      label="Title"
+                      placeholder="Enter Title"
+                      name="title"
+                      type="text"
+                      onChange={handleChange}
+                      initialData={formData}
+                      error={errors.title}
                     />
                   </Col>
                 </Row>

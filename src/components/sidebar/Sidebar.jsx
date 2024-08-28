@@ -3,32 +3,25 @@ import { Button } from "react-bootstrap";
 import logo from "../../assets/images/logo.png";
 import { Sidebar as MenuBar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import { Link } from "react-router-dom";
-import { ShowContext } from "../../context/ShowContext";
 import {
   MdOutlineClose,
   MdHome,
   MdLogout,
-  MdOutlineContactMail,
-  MdAccountBox,
   MdOutlinePermContactCalendar,
 } from "react-icons/md";
-import { SiStorybook } from "react-icons/si";
-import { GrServices } from "react-icons/gr";
-import { RiTeamFill, RiFileListLine, RiContactsBookLine } from "react-icons/ri";
+import { RiTeamFill, RiContactsBookLine, RiFileListLine } from "react-icons/ri";
 import { FiUsers, FiList, FiFileText, FiUploadCloud } from "react-icons/fi";
-import { AiOutlineAppstoreAdd, AiOutlineProject } from "react-icons/ai";
 import {
-  BsNewspaper,
-  BsChatSquareQuote,
-  BsBuilding,
-  BsCameraVideo,
-} from "react-icons/bs";
-import { IoIosOptions, IoIosPeople } from "react-icons/io";
-import { FaRegNewspaper, FaBusinessTime } from "react-icons/fa";
+  AiOutlineAppstoreAdd,
+  AiOutlineProject,
+} from "react-icons/ai";
+import { BsNewspaper, BsBuilding, BsChatSquareQuote } from "react-icons/bs";
+import { FaRegNewspaper } from "react-icons/fa";
 import "./Sidebar.scss";
 import { SidebarContext } from "../../context/SidebarContext";
 import { TitleContext } from "../../context/TitleContext";
-
+import { IoIosOptions, IoIosPeople } from "react-icons/io";
+// Sidebar menu structure
 const SidebarMenu = [
   {
     menu: "Home",
@@ -192,147 +185,7 @@ const SidebarMenu = [
   },
 ];
 
-
-
-////savita mam code 
-
-// const Sidebar = ({setButtonText, setTableView}) => {
-//   const { isSidebarOpen, closeSidebar, setActiveMenu, activeMenuName } =
-//     useContext(SidebarContext);
-//   const { setTitle } = useContext(TitleContext);
-//   const navbarRef = useRef(null);
-//   const [activeSubMenu, setActiveSubMenu] = useState("");
-
-//   const handleClickOutside = (event) => {
-//     if (
-//       navbarRef.current &&
-//       !navbarRef.current.contains(event.target) &&
-//       event.target.className !== "sidebar-open-btn"
-//     ) {
-//       closeSidebar();
-//     }
-//   };
-
-//   const handleResize = () => {
-//     if (window.innerWidth <= 1200) {
-//       closeSidebar();
-//     }
-//   };
-
-//   useEffect(() => {
-//     document.addEventListener("mousedown", handleClickOutside);
-//     window.addEventListener("resize", handleResize);
-
-//     return () => {
-//       document.removeEventListener("mousedown", handleClickOutside);
-//       window.removeEventListener("resize", handleResize);
-//     };
-//   }, []);
-
-//   useEffect(() => {
-//     setTitle(activeMenuName);
-//   }, [activeMenuName, setTitle]);
-
-//   const handleMenuClick = (menu) => {
-//     setActiveMenu(menu);
-//     setActiveSubMenu(""); // Reset active submenu when a menu is clicked
-//     setTitle(menu); // Update title when menu is clicked
-//   };
-
-//   const handleSubMenuClick = (subMenu, parentMenu) => {
-//     setButtonText("View")
-//     setTableView(false)
-//     setTitle(subMenu);
-//     setActiveSubMenu(subMenu);
-//     setActiveMenu(parentMenu); // Set the parent menu as active
-//   };
-
-//   return (
-//     <nav
-//       ref={navbarRef}
-//       className={`sidebar ${isSidebarOpen ? "sidebar-show" : ""}`}
-//     >
-//       <div className="sidebar-top">
-//         <div className="sidebar-brand">
-//           <img className="w-25" src={logo} alt="Logo" />
-//           <span className="sidebar-brand-text text-danger">
-//             Positive Metering Pvt Ltd
-//           </span>
-//         </div>
-//         <Button
-//           variant="outline-danger"
-//           className="sidebar-close-btn"
-//           onClick={closeSidebar}
-//         >
-//           <MdOutlineClose size={24} />
-//         </Button>
-//       </div>
-//       <div className="sidebar-body">
-//         <div className="sidebar-menu">
-//           <MenuBar>
-//             <Menu>
-//               {SidebarMenu.map((item, id) => (
-//                 <div key={id}>
-//                   {item.subMenu.length > 0 ? (
-//                     <SubMenu
-//                       className={`menu-link-text bg-white ${
-//                         activeMenuName === item.menu ? "active" : ""
-//                       }`}
-//                       icon={item.mainIcon}
-//                       label={item.menu}
-//                       open={activeMenuName === item.menu}
-//                       onClick={() => handleMenuClick(item.menu)}
-//                     >
-//                       {item.subMenu.map((sub, subId) => (
-//                         <MenuItem
-//                           key={subId}
-//                           className={`menu-link-text ${
-//                             activeSubMenu === sub.subMenus ? "active" : ""
-//                           }`}
-//                           icon={sub.icon}
-//                           component={<Link to={sub.url} />}
-//                           onClick={() =>
-//                             handleSubMenuClick(sub.subMenus, item.menu)
-//                           }
-//                         >
-//                           {sub.subMenus}
-//                         </MenuItem>
-//                       ))}
-//                     </SubMenu>
-//                   ) : (
-//                     <MenuItem
-//                       className={`menu-link-text bg-white ${
-//                         activeMenuName === item.menu ? "active" : ""
-//                       }`}
-//                       icon={item.mainIcon}
-//                       component={<Link to={item.url} />}
-//                       onClick={() => handleMenuClick(item.menu)}
-//                     >
-//                       {item.menu}
-//                     </MenuItem>
-//                   )}
-//                 </div>
-//               ))}
-//             </Menu>
-//           </MenuBar>
-//         </div>
-//       </div>
-//     </nav>
-//   );
-// };
-
-// export default Sidebar;
-
-
-
-
-
-
-
-
-
-
-////v1
+// Sidebar Component
 const Sidebar = () => {
   const { isSidebarOpen, closeSidebar } = useContext(SidebarContext);
   const navbarRef = useRef(null);
@@ -340,6 +193,7 @@ const Sidebar = () => {
   const [activeMenu, setActiveMenu] = useState("");
   const [activeSubMenu, setActiveSubMenu] = useState("");
 
+  // Close sidebar on clicking outside
   const handleClickOutside = (event) => {
     if (
       navbarRef.current &&
@@ -350,6 +204,7 @@ const Sidebar = () => {
     }
   };
 
+  // Close sidebar on window resize
   const handleResize = () => {
     if (window.innerWidth <= 1200) {
       closeSidebar();
@@ -366,14 +221,16 @@ const Sidebar = () => {
     };
   }, []);
 
+  // Handle main menu click
   const handleMenuClick = (menu) => {
-    setActiveMenu(menu);
-    setActiveSubMenu(""); // Reset active submenu when a menu is clicked
+    setActiveMenu(activeMenu === menu ? "" : menu); // Toggle active menu
+    setActiveSubMenu(""); // Close any open sub menu when a main menu is clicked
+    setTitle(menu); // Set the title context
   };
 
+  // Handle sub menu click
   const handleSubMenuClick = (subMenu) => {
-    setTitle(subMenu);
-    setActiveSubMenu(subMenu);
+    setActiveSubMenu(subMenu); // Set active sub menu
   };
 
   return (
@@ -406,43 +263,37 @@ const Sidebar = () => {
                       }`}
                       icon={item.mainIcon}
                       label={item.menu}
+                      open={activeMenu === item.menu}
+                      onClick={() => handleMenuClick(item.menu)}
                     >
                       {item.subMenu.map((subItem, subId) => (
-                        <div
+                        <MenuItem
                           key={subId}
+                          component={<Link to={subItem.url} />}
+                          icon={subItem.icon}
                           className={`menu-link-text bg-white ${
                             activeSubMenu === subItem.subMenus ? "active" : ""
                           }`}
-                          style={{ cursor: "pointer" }}
                           onClick={() => handleSubMenuClick(subItem.subMenus)}
                         >
-                          <Link
-                            to={subItem.url}
-                            className="text-decoration-none text-black"
-                          >
-                            <MenuItem icon={subItem.icon}>
-                              {subItem.subMenus}
-                            </MenuItem>
-                          </Link>
-                        </div>
+                          {subItem.subMenus}
+                        </MenuItem>
                       ))}
                     </SubMenu>
                   ) : (
-                    <div
-                      key={id}
+                    <MenuItem
+                      icon={item.mainIcon}
                       className={`menu-link-text bg-white ${
                         activeMenu === item.menu ? "active" : ""
                       }`}
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleMenuClick(item.menu)}
+                      onClick={() => {
+                        handleMenuClick(item.menu);
+                        closeSidebar(); // Close sidebar on menu item click
+                      }}
+                      component={<Link to={item.url} />}
                     >
-                      <Link
-                        to={item.url}
-                        className="text-decoration-none text-black"
-                      >
-                        <MenuItem icon={item.mainIcon}>{item.menu}</MenuItem>
-                      </Link>
-                    </div>
+                      {item.menu}
+                    </MenuItem>
                   )}
                 </div>
               ))}

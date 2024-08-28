@@ -63,15 +63,14 @@ const Carousal = () => {
     {
       name: <CustomHeader name="Media" />,
       cell: (row) => {
-        const fileExtension = row?.img?.split('.')?.pop()?.toLowerCase();
-
-        const isVideo = ['mp4', 'avi', 'mov', 'wmv'].includes(fileExtension);
-
-        return (
-          isVideo ? (
+        if (typeof row.img === 'string') {
+          const fileExtension = row.img.split('.').pop().toLowerCase();
+          const isVideo = ['mp4', 'avi', 'mov', 'wmv'].includes(fileExtension);
+    
+          return isVideo ? (
             <video
               src={row.img}
-              autoPlay  // Add autoPlay attribute for autoplay
+              autoPlay
               controls
               style={{ width: "100px", height: "auto" }}
             />
@@ -81,8 +80,10 @@ const Carousal = () => {
               alt="Event"
               style={{ width: "100px", height: "auto" }}
             />
-          )
-        );
+          );
+        } else {
+          return <div>Invalid Media</div>;
+        }
       },
     },
     {
@@ -253,7 +254,7 @@ const Carousal = () => {
 
     try {
       if (imagePreview.startsWith('data:')) {
-        const mimeType = imagePreview.split(',')[0].split(':')[1].split(';')[0];
+        const mimeType = imagePreview?.split(',')[0]?.split(':')[1]?.split(';')[0];
         const isVideo = mimeType.startsWith('video/');
         const isImage = mimeType.startsWith('image/');
 
@@ -285,7 +286,7 @@ const Carousal = () => {
   const handleChange = async (name, value) => {
     if (name === "img" && value instanceof File) {
       try {
-        const fileType = value.type.split("/")[0];
+        const fileType = value.type?.split("/")[0];
 
         if (fileType === "image" || fileType === "video") {
           setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
