@@ -81,7 +81,11 @@ import { toast } from "react-toastify";
 
 const instance = axios.create({
   // baseURL: `https://positivebackend.sumagodemo.com/`,
-  baseURL: `https://api.positivemetering.in/`,
+  // baseURL: `https://api.positivemetering.in/`,
+  // baseURL: `http://api.positivemetering.ae.sumagodemo.com/`,
+  // baseURL: `https://apipositiveae.sumagodemo.com/`,
+  // baseURL: `http://api.positivemetering.ae/`,
+  baseURL: `https://api.positivemetering.in/api`,
   // baseURL: `  http://localhost:5173/`,
 });
 
@@ -100,13 +104,13 @@ instance.interceptors.response.use(
   async (response) => response,
   async (error) => {
     if (error?.response?.status === 401) {
-      let keysToRemove = [ "accessToken"];
+      let keysToRemove = ["accessToken"];
       for (let key of keysToRemove) {
         localStorage.removeItem(key);
       }
       toast.error("Unauthorized access - please log in.");
       window.location.href = "/"; // Redirect to login page
-    } 
+    }
     //  if (error?.response?.status === 404) {
     //   toast.error("Resource not found.");
     // } 
