@@ -85,7 +85,7 @@ const instance = axios.create({
   // baseURL: `http://api.positivemetering.ae.sumagodemo.com/`,
   // baseURL: `https://apipositiveae.sumagodemo.com/`,
   // baseURL: `http://api.positivemetering.ae/`,
-  baseURL: `https://api.positivemetering.in/api`,
+  baseURL: `https://nodetest.positivemetering.in/`,
   // baseURL: `  http://localhost:5173/`,
 });
 
