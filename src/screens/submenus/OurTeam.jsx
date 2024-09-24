@@ -57,6 +57,10 @@ const OurTeam = () => {
 
 
     {
+      name: <CustomHeader name="Name" />,
+      cell: (row) => <span>{row?.name}</span>,
+    },
+    {
       name: <CustomHeader name="Designation" />,
       cell: (row) => <span>{row.designation}</span>,
     },
