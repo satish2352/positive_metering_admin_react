@@ -1,9 +1,4 @@
 
-
-
-
-///////sos
-////v1 datatable added
 import React, { useState, useEffect } from "react";
 import {
   Container,

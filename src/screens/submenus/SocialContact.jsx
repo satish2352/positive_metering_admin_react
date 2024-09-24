@@ -6,7 +6,7 @@ import {
   Card,
   Button,
   Form,
-  Tooltip, OverlayTrigger,  
+  Tooltip, OverlayTrigger,
 } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import { useSearchExport } from "../../context/SearchExportContext";
@@ -63,17 +63,21 @@ const SocialContact = () => {
       cell: (row) => <span>{row.linkedin}</span>,
     },
     {
+      name: <CustomHeader name="Twitter" />,
+      cell: (row) => <span>{row.twitter}</span>,
+    },
+    {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
         <div className="d-flex">
-        <OverlayTrigger
-           placement="top"
-           overlay={<Tooltip id="edit-tooltip">Edit</Tooltip>}
-        >
-        
-          <Button className="ms-1"  onClick={() => toggleEdit(row.id)}>
-            <FaEdit />
-          </Button>
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip id="edit-tooltip">Edit</Tooltip>}
+          >
+
+            <Button className="ms-1" onClick={() => toggleEdit(row.id)}>
+              <FaEdit />
+            </Button>
           </OverlayTrigger>
         </div>
       ),
@@ -95,7 +99,7 @@ const SocialContact = () => {
         },
       });
       console.log("response", response);
-      
+
       const reversedData = response.data.responseData;
       setTeam(reversedData);
       setData(reversedData);
@@ -125,6 +129,10 @@ const SocialContact = () => {
     }
     if (!formData.linkedin?.trim()) {
       errors.linkedin = "linkedin link is required";
+      isValid = false;
+    }
+    if (!formData.twitter?.trim()) {
+      errors.linkedin = "twitter link is required";
       isValid = false;
     }
     if (!formData.whatsapp?.trim()) {
@@ -159,7 +167,7 @@ const SocialContact = () => {
       for (const key in formData) {
         data.append(key, formData[key]);
       }
-  
+
       try {
         await instance.put(`social-contact/socialcontact/${editingId}`, data, {
           headers: {
@@ -168,13 +176,13 @@ const SocialContact = () => {
           },
         });
         toast.success("Data Updated Successfully");
-  
-       
+
+
         const updatedTeam = team.map((member) =>
           member.id === editingId ? { ...member, ...formData } : member
         );
         setTeam(updatedTeam);
-        setData(updatedTeam); 
+        setData(updatedTeam);
         setEditMode(false);
         setFormData({});
         setShowTable(true);
@@ -299,6 +307,17 @@ const SocialContact = () => {
                         onChange={handleChange}
                         initialData={formData}
                         error={errors.linkedin}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <NewResuableForm
+                        label={"Twitter"}
+                        placeholder={"Enter Twitter Link "}
+                        type={"text"}
+                        name={"twitter"}
+                        onChange={handleChange}
+                        initialData={formData}
+                        error={errors.twitter}
                       />
                     </Col>
                   </Row>

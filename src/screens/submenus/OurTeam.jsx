@@ -54,8 +54,6 @@ const OurTeam = () => {
       name: <CustomHeader name="Sr. No." />,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
     },
-
-
     {
       name: <CustomHeader name="Name" />,
       cell: (row) => <span>{row?.name}</span>,

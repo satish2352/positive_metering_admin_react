@@ -66,6 +66,11 @@ const SidebarMenu = [
         icon: <BsBuilding style={{ color: "red" }} size={24} />,
       },
       {
+        subMenus: "Leadership",
+        url: "/leadership",
+        icon: <FiUsers style={{ color: "red" }} size={24} />,
+      },
+      {
         subMenus: "Our Team",
         url: "/ourteam",
         icon: <FiUsers style={{ color: "red" }} size={24} />,

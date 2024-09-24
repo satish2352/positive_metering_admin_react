@@ -62,6 +62,10 @@ const ProductDetails = () => {
       name: <CustomHeader name="Application" />,
       cell: (row) => <span>{row.application}</span>,
     },
+    // {
+    //   name: <CustomHeader name="Slug" />,
+    //   cell: (row) => <span>{row.slug}</span>,
+    // },
     {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
@@ -162,6 +166,10 @@ const ProductDetails = () => {
       errors.application = "Product Description is required";
       isValid = false;
     } 
+    // if (!formData.slug?.trim()) {
+    //   errors.application = "Slug is required";
+    //   isValid = false;
+    // } 
   
 
     setErrors(errors);
@@ -492,6 +500,20 @@ const ProductDetails = () => {
                       // charLimit={1000}
                     />
                   </Col>
+                  {/* <Col md={12}>
+                    <NewReusableForm
+                      label="Slug"
+                      placeholder="Enter Slug"
+                      name="slug"
+                      type="text"
+                      onChange={handleChange}
+                      initialData={formData}
+                      // textarea
+                      // useJodit={true}
+                      error={errors.slug}
+                      // charLimit={1000}
+                    />
+                  </Col> */}
                 </Row>
                 <Row>
                   <div className="mt-3 d-flex justify-content-end">

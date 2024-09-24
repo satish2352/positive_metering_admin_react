@@ -11,7 +11,7 @@ import { addDays } from "date-fns";
 import "./AreaTop.scss";
 
 const AreaTop = ({ buttonValue, tableView }) => {
-  
+
   const { openSidebar, activeMenuName } = useContext(SidebarContext);
   const [headerName, setHeader] = useState("");
   const { title, setTitle } = useContext(TitleContext);
@@ -26,7 +26,7 @@ const AreaTop = ({ buttonValue, tableView }) => {
     }
   };
 
-  
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -56,24 +56,26 @@ const AreaTop = ({ buttonValue, tableView }) => {
     "/headercontact",
     "/homeslider",
     "/carousal",
-     "/infrastructure",
-     "/ourteam",
-"/productname",
-"/productdetails",
-"/technicaldata",
-"/optionsdata",
- "/materialdata",
- "/blogdetails",
- "/applicationdata",
- "/uploadcv",
- "/subscribe",
- "/getintouch",
- "/office",
- "/contactsalesperson",
- "/events",
- "/news",
- "/productimages",
- "/social-contact"
+    "/infrastructure",
+    "/ourteam",
+    "/leadership",
+    "/productname",
+    "/productdetails",
+    "/technicaldata",
+    "/optionsdata",
+    "/materialdata",
+    "/blogdetails",
+    "/applicationdata",
+    "/uploadcv",
+    "/subscribe",
+    "/getintouch",
+    "/office",
+    "/contactsalesperson",
+    "/events",
+    "/news",
+    "/productimages",
+    "/social-contact",
+    "/leadership"
   ];
   const isHiddenPath = hiddenPaths.includes(location.pathname);
 
@@ -86,6 +88,8 @@ const AreaTop = ({ buttonValue, tableView }) => {
       setHeader("Image Slider");
     } else if (window.location.pathname == "/carousal") {
       setHeader("Home Sliding Media");
+    } else if (window.location.pathname == "/leadership") {
+      setHeader("Leadership");
     } else if (window.location.pathname == "/infrastructure") {
       setHeader("Infrastructure");
     } else if (window.location.pathname == "/ourteam") {
@@ -126,10 +130,10 @@ const AreaTop = ({ buttonValue, tableView }) => {
       setHeader("Cv List");
     } else if (window.location.pathname == "/applicationdata") {
       setHeader("Application Data");
-    }else if (window.location.pathname == "/productimages") {
-    setHeader("Product Images");
-  }
-    
+    } else if (window.location.pathname == "/productimages") {
+      setHeader("Product Images");
+    }
+
   }, [window.location.pathname]);
   return (
     <section className="content-area-top bg-white p-3 mb-3">
