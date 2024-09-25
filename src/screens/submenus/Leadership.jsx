@@ -565,7 +565,6 @@ const Leadership = () => {
                         textarea={true}
                         error={errors.designation}
                       />
-
                     </Col>
                     <Col md={6}>
                       <NewResuableForm

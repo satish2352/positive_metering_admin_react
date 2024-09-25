@@ -47,6 +47,7 @@ import ApplicationData from "./screens/submenus/ApplicationData";
 import Events from "./screens/submenus/Events";
 import ProductImages from "./screens/submenus/ProductImages";
 import SocialContact from "./screens/submenus/SocialContact";
+import About from "./screens/submenus/About";
 
 function App() {
   return (
@@ -86,6 +87,10 @@ function App() {
           <Route
             path="/leadership"
             element={<ProtectedRoutes Component={Leadership} />}
+          />
+          <Route
+            path="/about"
+            element={<ProtectedRoutes Component={About} />}
           />
           <Route
             path="/news"

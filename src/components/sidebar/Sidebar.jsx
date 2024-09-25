@@ -61,6 +61,11 @@ const SidebarMenu = [
     mainIcon: <RiTeamFill size={24} />,
     subMenu: [
       {
+        subMenus: "About",
+        url: "/about",
+        icon: <BsBuilding style={{ color: "red" }} size={24} />,
+      },
+      {
         subMenus: "Infrastructure",
         url: "/infrastructure",
         icon: <BsBuilding style={{ color: "red" }} size={24} />,

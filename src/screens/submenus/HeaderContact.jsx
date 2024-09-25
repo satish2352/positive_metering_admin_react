@@ -9,7 +9,7 @@ import {
   Card,
   Button,
   Form,
-  Tooltip, OverlayTrigger,  
+  Tooltip, OverlayTrigger,
 } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import { useSearchExport } from "../../context/SearchExportContext";
@@ -57,14 +57,14 @@ const HeaderContact = () => {
       name: <CustomHeader name="Actions" />,
       cell: (row) => (
         <div className="d-flex">
-        <OverlayTrigger
-           placement="top"
-           overlay={<Tooltip id="edit-tooltip">Edit</Tooltip>}
-        >
-        
-          <Button className="ms-1"  onClick={() => toggleEdit(row.id)}>
-            <FaEdit />
-          </Button>
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip id="edit-tooltip">Edit</Tooltip>}
+          >
+
+            <Button className="ms-1" onClick={() => toggleEdit(row.id)}>
+              <FaEdit />
+            </Button>
           </OverlayTrigger>
         </div>
       ),
@@ -142,7 +142,7 @@ const HeaderContact = () => {
       for (const key in formData) {
         data.append(key, formData[key]);
       }
-  
+
       try {
         await instance.put(`header-contact/headercontact/${editingId}`, data, {
           headers: {
@@ -151,13 +151,13 @@ const HeaderContact = () => {
           },
         });
         toast.success("Data Updated Successfully");
-  
-       
+
+
         const updatedTeam = team.map((member) =>
           member.id === editingId ? { ...member, ...formData } : member
         );
         setTeam(updatedTeam);
-        setData(updatedTeam); 
+        setData(updatedTeam);
         setEditMode(false);
         setFormData({});
         setShowTable(true);
@@ -190,13 +190,18 @@ const HeaderContact = () => {
             <Card.Header>
               <Row>
                 <Col className="d-flex justify-content-end align-items-center">
-                  {showTable && (
+                  {showTable ? (
                     <SearchInput
                       searchQuery={searchQuery}
                       onSearch={handleSearch}
                       showExportButton={false}
                     />
-                  )}
+                  )
+                    :
+                    <Button variant="outline-secondary" onClick={() => setShowTable(true)}>
+                      View
+                    </Button>
+                  }
                 </Col>
               </Row>
             </Card.Header>

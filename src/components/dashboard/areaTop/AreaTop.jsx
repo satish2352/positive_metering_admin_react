@@ -75,7 +75,8 @@ const AreaTop = ({ buttonValue, tableView }) => {
     "/news",
     "/productimages",
     "/social-contact",
-    "/leadership"
+    "/leadership",
+    "/about"
   ];
   const isHiddenPath = hiddenPaths.includes(location.pathname);
 
@@ -90,6 +91,8 @@ const AreaTop = ({ buttonValue, tableView }) => {
       setHeader("Home Sliding Media");
     } else if (window.location.pathname == "/leadership") {
       setHeader("Leadership");
+    } else if (window.location.pathname == "/about") {
+      setHeader("About");
     } else if (window.location.pathname == "/infrastructure") {
       setHeader("Infrastructure");
     } else if (window.location.pathname == "/ourteam") {
