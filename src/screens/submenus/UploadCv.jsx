@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Container, Row, Col, Button  , Tooltip, OverlayTrigger,} from "react-bootstrap";
+import { Container, Row, Col, Button, Tooltip, OverlayTrigger, } from "react-bootstrap";
 import { FaDownload, FaTrash } from "react-icons/fa";
 import { useSearchExport } from "../../context/SearchExportContext";
 import { ShowContext } from "../../context/ShowContext";
@@ -49,6 +49,21 @@ const UploadCv = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const customStyles = {
+    rows: {
+      style: {
+        wordBreak: "break-word",
+        whiteSpace: "normal",
+      },
+    },
+    cells: {
+      style: {
+        whiteSpace: "normal !important", // This mimics the effect of `!important`
+        wordWrap: "break-word",
+      },
+    },
   };
 
   const exportData = () => {
@@ -127,26 +142,42 @@ const UploadCv = () => {
       name: <CustomHeader name="Sr. No." />,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
       key: "srNo",
+      width: "100px"
     },
     {
       name: <CustomHeader name="Name" />,
       selector: (row) => row.name,
       key: "name",
+      width: "300px"
     },
     {
       name: <CustomHeader name="Phone" />,
       selector: (row) => row.phone,
       key: "phone",
+      width: "200px"
     },
     {
       name: <CustomHeader name="Subject" />,
       selector: (row) => row.subject,
       key: "subject",
+      width: "300px",
+      cell: (row) => (
+        <div style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+          {row.subject}
+        </div>
+      ),
     },
     {
       name: <CustomHeader name="Message" />,
       selector: (row) => row.message,
       key: "message",
+      wrap: true, // Enables text wrapping in the column
+      width: "400px", // Adjust width as per requirement
+      cell: (row) => (
+        <div style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+          {row.message}
+        </div>
+      ),
     },
     {
       name: <CustomHeader name="Docs" />,
@@ -159,7 +190,7 @@ const UploadCv = () => {
     },
     {
       name: <CustomHeader name="Date" />,
-      selector: (row) => (row.createdAt)?.slice(0,10),
+      selector: (row) => (row.createdAt)?.slice(0, 10),
       key: "message",
     },
     {
@@ -167,13 +198,13 @@ const UploadCv = () => {
       cell: (row) => (
         <div className="d-flex">
           <OverlayTrigger
-           placement="top"
-           overlay={<Tooltip id="delete-tooltip">Delete</Tooltip>}
-        >
-        <Button className="ms-1" style={{backgroundColor:"red",color:"white",borderColor:"red"}} onClick={() => handleDelete(row.id)}>
-            <FaTrash />
-          </Button>
-        </OverlayTrigger>
+            placement="top"
+            overlay={<Tooltip id="delete-tooltip">Delete</Tooltip>}
+          >
+            <Button className="ms-1" style={{ backgroundColor: "red", color: "white", borderColor: "red" }} onClick={() => handleDelete(row.id)}>
+              <FaTrash />
+            </Button>
+          </OverlayTrigger>
         </div>
       ),
       key: "actions",
@@ -225,6 +256,7 @@ const UploadCv = () => {
               responsive
               striped
               noDataComponent="No Data Available"
+              customStyles={customStyles}
             />
           )}
         </Col>

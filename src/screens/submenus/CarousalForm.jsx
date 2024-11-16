@@ -296,6 +296,21 @@ const CarousalForm = () => {
     }
   };
 
+  const customStyles = {
+    rows: {
+      style: {
+        wordBreak: "break-word",
+        whiteSpace: "normal",
+      },
+    },
+    cells: {
+      style: {
+        whiteSpace: "normal !important", // This mimics the effect of `!important`
+        wordWrap: "break-word",
+      },
+    },
+  };
+
   const exportData = () => {
     const dataToExport = searchQuery.trim() ? filteredData : team;
     handleExport(dataToExport, tableColumns, "UserData");
@@ -382,6 +397,8 @@ const CarousalForm = () => {
       name: <CustomHeader name="Email" />,
       selector: (row) => row.email,
       key: "email",
+      grow: 3, // This makes the column take up more space
+      style: { whiteSpace: "normal" }, // Ensure content wraps if too long
     },
     {
       name: <CustomHeader name="Mobile No" />,
@@ -392,11 +409,16 @@ const CarousalForm = () => {
       name: <CustomHeader name="Message" />,
       selector: (row) => row.message,
       key: "message",
+      grow: 3, // Assign even more space for the "Message" column
+      style: {
+        whiteSpace: "normal", // Enable text wrapping
+        wordWrap: "break-word", // Break long words to prevent overflow
+      },
     },
     {
       name: <CustomHeader name="Date" />,
-      selector: (row) => (row.createdAt)?.slice(0,10),
-      key: "message",
+      selector: (row) => (row.createdAt)?.slice(0, 10),
+      key: "date",
     },
     {
       name: <CustomHeader name="Actions" />,
@@ -461,6 +483,7 @@ const CarousalForm = () => {
               responsive
               striped
               noDataComponent="No Data Available"
+              customStyles={customStyles}
             />
           )}
         </Col>
