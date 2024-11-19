@@ -5,7 +5,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 /*** Common variables ***/
 :root {
   // colors
@@ -226,9 +225,6 @@ ul {
   white-space: pre-wrap !important;
 }
 
-
-
-
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -238,16 +234,6 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
-
-
-
-
-
-
-
-
-
-
 
 .action-btn {
   margin-left: 0.25rem;
@@ -271,4 +257,9 @@ input[type="number"] {
 .jwveJq div:first-child {
   white-space: normal !important;
   overflow: hidden;
+}
+.cOuVDk div:first-child {
+  white-space: normal !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
