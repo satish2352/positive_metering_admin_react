@@ -225,9 +225,6 @@ const ContactSalesPerson = () => {
     if (!formData.phone?.trim()) {
       errors.phone = "Phone number is required";
       isValid = false;
-    } else if (!/^\d{10}$/.test(formData.phone)) {
-      errors.phone = "Phone number must be exactly 10 digits";
-      isValid = false;
     }
     setErrors(errors);
     return isValid;
@@ -594,7 +591,7 @@ const ContactSalesPerson = () => {
                     <NewResuableForm
                       label="Phone No"
                       placeholder="Enter Phone No"
-                      type="number"
+                      type="text"
                       name="phone"
                       onChange={handleChange}
                       initialData={formData}
