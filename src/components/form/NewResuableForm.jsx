@@ -29,7 +29,8 @@ const NewReusableForm = ({
       "fullsize", "print", "about"
     ],
     uploader: { insertImageAsBase64URI: true }, // Enables local image insertion without API
-    height: 400, // Adjust the height as needed
+    height: "auto", 
+    imageDefaultWidth: 300,
   };
 
 
