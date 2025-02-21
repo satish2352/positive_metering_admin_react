@@ -261,6 +261,7 @@ const BlogDetails = () => {
             member.id === editingId ? formData : member
           );
           setTeam(updatedTeam);
+        fetchTeam();
         } else {
           await instance.post("blogdetails/create-blogdetail", data, {
             headers: {
@@ -269,8 +270,8 @@ const BlogDetails = () => {
             },
           });
           toast.success("Data Submitted Successfully");
+          fetchTeam()
         }
-        fetchTeam();
 
         setEditMode(false);
         setFormData({});
