@@ -240,19 +240,44 @@ const UploadCv = () => {
               />
             </div>
           ) : (
+            // <DataTable
+            //   columns={tableColumns}
+            //   data={filteredData.length > 0 ? filteredData : team}
+            //   pagination
+            //   paginationServer
+            //   paginationTotalRows={
+            //     filteredData.length > 0 ? filteredData.length : team.length
+            //   }
+            //   onChangePage={(page) => setCurrentPage(page)}
+            //   onChangeRowsPerPage={(newRowsPerPage) =>
+            //     setRowsPerPage(newRowsPerPage)
+            //   }
+            //   paginationPerPage={rowsPerPage}
+            //   responsive
+            //   striped
+            //   noDataComponent="No Data Available"
+            //   customStyles={customStyles}
+            // />
+
             <DataTable
               columns={tableColumns}
-              data={filteredData.length > 0 ? filteredData : team}
+              data={
+                (filteredData.length > 0 ? filteredData : team)
+                  .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage) // Pagination logic
+              }
               pagination
               paginationServer
-              paginationTotalRows={
-                filteredData.length > 0 ? filteredData.length : team.length
-              }
+              paginationTotalRows={filteredData.length > 0 ? filteredData.length : team.length}
               onChangePage={(page) => setCurrentPage(page)}
-              onChangeRowsPerPage={(newRowsPerPage) =>
-                setRowsPerPage(newRowsPerPage)
-              }
+              onChangeRowsPerPage={(newRowsPerPage, page) => {
+                setRowsPerPage(newRowsPerPage);
+                setCurrentPage(page);
+              }}
               paginationPerPage={rowsPerPage}
+              paginationComponentOptions={{
+                rowsPerPageText: "Rows per page:",
+                rangeSeparatorText: "of",
+              }}
               responsive
               striped
               noDataComponent="No Data Available"
