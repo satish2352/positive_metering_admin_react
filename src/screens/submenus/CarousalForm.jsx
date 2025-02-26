@@ -472,7 +472,11 @@ const CarousalForm = () => {
           ) : (
             <DataTable
               columns={tableColumns}
-              data={filteredData.length > 0 ? filteredData.slice(0, rowsPerPage) : team.slice(0, rowsPerPage)}
+              data={
+                filteredData.length > 0
+                  ? filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+                  : team.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+              }
               pagination
               paginationServer
               paginationTotalRows={totalRows}
@@ -483,7 +487,6 @@ const CarousalForm = () => {
               responsive
               striped
               noDataComponent="No Data Available"
-              customStyles={customStyles}
             />
           )}
         </Col>
