@@ -24,10 +24,11 @@ const NewReusableForm = ({
     buttons: [
       "source", "bold", "italic", "underline", "strikethrough", "|",
       "superscript", "subscript", "|", "ul", "ol", "paragraph", "|",
-      "image", "table", "link", "|", "align", "outdent", "indent", "|",
+      "fontsize", "image", "table", "link", "|",
+      "align", "outdent", "indent", "|",
       "undo", "redo", "hr", "eraser", "copyformat", "|",
       "fullsize", "print", "about"
-    ],
+    ],    
     uploader: { insertImageAsBase64URI: true }, // Enables local image insertion without API
     height: "auto", 
     imageDefaultWidth: 300,
