@@ -63,6 +63,10 @@ const SocialContact = () => {
       cell: (row) => <span>{row.linkedin}</span>,
     },
     {
+      name: <CustomHeader name="Youtube" />,
+      cell: (row) => <span>{row.youtube}</span>,
+    },
+    {
       name: <CustomHeader name="Twitter" />,
       cell: (row) => <span>{row.twitter}</span>,
     },
@@ -129,6 +133,10 @@ const SocialContact = () => {
     }
     if (!formData.linkedin?.trim()) {
       errors.linkedin = "linkedin link is required";
+      isValid = false;
+    }
+    if (!formData.youtube?.trim()) {
+      errors.youtube = "youtube link is required";
       isValid = false;
     }
     if (!formData.twitter?.trim()) {
@@ -318,6 +326,17 @@ const SocialContact = () => {
                         onChange={handleChange}
                         initialData={formData}
                         error={errors.twitter}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <NewResuableForm
+                        label={"Youtube"}
+                        placeholder={"Enter Youtube Link "}
+                        type={"text"}
+                        name={"youtube"}
+                        onChange={handleChange}
+                        initialData={formData}
+                        error={errors.youtube}
                       />
                     </Col>
                   </Row>
