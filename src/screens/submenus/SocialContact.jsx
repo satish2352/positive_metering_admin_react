@@ -173,9 +173,14 @@ const SocialContact = () => {
       const accessToken = localStorage.getItem("accessToken");
       const data = new FormData();
       for (const key in formData) {
-        data.append(key, formData[key]);
+        if (key === "whatsapp") {
+          data.append(key, `+91${formData[key]}`);
+        } else {
+          data.append(key, formData[key]);
+        }
       }
 
+      console.log("formData[key]", data);
       try {
         await instance.put(`social-contact/socialcontact/${editingId}`, data, {
           headers: {
@@ -203,8 +208,15 @@ const SocialContact = () => {
   };
   const toggleEdit = (id) => {
     const selectedMember = team.find((member) => member.id === id);
+
+    let cleanedMember = { ...selectedMember };
+
+    // If whatsapp starts with +91, remove it
+    if (cleanedMember.whatsapp?.startsWith("+91")) {
+      cleanedMember.whatsapp = cleanedMember.whatsapp.slice(3);
+    }
     setEditingId(id);
-    setFormData(selectedMember);
+    setFormData(cleanedMember);
     setEditMode(true);
     setShowTable(false);
   };
